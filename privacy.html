@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1B4FD8">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="/assets/css/styles.css">
+  <title>Privacy Policy — Files Online</title>
+  <style>
+    .legal-page {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 56px 40px 80px;
+    }
+
+    .legal-page h1 {
+      margin-bottom: 40px;
+    }
+
+    .legal-section {
+      margin-bottom: 40px;
+    }
+
+    .legal-section h2 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.005em;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .legal-section p {
+      color: var(--text-2);
+      margin-bottom: 8px;
+    }
+
+    .legal-section p:last-child {
+      margin-bottom: 0;
+    }
+
+    .legal-section ul {
+      list-style: disc;
+      padding-left: 20px;
+      margin-top: 8px;
+    }
+
+    .legal-section ul li {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-2);
+      margin-bottom: 4px;
+    }
+
+    .legal-section address {
+      font-style: normal;
+      color: var(--text-2);
+      line-height: 1.8;
+    }
+
+    .at-a-glance {
+      background-color: var(--accent-light);
+      border: 1px solid rgba(27, 79, 216, 0.15);
+      border-radius: var(--radius-lg);
+      padding: 20px 24px;
+      margin-bottom: 40px;
+    }
+
+    .at-a-glance p {
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    @media (max-width: 600px) {
+      .legal-page {
+        padding: 32px 16px 64px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a href="/" class="logo">Files Online</a>
+    <nav class="nav">
+      <a href="/#features">Features</a>
+      <a href="/#faq">FAQ</a>
+    </nav>
+    <div class="header-actions">
+      <a href="/" class="btn btn-primary">Open App</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="legal-page">
+      <h1>Privacy Policy</h1>
+
+      <div class="at-a-glance">
+        <p>Files Online is a browser-based utility. All file operations happen locally in your browser. We do not operate a file processing server. Your files are never transmitted to any third party.</p>
+      </div>
+
+      <section class="legal-section">
+        <h2>What we process</h2>
+        <p>Files Online processes data only within your browser:</p>
+        <ul>
+          <li><strong>Files you open</strong> — processed entirely in your browser's memory. They are never uploaded to any server.</li>
+          <li><strong>Recipes and settings</strong> — stored locally in your browser's IndexedDB. This data never leaves your device.</li>
+          <li>No analytics, no tracking scripts, no cookies.</li>
+          <li>No personal data is collected or stored by us.</li>
+        </ul>
+      </section>
+
+      <section class="legal-section">
+        <h2>Local storage</h2>
+        <p>The app may use the following browser storage mechanisms:</p>
+        <ul>
+          <li><strong>IndexedDB</strong> — to store saved recipes and preferences. This data is local to your browser and is never transmitted anywhere.</li>
+          <li><strong>Cache Storage</strong> — to cache app assets for offline use, managed by the service worker.</li>
+        </ul>
+        <p>Both can be cleared at any time via your browser settings (typically under Site Data or Storage for this site).</p>
+      </section>
+
+      <section class="legal-section">
+        <h2>Third-party libraries</h2>
+        <p>The app loads certain libraries from a CDN (<a href="https://www.jsdelivr.com/" target="_blank" rel="noopener noreferrer">cdn.jsdelivr.net</a>) to support features such as archive extraction and document preview. These network requests may be logged by jsDelivr in accordance with their own privacy policy.</p>
+        <p>If you require full local operation without any external requests, you can self-host the vendor files. See the <a href="https://github.com/andreasdittes/filesonline" target="_blank" rel="noopener noreferrer">GitHub repository</a> for instructions and the included download script.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2>Hosting</h2>
+        <p>Files Online is hosted as a static site. The hosting provider (e.g., GitHub Pages) may collect standard web server access logs — including IP address, browser type, and request timestamp — in accordance with their own privacy policy. We do not control or process this data.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2>Your rights</h2>
+        <p>Under the General Data Protection Regulation (GDPR), you have rights regarding any personal data processed about you — including the right of access, rectification, erasure, and data portability.</p>
+        <p>Since we do not collect or store any personal data ourselves, there is nothing for us to provide or delete. If you have questions, please contact us at <a href="mailto:files-online@dittes.info">files-online@dittes.info</a>.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2>Contact</h2>
+        <address>
+          Andreas Dittes<br>
+          Bautzener Str. 35<br>
+          10829 Berlin<br>
+          Germany<br>
+          <a href="mailto:files-online@dittes.info">files-online@dittes.info</a>
+        </address>
+      </section>
+
+      <section class="legal-section">
+        <h2>Last updated</h2>
+        <p>March 2026</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <span>&copy; 2025 Andreas Dittes</span>
+    <nav class="footer-links">
+      <a href="/imprint.html">Imprint</a>
+      <a href="/privacy.html">Privacy Policy</a>
+      <a href="https://github.com/andreasdittes/filesonline" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </nav>
+  </footer>
+</body>
+</html>

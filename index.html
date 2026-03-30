@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1B4FD8">
+  <title>Files Online — Browser File Manager, ZIP Tool &amp; File Viewer</title>
+  <meta name="description" content="Open, view, zip, unzip, rename and export files — entirely in your browser. No upload. No server. Private by design.">
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://files-online.dittes.info/">
+
+  <!-- Manifest -->
+  <link rel="manifest" href="/manifest.webmanifest">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://files-online.dittes.info/">
+  <meta property="og:title" content="Files Online — Browser File Manager, ZIP Tool &amp; File Viewer">
+  <meta property="og:description" content="Open, view, zip, unzip, rename and export files — entirely in your browser. No upload. No server. Private by design.">
+  <meta property="og:site_name" content="Files Online">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Files Online — Browser File Manager, ZIP Tool &amp; File Viewer">
+  <meta name="twitter:description" content="Open, view, zip, unzip, rename and export files — entirely in your browser. No upload. No server. Private by design.">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="/assets/css/styles.css">
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Files Online",
+    "url": "https://files-online.dittes.info/",
+    "description": "Open, view, zip, unzip, rename and export files — entirely in your browser. No upload. No server. Private by design.",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Web Browser",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "featureList": [
+      "Browse files and folders",
+      "Preview text, images, PDF, audio, video, spreadsheets and Word documents",
+      "Create and extract ZIP archives",
+      "Batch file rename with live preview",
+      "Export file metadata as CSV or JSON",
+      "Save reusable operation presets"
+    ],
+    "browserRequirements": "Requires a modern web browser with JavaScript enabled"
+  }
+  </script>
+</head>
+<body>
+
+  <noscript>
+    <div style="padding:2rem;text-align:center;font-family:system-ui,sans-serif;">
+      <strong>Files Online requires JavaScript.</strong> Please enable JavaScript in your browser to use this application.
+    </div>
+  </noscript>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       LANDING PAGE
+  ════════════════════════════════════════════════════════════ -->
+  <div class="landing" id="landing">
+
+    <!-- Site Header -->
+    <header class="site-header">
+      <div class="header-inner">
+        <a href="/" class="logo">Files Online</a>
+        <nav class="nav" aria-label="Main navigation">
+          <a href="#features">Features</a>
+          <a href="#how-it-works">How it works</a>
+          <a href="#faq">FAQ</a>
+          <a href="/privacy.html">Privacy</a>
+          <a href="/imprint.html">Imprint</a>
+        </nav>
+        <div class="header-actions">
+          <button class="btn btn-secondary btn-sm" data-action="open-files">Open Files</button>
+          <button class="btn btn-primary btn-sm" data-action="open-folder">Open Folder</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+      <div class="hero-inner">
+        <div class="hero-badges">
+          <span class="badge badge-neutral">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" width="14" height="14"><rect x="3" y="7" width="10" height="8" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.5"/></svg>
+            100% Private
+          </span>
+          <span class="badge badge-neutral">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" width="14" height="14"><path d="M8 10V2M5 5l3-3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2 2"/></svg>
+            No Upload
+          </span>
+          <span class="badge badge-neutral">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" width="14" height="14"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M2 6h12" stroke="currentColor" stroke-width="1.5"/><circle cx="5" cy="4" r=".75" fill="currentColor"/><circle cx="8" cy="4" r=".75" fill="currentColor"/></svg>
+            Browser-Native
+          </span>
+        </div>
+
+        <h1 class="hero-title">Your files.<br>Your browser.<br>Your control.</h1>
+
+        <p class="hero-subtitle">Open, view, zip, rename, and export files entirely in your browser. Nothing is uploaded. No server processes your data.</p>
+
+        <div class="hero-cta">
+          <button class="btn btn-primary btn-lg hero-open-files" data-action="open-files">Open Files</button>
+          <button class="btn btn-secondary btn-lg hero-open-folder" data-action="open-folder">Open Folder</button>
+        </div>
+
+        <p class="hero-note">Drag files here or click to begin. Works in Chrome, Firefox, Safari and Edge.</p>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" id="features">
+      <div class="section-inner">
+        <h2 class="section-title">Everything you need, nothing you don't</h2>
+        <p class="section-subtitle">Six purpose-built tools that run entirely in your browser. No account. No extension. No install.</p>
+
+        <div class="features-grid">
+
+          <div class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none" width="20" height="20">
+                <path d="M3 5a1 1 0 011-1h5l1 1h6a1 1 0 011 1v8a1 1 0 01-1 1H4a1 1 0 01-1-1V5z" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="14" cy="14" r="3" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M16.5 16.5l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">File Browser</h3>
+            <p class="feature-desc">Browse files and folders you select. Sort, filter and search by name, type, size or date. Nothing persists between sessions.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none" width="20" height="20">
+                <path d="M2 10s3-6 8-6 8 6 8 6-3 6-8 6-8-6-8-6z" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">File Previewer</h3>
+            <p class="feature-desc">Preview text, JSON, CSV, spreadsheets, images, audio, video, PDF, and Word documents without installing anything.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none" width="20" height="20">
+                <rect x="3" y="7" width="14" height="10" rx="1" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M2 7h16M3 3h14a1 1 0 011 1v3H2V4a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M8 11h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">Archive Tools</h3>
+            <p class="feature-desc">Create ZIP files from any selection. Extract ZIP, TAR, and other archive formats. Repackage extracted content as a new ZIP.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none" width="20" height="20">
+                <path d="M4 6h3l3 8h-2l-.75-2h-3.5L3 14H1l3-8z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+                <path d="M11 8h5a2 2 0 010 4h-4v2h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">Batch Rename</h3>
+            <p class="feature-desc">Apply rename rules: find/replace, prefix, suffix, numbering, case transform. Live preview before applying. Export a rename plan.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none" width="20" height="20">
+                <rect x="2" y="2" width="16" height="16" rx="1" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M2 8h16M2 13h16M8 8v9" stroke="currentColor" stroke-width="1.2"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">Metadata Export</h3>
+            <p class="feature-desc">Extract file metadata — name, size, type, modified date, path — into a CSV or JSON file. Optional SHA-256 checksums.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none" width="20" height="20">
+                <path d="M5 2h10a1 1 0 011 1v14l-6-3-6 3V3a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">Saved Recipes</h3>
+            <p class="feature-desc">Save reusable operation presets locally in your browser. Load and apply rename, archive, or export configurations in one click.</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works-section" id="how-it-works">
+      <div class="section-inner">
+        <h2 class="section-title">How it works</h2>
+        <p class="section-subtitle">Three steps. No sign-up. No waiting.</p>
+
+        <div class="steps-list">
+
+          <div class="step">
+            <div class="step-number" aria-hidden="true">1</div>
+            <div class="step-content">
+              <h3 class="step-title">Select your files</h3>
+              <p class="step-desc">Click "Open Files" or "Open Folder" to select what you want to work with. You can also drag files directly into the browser window. No upload happens — files stay on your device.</p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-number" aria-hidden="true">2</div>
+            <div class="step-content">
+              <h3 class="step-title">Use the tools</h3>
+              <p class="step-desc">Browse your file list, preview files in-browser, create or extract archives, batch rename with live preview, or export metadata tables.</p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-number" aria-hidden="true">3</div>
+            <div class="step-content">
+              <h3 class="step-title">Save your results</h3>
+              <p class="step-desc">Download processed files or archives directly to your computer. In Chrome and Edge, you can save back to a folder you've chosen. Recipes persist locally for reuse.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Privacy Promise Section -->
+    <section class="privacy-section" id="privacy">
+      <div class="section-inner">
+        <div class="privacy-box">
+          <div class="privacy-box-icon" aria-hidden="true">
+            <svg viewBox="0 0 20 20" fill="none" width="24" height="24">
+              <path d="M10 2l7 3v5c0 4-3 7-7 8-4-1-7-4-7-8V5l7-3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+              <path d="M7 10l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="privacy-box-text">
+            <h2 class="privacy-box-title">Your privacy is the architecture, not a policy</h2>
+            <p>Everything happens in your browser. We do not operate any file processing server. Your files are never transmitted anywhere. There is no backend that could receive your data even if it wanted to.</p>
+            <a href="/privacy.html" class="privacy-link">Read our privacy policy →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Browser Compatibility Section -->
+    <section class="compat-section" id="browser-compat">
+      <div class="section-inner">
+        <h2 class="section-title">Browser compatibility</h2>
+        <p class="section-subtitle">Most features work in all modern browsers. Chrome and Edge unlock the full experience via the File System Access API.</p>
+
+        <div class="compat-table-wrapper">
+          <table class="compat-table">
+            <thead>
+              <tr>
+                <th scope="col">Feature</th>
+                <th scope="col">Chrome / Edge</th>
+                <th scope="col">Firefox</th>
+                <th scope="col">Safari</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Open files</td>
+                <td><span class="compat-full">Full</span></td>
+                <td><span class="compat-full">Full</span></td>
+                <td><span class="compat-full">Full</span></td>
+              </tr>
+              <tr>
+                <td>Open folder</td>
+                <td><span class="compat-full">Full</span></td>
+                <td><span class="compat-full">Full</span></td>
+                <td><span class="compat-partial">Partial (no subfolders)</span></td>
+              </tr>
+              <tr>
+                <td>File System Access (direct read/write)</td>
+                <td><span class="compat-full">Full</span></td>
+                <td><span class="compat-partial">Limited (download only)</span></td>
+                <td><span class="compat-partial">Limited (download only)</span></td>
+              </tr>
+              <tr>
+                <td>Archive creation (ZIP)</td>
+                <td><span class="compat-full">Full</span></td>
+                <td><span class="compat-full">Full</span></td>
+                <td><span class="compat-full">Full</span></td>
+              </tr>
+              <tr>
+                <td>Archive extraction</td>
+                <td><span class="compat-full">Full</span></td>
+                <td><span class="compat-full">Full</span></td>
+                <td><span class="compat-full">Full</span></td>
+              </tr>
+              <tr>
+                <td>Save directly to folder</td>
+                <td><span class="compat-full">Full</span></td>
+                <td><span class="compat-partial">Download fallback</span></td>
+                <td><span class="compat-partial">Download fallback</span></td>
+              </tr>
+              <tr>
+                <td>PDF preview</td>
+                <td><span class="compat-full">Full</span></td>
+                <td><span class="compat-full">Full</span></td>
+                <td><span class="compat-full">Full</span></td>
+              </tr>
+              <tr>
+                <td>Progressive Web App</td>
+                <td><span class="compat-full">Full</span></td>
+                <td><span class="compat-partial">Partial</span></td>
+                <td><span class="compat-partial">Partial</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section" id="faq">
+      <div class="section-inner">
+        <h2 class="section-title">Frequently asked questions</h2>
+
+        <div class="faq-list">
+
+          <details class="faq-item">
+            <summary class="faq-question">Are my files uploaded anywhere?</summary>
+            <div class="faq-answer">
+              <p>No. All file operations happen inside your browser using standard web APIs. Your files never leave your device. There is no server involved in reading, processing, or writing your files.</p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">Does this work offline?</summary>
+            <div class="faq-answer">
+              <p>The app shell works offline once cached by your browser. Libraries for archive extraction and document preview require an internet connection on first use unless you self-host the vendor files.</p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">What archive formats can I extract?</summary>
+            <div class="faq-answer">
+              <p>ZIP extraction works natively in all modern browsers via zip.js. RAR, 7-Zip, TAR and other formats are supported via libarchive.js using WebAssembly.</p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">How are Recipes stored?</summary>
+            <div class="faq-answer">
+              <p>Recipes are stored in your browser's IndexedDB — a local database only accessible to this site. They never leave your device and are not synced across browsers or devices.</p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">Can I use this to manage my whole file system?</summary>
+            <div class="faq-answer">
+              <p>No. Files Online only works with files and folders you explicitly open in the tool. It cannot access arbitrary file system locations without your permission. Every access requires a deliberate action from you.</p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">What browsers work best?</summary>
+            <div class="faq-answer">
+              <p>Chrome and Edge provide the fullest experience via the File System Access API, including the ability to save files back to a folder you've selected. Firefox and Safari work well with minor limitations around direct folder write-back.</p>
+            </div>
+          </details>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Site Footer -->
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <span class="footer-brand">Files Online</span>
+        <nav class="footer-nav" aria-label="Footer navigation">
+          <a href="/privacy.html">Privacy Policy</a>
+          <a href="/imprint.html">Imprint</a>
+        </nav>
+        <span class="footer-meta">Runs entirely in your browser. No server. No upload.</span>
+      </div>
+    </footer>
+
+  </div><!-- /landing -->
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       WORKSPACE
+  ════════════════════════════════════════════════════════════ -->
+  <div class="workspace" id="workspace" role="main" aria-label="File workspace" hidden>
+
+    <!-- Workspace Header -->
+    <header class="workspace-header">
+      <div class="workspace-header-left">
+        <button class="btn btn-ghost btn-icon" id="workspace-back" aria-label="Back to home" title="Back to home">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <span class="workspace-brand">Files Online</span>
+      </div>
+
+      <nav class="workspace-tabs" role="tablist" aria-label="Workspace modules">
+        <button class="tab active" data-module-tab="browser" role="tab" aria-selected="true" aria-controls="module-panel-browser">Browse</button>
+        <button class="tab" data-module-tab="archive" role="tab" aria-selected="false" aria-controls="module-panel-archive">Archive</button>
+        <button class="tab" data-module-tab="rename" role="tab" aria-selected="false" aria-controls="module-panel-rename">Rename</button>
+        <button class="tab" data-module-tab="metadata" role="tab" aria-selected="false" aria-controls="module-panel-metadata">Metadata</button>
+        <button class="tab" data-module-tab="recipes" role="tab" aria-selected="false" aria-controls="module-panel-recipes">Recipes</button>
+      </nav>
+
+      <div class="workspace-header-right">
+        <button class="btn btn-ghost btn-sm" data-action="open-files">+ Files</button>
+        <button class="btn btn-ghost btn-sm" data-action="open-folder">+ Folder</button>
+        <button class="btn btn-ghost btn-icon" id="workspace-help-btn" aria-label="Browser support info" title="Browser support info">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M6 6.5a2 2 0 113 1.73L8 9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11.5" r=".75" fill="currentColor"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Workspace Body: 3-pane layout -->
+    <div class="workspace-body">
+
+      <!-- Left pane: folder tree -->
+      <aside class="pane-left" id="pane-left" aria-label="Folder tree">
+        <button class="pane-toggle" id="pane-left-toggle" aria-label="Toggle folder panel" aria-expanded="true">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="tree" id="folder-tree" role="tree" aria-label="Folder tree">
+          <!-- rendered by folder-tree.js -->
+        </div>
+      </aside>
+
+      <!-- Center pane: file table + module panels -->
+      <main class="pane-center" id="pane-center">
+
+        <!-- Browse module -->
+        <div id="module-panel-browser" data-module-panel="browser" class="module-view active-module" role="tabpanel" aria-labelledby="tab-browser">
+          <div id="file-table-container">
+            <!-- rendered by app.js renderFileTable() -->
+          </div>
+        </div>
+
+        <!-- Archive module -->
+        <div id="module-panel-archive" data-module-panel="archive" class="module-view" hidden role="tabpanel" aria-labelledby="tab-archive">
+          <div id="archive-module-container" class="module-panel">
+            <!-- rendered by archives.js initArchiveModule() -->
+          </div>
+        </div>
+
+        <!-- Rename module -->
+        <div id="module-panel-rename" data-module-panel="rename" class="module-view" hidden role="tabpanel" aria-labelledby="tab-rename">
+          <div id="rename-module-container" class="module-panel">
+            <!-- rendered by rename.js initRenameModule() -->
+          </div>
+        </div>
+
+        <!-- Metadata module -->
+        <div id="module-panel-metadata" data-module-panel="metadata" class="module-view" hidden role="tabpanel" aria-labelledby="tab-metadata">
+          <div id="metadata-module-container" class="module-panel">
+            <!-- rendered by metadata.js initMetadataModule() -->
+          </div>
+        </div>
+
+        <!-- Recipes module -->
+        <div id="module-panel-recipes" data-module-panel="recipes" class="module-view" hidden role="tabpanel" aria-labelledby="tab-recipes">
+          <div id="recipes-module-container" class="module-panel">
+            <!-- rendered by recipes.js initRecipesModule() -->
+          </div>
+        </div>
+
+      </main>
+
+      <!-- Right pane: preview panel -->
+      <aside class="pane-right" id="pane-right" aria-label="File preview">
+        <button class="pane-toggle pane-toggle-right" id="pane-right-toggle" aria-label="Toggle preview panel" aria-expanded="true">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div id="preview-panel-container">
+          <!-- rendered by preview.js initPreviewPanel() -->
+        </div>
+      </aside>
+
+    </div><!-- /workspace-body -->
+
+    <!-- Status bar -->
+    <footer class="status-bar" id="status-bar" role="status" aria-live="polite">
+      <span class="status-bar-item" id="file-count-status">No files loaded</span>
+      <span class="status-bar-item" id="browser-support-status"></span>
+      <span class="status-bar-item status-bar-right">
+        <a href="#" id="browser-support-link" class="status-link">Browser support</a>
+      </span>
+    </footer>
+
+  </div><!-- /workspace -->
+
+
+  <!-- Browser Support Modal -->
+  <div class="modal-overlay" id="browser-support-modal" hidden role="dialog" aria-modal="true" aria-labelledby="browser-support-modal-title">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="browser-support-modal-title">Browser Support</h3>
+        <button class="btn btn-ghost btn-icon modal-close" aria-label="Close browser support dialog">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="browser-support-panel-content">
+          <!-- rendered by browser-support.js renderSupportPanel() -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary modal-close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- App entry point -->
+  <script type="module" src="/assets/js/app.js"></script>
+
+</body>
+</html>
