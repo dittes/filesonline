@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#1B4FD8"/>
+  <!-- Folder shape -->
+  <path d="M120 180 a20 20 0 0 1 20-20 h100 l30 28 h122 a20 20 0 0 1 20 20 v144 a20 20 0 0 1-20 20 H140 a20 20 0 0 1-20-20 Z" fill="none" stroke="white" stroke-width="22" stroke-linejoin="round"/>
+  <!-- Document lines inside -->
+  <line x1="180" y1="280" x2="332" y2="280" stroke="white" stroke-width="18" stroke-linecap="round"/>
+  <line x1="180" y1="312" x2="300" y2="312" stroke="white" stroke-width="18" stroke-linecap="round"/>
+</svg>

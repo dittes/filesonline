@@ -8,14 +8,14 @@
   <meta name="description" content="Open, view, zip, unzip, rename and export files — entirely in your browser. No upload. No server. Private by design.">
 
   <!-- Canonical -->
-  <link rel="canonical" href="https://files-online.dittes.info/">
+  <link rel="canonical" href="https://files-online.com/">
 
   <!-- Manifest -->
   <link rel="manifest" href="/manifest.webmanifest">
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://files-online.dittes.info/">
+  <meta property="og:url" content="https://files-online.com/">
   <meta property="og:title" content="Files Online — Browser File Manager, ZIP Tool &amp; File Viewer">
   <meta property="og:description" content="Open, view, zip, unzip, rename and export files — entirely in your browser. No upload. No server. Private by design.">
   <meta property="og:site_name" content="Files Online">
@@ -34,7 +34,7 @@
     "@context": "https://schema.org",
     "@type": "WebApplication",
     "name": "Files Online",
-    "url": "https://files-online.dittes.info/",
+    "url": "https://files-online.com/",
     "description": "Open, view, zip, unzip, rename and export files — entirely in your browser. No upload. No server. Private by design.",
     "applicationCategory": "UtilitiesApplication",
     "operatingSystem": "Web Browser",
@@ -520,6 +520,23 @@
 
   <!-- App entry point -->
   <script type="module" src="/assets/js/app.js"></script>
+
+  <!-- Service Worker registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+      });
+    }
+  </script>
+
+  <noscript>
+    <style>.site-header,.hero,.features-section,.how-it-works,.privacy-promise,.browser-compat-section,.faq-section,.site-footer{display:block!important}</style>
+    <div style="padding:48px 24px;text-align:center;font-family:system-ui,sans-serif;max-width:480px;margin:0 auto">
+      <h2 style="margin-bottom:16px">JavaScript required</h2>
+      <p>Files Online is a browser-based file utility that requires JavaScript to function. Please enable JavaScript in your browser settings and reload the page.</p>
+    </div>
+  </noscript>
 
 </body>
 </html>

@@ -673,6 +673,8 @@ async function _downloadSelectedAsZip() {
  * Open the workspace view.
  */
 export function openWorkspace() {
+  const ws = document.getElementById('workspace');
+  if (ws) ws.removeAttribute('hidden');
   document.body.classList.add('workspace-active');
   history.replaceState(null, '', '#workspace');
   stateOpenWorkspace();
@@ -826,23 +828,28 @@ function _initKeyboardShortcuts() {
  * Set up all landing page interactions.
  */
 function _initLandingPage() {
-  // Hero "Open Files" CTA
-  const heroOpenFiles = document.querySelector('.hero-open-files, [data-action="open-files"]');
-  if (heroOpenFiles) {
-    heroOpenFiles.addEventListener('click', async () => {
+  // All "Open Files" CTAs on the landing (header + hero) — exclude workspace buttons
+  const landing = document.querySelector('.landing, .site-header, header');
+  const openFilesBtns = document.querySelectorAll(
+    '.site-header [data-action="open-files"], .hero [data-action="open-files"], .hero-open-files'
+  );
+  openFilesBtns.forEach(btn => {
+    btn.addEventListener('click', async () => {
       const entries = await openFiles();
       if (entries.length) openWorkspace();
     });
-  }
+  });
 
-  // Hero "Open Folder" CTA
-  const heroOpenFolder = document.querySelector('.hero-open-folder, [data-action="open-folder"]');
-  if (heroOpenFolder) {
-    heroOpenFolder.addEventListener('click', async () => {
+  // All "Open Folder" CTAs on the landing
+  const openFolderBtns = document.querySelectorAll(
+    '.site-header [data-action="open-folder"], .hero [data-action="open-folder"], .hero-open-folder'
+  );
+  openFolderBtns.forEach(btn => {
+    btn.addEventListener('click', async () => {
       const entries = await openFolder();
       if (entries.length) openWorkspace();
     });
-  }
+  });
 
   // Drop zone on hero section
   const heroSection = document.querySelector('.hero, .hero-section, [data-dropzone="hero"]');
@@ -867,21 +874,48 @@ function _initLandingPage() {
  * Set up the workspace header buttons and module tabs.
  */
 function _initWorkspaceHeader() {
-  // Close workspace button
-  const closeWsBtn = document.querySelector('.workspace-close-btn, [data-action="close-workspace"]');
+  // Back / close workspace button
+  const closeWsBtn = document.querySelector(
+    '#workspace-back, .workspace-close-btn, [data-action="close-workspace"]'
+  );
   if (closeWsBtn) {
     closeWsBtn.addEventListener('click', closeWorkspace);
   }
 
-  // Add files button in workspace header
-  const wsAddFiles = document.querySelector('.ws-add-files, [data-action="ws-add-files"]');
-  if (wsAddFiles) {
-    wsAddFiles.addEventListener('click', async () => { await openFiles(); });
+  // "Help / Browser support" button in workspace header
+  const helpBtn = document.getElementById('workspace-help-btn');
+  if (helpBtn) {
+    helpBtn.addEventListener('click', () => _openBrowserSupportModal());
   }
 
-  const wsAddFolder = document.querySelector('.ws-add-folder, [data-action="ws-add-folder"]');
-  if (wsAddFolder) {
-    wsAddFolder.addEventListener('click', async () => { await openFolder(); });
+  // Pane collapse toggles
+  const leftToggle = document.getElementById('pane-left-toggle');
+  const leftPane = document.getElementById('pane-left');
+  if (leftToggle && leftPane) {
+    leftToggle.addEventListener('click', () => {
+      leftPane.classList.toggle('collapsed');
+      leftToggle.setAttribute('aria-expanded', String(!leftPane.classList.contains('collapsed')));
+    });
+  }
+
+  const rightToggle = document.getElementById('pane-right-toggle');
+  const rightPane = document.getElementById('pane-right');
+  if (rightToggle && rightPane) {
+    rightToggle.addEventListener('click', () => {
+      rightPane.classList.toggle('collapsed');
+      rightToggle.setAttribute('aria-expanded', String(!rightPane.classList.contains('collapsed')));
+    });
+  }
+
+  // "+ Files" and "+ Folder" buttons inside the workspace header
+  const ws = document.getElementById('workspace');
+  if (ws) {
+    ws.querySelectorAll('[data-action="open-files"]').forEach(btn => {
+      btn.addEventListener('click', async () => { await openFiles(); });
+    });
+    ws.querySelectorAll('[data-action="open-folder"]').forEach(btn => {
+      btn.addEventListener('click', async () => { await openFolder(); });
+    });
   }
 
   // Module tab buttons
@@ -891,6 +925,33 @@ function _initWorkspaceHeader() {
       if (moduleName) _switchModule(moduleName);
     });
   });
+
+  // Status bar "Browser support" link
+  const supportLink = document.getElementById('browser-support-link');
+  if (supportLink) {
+    supportLink.addEventListener('click', e => {
+      e.preventDefault();
+      _openBrowserSupportModal();
+    });
+  }
+
+  // Modal close buttons (generic — works for all modals in the page)
+  document.addEventListener('click', e => {
+    if (e.target.matches('.modal-close, .modal-overlay')) {
+      const overlay = e.target.closest('.modal-overlay') || e.target;
+      if (overlay.classList.contains('modal-overlay')) overlay.hidden = true;
+    }
+  });
+}
+
+function _openBrowserSupportModal() {
+  const modal = document.getElementById('browser-support-modal');
+  if (!modal) return;
+  const content = document.getElementById('browser-support-panel-content');
+  if (content && _browserSupportModule && typeof _browserSupportModule.renderSupportPanel === 'function') {
+    _browserSupportModule.renderSupportPanel(content);
+  }
+  modal.hidden = false;
 }
 
 // ─── URL hash routing ──────────────────────────────────────────────────────────
@@ -1061,17 +1122,21 @@ function _initBeforeUnloadWarning() {
 async function init() {
   // ── 1. Browser support detection ──────────────────────────────────────────
   _browserSupportModule = await tryImport('./browser-support.js');
-  if (_browserSupportModule && typeof _browserSupportModule.detectBrowserSupport === 'function') {
-    state.browserSupport = _browserSupportModule.detectBrowserSupport();
-  } else if (_browserSupportModule && typeof _browserSupportModule.default === 'function') {
-    state.browserSupport = _browserSupportModule.default();
+  const detectFn = _browserSupportModule && (
+    _browserSupportModule.detectBrowserSupport ||
+    _browserSupportModule.detectCapabilities ||
+    _browserSupportModule.getCapabilities
+  );
+  if (typeof detectFn === 'function') {
+    try { state.browserSupport = detectFn(); } catch (e) { /* non-fatal */ }
   }
 
   // ── 2. Storage / IndexedDB init ────────────────────────────────────────────
   _storageModule = await tryImport('./storage.js');
-  if (_storageModule && typeof _storageModule.initStorage === 'function') {
+  const initStorageFn = _storageModule && (_storageModule.initStorage || _storageModule.initDB);
+  if (typeof initStorageFn === 'function') {
     try {
-      await _storageModule.initStorage();
+      await initStorageFn();
     } catch (err) {
       console.warn('app: storage init failed (non-fatal)', err.message);
     }
