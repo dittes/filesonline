@@ -416,10 +416,11 @@ export function initRenameModule(containerEl) {
 
   // ── Preview ───────────────────────────────────────────────────────────────
   function getActiveFiles() {
+    const all = Array.from(state.files.values());
     if (scope === 'selected' && state.selectedIds.size > 0) {
-      return state.files.filter(f => state.selectedIds.has(f.id));
+      return all.filter(f => state.selectedIds.has(f.id));
     }
-    return state.files;
+    return all;
   }
 
   function refreshPreview() {

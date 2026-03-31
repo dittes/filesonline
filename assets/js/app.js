@@ -698,11 +698,26 @@ export function closeWorkspace() {
 function _switchModule(moduleName) {
   setActiveModule(moduleName);
 
-  // Update tab buttons
+  // Update tab buttons and scroll active tab into view
   $$('[data-module-tab]').forEach(btn => {
     const active = btn.dataset.moduleTab === moduleName;
     btn.classList.toggle('active', active);
     btn.setAttribute('aria-selected', String(active));
+    if (active) {
+      // Scroll the active tab into view within the scrollable tab bar
+      requestAnimationFrame(() => {
+        const tabBar = btn.closest('.workspace-tabs');
+        if (tabBar) {
+          const btnLeft = btn.offsetLeft;
+          const btnRight = btnLeft + btn.offsetWidth;
+          if (btnRight > tabBar.scrollLeft + tabBar.clientWidth) {
+            tabBar.scrollLeft = btnRight - tabBar.clientWidth + 4;
+          } else if (btnLeft < tabBar.scrollLeft) {
+            tabBar.scrollLeft = btnLeft - 4;
+          }
+        }
+      });
+    }
   });
 
   // Show/hide module panels
