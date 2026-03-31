@@ -13,7 +13,9 @@ let zipLib = null;
 async function getZipLib() {
   if (zipLib) return zipLib;
   try {
-    zipLib = await import('https://cdn.jsdelivr.net/npm/@zip.js/zip.js@2.7.52/dist/zip.min.js');
+    const mod = await import('https://cdn.jsdelivr.net/npm/@zip.js/zip.js@2.7.52/dist/zip.min.js');
+    // Handle both ESM named exports and UMD/CJS default-wrapped bundles
+    zipLib = mod.ZipWriter ? mod : (mod.default ?? mod);
     return zipLib;
   } catch {
     throw new Error('zip.js could not be loaded. Please check your internet connection.');
@@ -62,6 +64,25 @@ export function isArchiveFile(file) {
   const name = (file.name || '').toLowerCase();
   const archiveExts = ['.zip', '.rar', '.7z', '.tar', '.gz', '.bz2', '.xz', '.tgz', '.tar.gz', '.tar.bz2'];
   return archiveExts.some(ext => name.endsWith(ext));
+}
+
+/**
+ * @param {File} file
+ * @returns {boolean}
+ */
+export function isRarFile(file) {
+  const name = (file.name || '').toLowerCase();
+  return name.endsWith('.rar');
+}
+
+/**
+ * @param {File} file
+ * @returns {boolean}
+ */
+export function isNonZipArchive(file) {
+  const name = (file.name || '').toLowerCase();
+  const exts = ['.rar', '.7z', '.tar', '.gz', '.bz2', '.xz', '.tgz', '.tar.gz', '.tar.bz2'];
+  return exts.some(ext => name.endsWith(ext));
 }
 
 // ─── ZIP creation ─────────────────────────────────────────────────────────────
@@ -193,6 +214,7 @@ export function initArchiveModule(containerEl) {
       <div class="archive-tabs">
         <button class="archive-tab active" data-tab="create">Create ZIP</button>
         <button class="archive-tab" data-tab="extract">Extract Archive</button>
+        <button class="archive-tab" data-tab="convert">Convert to ZIP</button>
       </div>
 
       <!-- CREATE TAB -->
@@ -281,6 +303,50 @@ export function initArchiveModule(containerEl) {
           <ul class="extract-tree" id="extract-tree"></ul>
         </div>
       </div>
+
+      <!-- CONVERT TAB -->
+      <div class="archive-panel" id="archive-panel-convert" hidden>
+        <p class="archive-convert-desc">Drop a RAR, 7z, TAR, GZ or any archive — it will be extracted and repacked as a ZIP file.</p>
+
+        <div class="archive-dropzone" id="convert-dropzone" tabindex="0" role="button" aria-label="Drop archive here or click to select">
+          <div class="dropzone-inner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="40" height="40"><path d="M8 7h12M8 12h12M8 17h12M4 7h.01M4 12h.01M4 17h.01"/></svg>
+            <p>Drop RAR / 7z / TAR / ZIP here or <button class="btn-link" id="convert-select-btn">browse</button></p>
+          </div>
+        </div>
+        <input type="file" id="convert-file-input" accept=".zip,.rar,.7z,.tar,.gz,.bz2,.xz,.tgz" hidden>
+
+        <div id="convert-selected-info" hidden>
+          <span id="convert-filename"></span>
+          <span id="convert-filesize"></span>
+          <button class="btn btn-ghost btn-sm" id="convert-clear-file-btn">✕</button>
+        </div>
+
+        <div id="convert-wasm-warning" class="archive-warning" hidden>
+          <strong>Note:</strong> RAR/7z/tar requires WebAssembly (libarchive.js). If conversion fails, your browser may not support WASM.
+        </div>
+
+        <div class="archive-create-options">
+          <label class="archive-label">Output ZIP filename
+            <input type="text" id="convert-zip-name" class="archive-input" placeholder="converted.zip">
+          </label>
+        </div>
+
+        <div class="archive-progress-wrap" id="convert-progress-wrap" hidden>
+          <div class="archive-progress-bar">
+            <div class="archive-progress-fill" id="convert-progress-fill" style="width:0%"></div>
+          </div>
+          <span id="convert-progress-label">0%</span>
+        </div>
+
+        <div class="archive-actions">
+          <button class="btn btn-primary" id="convert-btn">Convert to ZIP</button>
+        </div>
+
+        <div id="convert-result-wrap" hidden>
+          <button class="btn btn-secondary" id="convert-download-btn">Download ZIP</button>
+        </div>
+      </div>
     </div>
   `;
 
@@ -290,8 +356,9 @@ export function initArchiveModule(containerEl) {
     tab.addEventListener('click', () => {
       tabs.forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
-      containerEl.querySelector('#archive-panel-create').hidden = (tab.dataset.tab !== 'create');
+      containerEl.querySelector('#archive-panel-create').hidden  = (tab.dataset.tab !== 'create');
       containerEl.querySelector('#archive-panel-extract').hidden = (tab.dataset.tab !== 'extract');
+      containerEl.querySelector('#archive-panel-convert').hidden = (tab.dataset.tab !== 'convert');
     });
   });
 
@@ -502,6 +569,93 @@ export function initArchiveModule(containerEl) {
     } finally {
       extractDownloadAllBtn.disabled = false;
       extractDownloadAllBtn.textContent = 'Download All as ZIP';
+    }
+  });
+
+  // ═══════════════════════════════════════════════════════════════
+  // CONVERT TO ZIP
+  // ═══════════════════════════════════════════════════════════════
+  let convertFile = null;
+  let convertResultBlob = null;
+
+  const convertDropzone      = containerEl.querySelector('#convert-dropzone');
+  const convertFileInput     = containerEl.querySelector('#convert-file-input');
+  const convertSelectBtn     = containerEl.querySelector('#convert-select-btn');
+  const convertSelectedInfo  = containerEl.querySelector('#convert-selected-info');
+  const convertFilename      = containerEl.querySelector('#convert-filename');
+  const convertFilesize      = containerEl.querySelector('#convert-filesize');
+  const convertClearFileBtn  = containerEl.querySelector('#convert-clear-file-btn');
+  const convertWasmWarning   = containerEl.querySelector('#convert-wasm-warning');
+  const convertZipNameInput  = containerEl.querySelector('#convert-zip-name');
+  const convertProgressWrap  = containerEl.querySelector('#convert-progress-wrap');
+  const convertProgressFill  = containerEl.querySelector('#convert-progress-fill');
+  const convertProgressLabel = containerEl.querySelector('#convert-progress-label');
+  const convertBtn           = containerEl.querySelector('#convert-btn');
+  const convertResultWrap    = containerEl.querySelector('#convert-result-wrap');
+  const convertDownloadBtn   = containerEl.querySelector('#convert-download-btn');
+
+  function setConvertFile(file) {
+    convertFile = file;
+    convertResultWrap.hidden = true;
+    convertResultBlob = null;
+    if (!file) {
+      convertSelectedInfo.hidden = true;
+      convertWasmWarning.hidden  = true;
+      convertZipNameInput.value  = '';
+      return;
+    }
+    convertFilename.textContent = file.name;
+    convertFilesize.textContent = formatBytes(file.size);
+    convertSelectedInfo.hidden  = false;
+    convertWasmWarning.hidden   = isZipFile(file);
+    // Pre-fill output name
+    const base = file.name.replace(/\.[^.]+$/, '');
+    convertZipNameInput.value = base + '.zip';
+  }
+
+  setupDropzone(convertDropzone, files => { if (files[0]) setConvertFile(files[0]); });
+  convertSelectBtn.addEventListener('click', e => { e.preventDefault(); convertFileInput.click(); });
+  convertFileInput.addEventListener('change', () => {
+    if (convertFileInput.files[0]) { setConvertFile(convertFileInput.files[0]); convertFileInput.value = ''; }
+  });
+  convertDropzone.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); convertFileInput.click(); } });
+  convertClearFileBtn.addEventListener('click', () => setConvertFile(null));
+
+  convertBtn.addEventListener('click', async () => {
+    if (!convertFile) { showToast('Select an archive file first.', 'warning'); return; }
+    const zipName = (convertZipNameInput.value.trim() || convertFile.name.replace(/\.[^.]+$/, '')) +
+                    (convertZipNameInput.value.trim().endsWith('.zip') ? '' : '.zip');
+
+    convertBtn.disabled = true;
+    convertResultWrap.hidden = true;
+    convertResultBlob = null;
+    convertProgressWrap.hidden = false;
+    setProgress(convertProgressFill, convertProgressLabel, 0);
+
+    try {
+      // Phase 1: extract (0–60%)
+      const extracted = await extractArchive(convertFile, {
+        onProgress: pct => setProgress(convertProgressFill, convertProgressLabel, Math.round(pct * 0.6)),
+      });
+      setProgress(convertProgressFill, convertProgressLabel, 60);
+
+      // Phase 2: repackage as ZIP (60–100%)
+      const nonDirs = extracted.filter(f => !f.isDirectory && f.blob);
+      if (nonDirs.length === 0) {
+        showToast('Archive appears to be empty or contains only directories.', 'warning');
+        return;
+      }
+      convertResultBlob = await repackageAsZip(extracted);
+      setProgress(convertProgressFill, convertProgressLabel, 100);
+
+      convertResultWrap.hidden = false;
+      convertDownloadBtn.onclick = () => downloadBlob(convertResultBlob, zipName);
+      showToast(`Converted to ZIP: ${formatBytes(convertResultBlob.size)}`, 'success');
+    } catch (err) {
+      showToast(`Conversion failed: ${err.message}`, 'error');
+    } finally {
+      convertBtn.disabled = false;
+      setTimeout(() => { convertProgressWrap.hidden = true; }, 1200);
     }
   });
 

@@ -296,11 +296,19 @@ pre code {
   text-decoration: none;
 }
 
+.header-inner {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  width: 100%;
+}
+
 .header-actions {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
+  margin-left: auto;
 }
 
 /* Hero Section */
@@ -487,7 +495,16 @@ pre code {
 }
 
 /* How It Works */
-.how-it-works {
+/* Shared section inner wrapper (max-width centering) */
+.section-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* How It Works — HTML uses .how-it-works-section */
+.how-it-works,
+.how-it-works-section {
   padding: 80px 40px;
   background-color: var(--surface);
   border-top: 1px solid var(--border);
@@ -497,6 +514,130 @@ pre code {
 .how-it-works-inner {
   max-width: 1120px;
   margin: 0 auto;
+}
+
+/* Privacy Section */
+.privacy-section {
+  padding: 80px 40px;
+  background-color: var(--accent-light);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.privacy-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: var(--shadow-sm);
+}
+
+.privacy-box-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--accent-light);
+  border-radius: var(--radius-md);
+  color: var(--accent);
+}
+
+.privacy-box-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.privacy-box-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.015em;
+}
+
+.privacy-link {
+  font-size: 14px;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+.privacy-link:hover {
+  text-decoration: underline;
+}
+
+/* Browser Compatibility Section */
+.compat-section {
+  padding: 80px 40px;
+  background-color: var(--bg);
+}
+
+.compat-table-wrapper {
+  overflow-x: auto;
+  margin-top: 40px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.compat-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.compat-table th,
+.compat-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.compat-table th {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-3);
+  background-color: var(--surface-hover);
+}
+
+.compat-table tr:last-child td {
+  border-bottom: none;
+}
+
+.compat-table td:first-child {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.compat-full {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--success);
+}
+
+.compat-full::before {
+  content: "✓";
+  font-weight: 700;
+}
+
+.compat-partial {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--warning);
 }
 
 .steps-list {
@@ -628,6 +769,34 @@ pre code {
 .site-footer a:hover {
   color: var(--text-2);
   text-decoration: none;
+}
+
+.footer-inner {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+}
+
+.footer-brand {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.footer-nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.footer-meta {
+  font-size: 13px;
+  color: var(--text-3);
+  white-space: nowrap;
+  margin-left: auto;
 }
 
 .footer-links {
@@ -2850,7 +3019,10 @@ body.workspace-active .landing {
 
   /* Sections */
   .features-section,
-  .how-it-works {
+  .how-it-works,
+  .how-it-works-section,
+  .privacy-section,
+  .compat-section {
     padding: 48px 24px;
   }
 
@@ -2858,8 +3030,15 @@ body.workspace-active .landing {
     padding: 48px 24px;
   }
 
-  .how-it-works .how-it-works-inner {
+  .how-it-works .how-it-works-inner,
+  .how-it-works-section .section-inner {
     padding: 0;
+  }
+
+  .privacy-box {
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px;
   }
 
   .steps-list {
@@ -3758,6 +3937,12 @@ body.workspace-active .landing {
    ARCHIVE MODULE — layout and tab styles
    ========================================================================== */
 
+.archive-convert-desc {
+  font-size: 13px;
+  color: var(--text-2);
+  margin-bottom: 16px;
+}
+
 .archive-module {
   display: flex;
   flex-direction: column;
@@ -3952,7 +4137,8 @@ body.workspace-active .landing {
   color: #92400E;
 }
 
-.extract-selected-info {
+.extract-selected-info,
+#convert-selected-info {
   display: flex;
   align-items: center;
   gap: 8px;
