@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Humic Acid — Interactive 3D Molecular Explorer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap');
+
+:root{
+  --earth:#c8a050;--earth-dim:rgba(200,160,80,0.15);
+  --bg:#08080a;--panel:rgba(14,14,18,0.92);--border:rgba(200,170,100,0.12);
+  --text:#e8e4df;--text-dim:rgba(228,224,218,0.45);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow:hidden;height:100vh}
+#canvas-container{position:fixed;inset:0;z-index:0}
+canvas{display:block;cursor:grab}canvas:active{cursor:grabbing}
+
+.grain{position:fixed;inset:0;z-index:5;pointer-events:none;opacity:0.03;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.vignette{position:fixed;inset:0;z-index:4;pointer-events:none;
+  background:radial-gradient(ellipse at center,transparent 35%,rgba(6,6,8,0.75) 100%)}
+
+.ui{position:fixed;z-index:10;pointer-events:none}
+.title-block{top:32px;left:40px}
+.title-block h1{font-family:'Instrument Serif',serif;font-size:clamp(26px,3.5vw,46px);font-weight:400;letter-spacing:-0.02em;color:#f5f0ea;text-shadow:0 0 50px rgba(180,140,60,0.25)}
+.title-block .sub{margin-top:4px;font-size:12px;font-weight:300;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim)}
+
+/* Sidebar */
+#group-list{
+  position:fixed;top:50%;right:24px;transform:translateY(-50%);z-index:12;
+  display:flex;flex-direction:column;gap:5px;pointer-events:auto;
+  max-height:82vh;overflow-y:auto;scrollbar-width:none;
+}
+#group-list::-webkit-scrollbar{display:none}
+.group-btn{
+  display:flex;align-items:center;gap:10px;padding:9px 14px;
+  background:var(--panel);border:1px solid var(--border);border-radius:8px;
+  cursor:pointer;transition:all 0.3s;min-width:180px;position:relative;overflow:hidden;
+}
+.group-btn::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gc);opacity:0;transition:opacity 0.3s}
+.group-btn:hover,.group-btn.active{border-color:var(--gc);background:rgba(14,14,18,0.97);box-shadow:0 0 20px rgba(0,0,0,0.4)}
+.group-btn:hover::before,.group-btn.active::before{opacity:1}
+.group-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;background:var(--gc);box-shadow:0 0 6px var(--gc);transition:transform 0.3s}
+.group-btn:hover .group-dot,.group-btn.active .group-dot{transform:scale(1.4)}
+.group-name{font-size:12px;font-weight:500;letter-spacing:0.03em;color:var(--text);white-space:nowrap}
+.group-formula{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);margin-left:auto;white-space:nowrap}
+
+/* Detail panel */
+#detail-panel{
+  position:fixed;bottom:32px;left:40px;z-index:12;max-width:420px;
+  background:var(--panel);border:1px solid var(--border);border-radius:12px;
+  padding:0;pointer-events:auto;overflow:hidden;
+  transform:translateY(20px);opacity:0;transition:all 0.4s cubic-bezier(0.22,1,0.36,1);
+}
+#detail-panel.visible{transform:translateY(0);opacity:1}
+.detail-header{padding:20px 24px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.detail-header .dot{width:14px;height:14px;border-radius:50%;flex-shrink:0}
+.detail-header h2{font-family:'Instrument Serif',serif;font-size:22px;font-weight:400}
+.detail-header .ftag{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:12px;padding:3px 10px;border-radius:4px;background:var(--earth-dim);color:var(--earth)}
+.detail-body{padding:18px 24px 22px}
+.detail-body p{font-size:13px;line-height:1.75;color:rgba(228,224,218,0.65);font-weight:300}
+.detail-body .role{margin-top:12px;padding:10px 14px;border-radius:6px;border:1px solid var(--border);background:rgba(200,170,100,0.03)}
+.detail-body .role-label{font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--earth);font-weight:500;margin-bottom:4px}
+.detail-body .role p{margin:0;font-size:12px;line-height:1.6;color:rgba(228,224,218,0.55)}
+.detail-close{position:absolute;top:16px;right:16px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--text-dim);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.detail-close:hover{background:rgba(255,255,255,0.08);color:var(--text)}
+
+/* Element legend */
+.legend{position:fixed;top:32px;right:24px;z-index:11;display:flex;gap:14px}
+.legend-item{display:flex;align-items:center;gap:5px}
+.legend-ldot{width:8px;height:8px;border-radius:50%}
+.legend-label{font-size:10px;font-weight:300;color:var(--text-dim);letter-spacing:0.05em;text-transform:uppercase}
+
+.hint{position:fixed;bottom:32px;right:24px;z-index:11;font-size:10px;color:rgba(228,224,218,0.2);letter-spacing:0.06em;text-transform:uppercase;text-align:right;line-height:1.8}
+
+/* 3D labels */
+.label-3d{
+  pointer-events:none;position:absolute;
+  font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;
+  letter-spacing:0.06em;text-transform:uppercase;
+  color:rgba(255,255,255,0.6);
+  text-shadow:0 0 8px rgba(0,0,0,0.9);
+  white-space:nowrap;padding:3px 8px;border-radius:4px;
+  background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.06);
+  transition:all 0.4s;transform:translate(-50%,-50%);
+}
+.label-3d.highlight{
+  color:#fff;background:rgba(0,0,0,0.6);
+  border-color:var(--lc);box-shadow:0 0 14px var(--lc);font-size:11px;
+  z-index:2;
+}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.ui{animation:fadeUp 1s ease-out both}
+.title-block{animation-delay:0.2s}
+.legend{animation-delay:0.4s}
+#group-list{animation:fadeUp 0.8s ease-out 0.5s both}
+
+@media(max-width:700px){
+  #group-list{right:8px;min-width:0}
+  .group-btn{min-width:0;padding:8px 10px}
+  .group-formula{display:none}
+  #detail-panel{left:10px;right:10px;max-width:none}
+  .title-block{left:16px;top:16px}
+}
+</style>
+</head>
+<body>
+<div id="canvas-container"></div>
+<div class="grain"></div>
+<div class="vignette"></div>
+
+<div class="ui title-block"><h1>Humic Acid</h1><div class="sub">Tap a functional group to explore</div></div>
+
+<div class="legend ui">
+  <div class="legend-item"><div class="legend-ldot" style="background:#2ecc71"></div><div class="legend-label">C</div></div>
+  <div class="legend-item"><div class="legend-ldot" style="background:#e74c3c"></div><div class="legend-label">O</div></div>
+  <div class="legend-item"><div class="legend-ldot" style="background:#3498db"></div><div class="legend-label">N</div></div>
+  <div class="legend-item"><div class="legend-ldot" style="background:#b0b8c0"></div><div class="legend-label">H</div></div>
+  <div class="legend-item"><div class="legend-ldot" style="background:#f1c40f"></div><div class="legend-label">S</div></div>
+</div>
+
+<div id="group-list"></div>
+
+<div id="detail-panel">
+  <button class="detail-close" onclick="closeDetail()">&#10005;</button>
+  <div class="detail-header">
+    <div class="dot" id="dd"></div>
+    <h2 id="dt"></h2>
+    <span class="ftag" id="df"></span>
+  </div>
+  <div class="detail-body">
+    <p id="ddesc"></p>
+    <div class="role"><div class="role-label">Role in Soil</div><p id="drole"></p></div>
+  </div>
+</div>
+
+<div class="hint ui">Drag to rotate · Scroll to zoom<br>Click a group to learn more</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const GROUPS=[
+  {id:'aromatic',name:'Aromatic Rings',formula:'C₆H₄',color:'#2ecc71',
+   desc:'Polycyclic aromatic structures form the stable, recalcitrant backbone of humic acid. These fused benzene-like rings resist microbial degradation, giving humic substances their persistence in soil for centuries.',
+   role:'Provide structural stability and hydrophobic domains that help aggregate soil particles, improving soil structure and water retention.',atomIds:[]},
+  {id:'carboxyl',name:'Carboxyl Groups',formula:'–COOH',color:'#e74c3c',
+   desc:'Carboxyl groups are the most important acidic functional groups in humic acid. They donate protons (H⁺) at soil pH, making humic acid a weak polyprotic acid and the primary source of its cation exchange capacity.',
+   role:'Bind and exchange essential plant nutrients (Ca²⁺, Mg²⁺, K⁺, Fe³⁺), buffer soil pH, and chelate heavy metals to reduce toxicity.',atomIds:[]},
+  {id:'hydroxyl',name:'Phenolic Hydroxyl',formula:'Ar–OH',color:'#e67e22',
+   desc:'Hydroxyl groups on aromatic rings (phenols) are the second major acidic group. They deprotonate at higher pH than carboxyls and contribute to the dark brown color through quinone–hydroquinone redox chemistry.',
+   role:'Hydrogen-bond with clay minerals and water, enhancing soil water-holding capacity. They also chelate micronutrients like iron and zinc.',atomIds:[]},
+  {id:'quinone',name:'Quinone Carbonyls',formula:'C=O',color:'#f39c12',
+   desc:'Quinone groups are redox-active carbonyl structures on aromatic rings. They accept and donate electrons, acting as natural electron shuttles in soil biogeochemistry.',
+   role:'Facilitate electron transfer in microbial respiration, aid in reduction of iron/manganese oxides, and degrade organic pollutants abiotically.',atomIds:[]},
+  {id:'amine',name:'Amine Group',formula:'–NH₂',color:'#3498db',
+   desc:'Amine groups introduce nitrogen into humic structures. They originate from amino acids incorporated during humification and become protonated at lower pH.',
+   role:'Contribute to soil nitrogen cycling. As a nutrient reservoir, they slowly release plant-available nitrogen through mineralization.',atomIds:[]},
+  {id:'thiol',name:'Thiol Group',formula:'–SH',color:'#f1c40f',
+   desc:'Thiol (sulfhydryl) groups are rare but critically important. They originate from sulfur-containing amino acids and have very high affinity for soft metals like mercury.',
+   role:'Bind mercury, cadmium, lead, and other toxic heavy metals with exceptional strength, acting as natural detoxification agents.',atomIds:[]},
+  {id:'alkyl',name:'Alkyl Chain',formula:'–(CH₂)ₙ–',color:'#9b59b6',
+   desc:'Aliphatic carbon chains link aromatic clusters and functional groups. They derive from lipids, waxes, and plant cuticles incorporated during humification.',
+   role:'Create hydrophobic micro-domains that improve soil aggregate stability, reduce evaporation, and retain non-polar organic compounds.',atomIds:[]},
+  {id:'pyridine',name:'Pyridine Ring',formula:'C₅H₄N',color:'#1abc9c',
+   desc:'Heterocyclic nitrogen rings formed when amino compounds react with sugars and phenols during humification (Maillard reactions). They represent the most stable form of organic nitrogen in soil.',
+   role:'Lock nitrogen into extremely stable structures resistant to leaching, providing a long-term nitrogen reserve and stabilizing organic matter on clay surfaces.',atomIds:[]},
+];
+
+const ELEM={
+  C:{color:0x2ecc71,radius:0.34,emissive:0x0a4a1e},
+  O:{color:0xe74c3c,radius:0.30,emissive:0x5a1a10},
+  N:{color:0x3498db,radius:0.32,emissive:0x0e2a4a},
+  H:{color:0xb0b8c0,radius:0.18,emissive:0x2a2a2a},
+  S:{color:0xf1c40f,radius:0.36,emissive:0x5a4a00},
+};
+
+function buildMolecule(){
+  const atoms=[],bonds=[];let id=0;
+  const A=(el,x,y,z,groups)=>{const i=id++;atoms.push({id:i,el,x,y,z,groups:groups||[]});
+    (groups||[]).forEach(g=>{const gr=GROUPS.find(gg=>gg.id===g);if(gr)gr.atomIds.push(i)});return i};
+  const B=(i,j,o=1)=>bonds.push({i,j,order:o});
+
+  const r1=[];
+  for(let i=0;i<6;i++){const a=Math.PI/3*i-Math.PI/6;r1.push(A('C',Math.cos(a)*1.4,Math.sin(a)*1.4,0,['aromatic']))}
+  for(let i=0;i<6;i++)B(r1[i],r1[(i+1)%6],i%2===0?2:1);
+
+  const ox=1.4+1.4*Math.cos(Math.PI/6),oy=1.4*Math.sin(Math.PI/6);
+  const r2=[r1[0],r1[1]];
+  for(let i=0;i<4;i++){const a=Math.PI/3*(i+2)-Math.PI/6;r2.push(A('C',ox+Math.cos(a)*1.4,oy+Math.sin(a)*1.4,0,['aromatic']))}
+  B(r2[1],r2[2],2);B(r2[2],r2[3]);B(r2[3],r2[4],2);B(r2[4],r2[5]);B(r2[5],r2[0],2);
+
+  const ox3=-1.4-1.4*Math.cos(Math.PI/6),oy3=-1.4*Math.sin(Math.PI/6);
+  const r3=[r1[3],r1[4]];
+  for(let i=0;i<3;i++){const a=Math.PI/3*(i+2)-Math.PI/6+Math.PI;r3.push(A('C',ox3+Math.cos(a)*1.4,oy3+Math.sin(a)*1.4,0,['pyridine','aromatic']))}
+  r3.push(A('N',ox3+Math.cos(5*Math.PI/3-Math.PI/6+Math.PI)*1.4,oy3+Math.sin(5*Math.PI/3-Math.PI/6+Math.PI)*1.4,0,['pyridine']));
+  B(r3[1],r3[2]);B(r3[2],r3[3],2);B(r3[3],r3[4]);B(r3[4],r3[5],2);B(r3[5],r3[0]);
+
+  const cC1=A('C',ox+2.8,oy,0.3,['carboxyl']);B(r2[3],cC1);
+  const oD1=A('O',ox+3.8,oy+0.7,0.3,['carboxyl']);B(cC1,oD1,2);
+  const oO1=A('O',ox+3.8,oy-0.7,0.3,['carboxyl']);B(cC1,oO1);
+  const hO1=A('H',ox+4.6,oy-1.2,0.3,['carboxyl']);B(oO1,hO1);
+
+  const oh1=A('O',atoms[r1[5]].x-0.5,atoms[r1[5]].y-1.3,0.2,['hydroxyl']);B(r1[5],oh1);
+  const hh1=A('H',atoms[r1[5]].x-0.2,atoms[r1[5]].y-2.2,0.2,['hydroxyl']);B(oh1,hh1);
+
+  const ch2=A('C',atoms[r1[2]].x+0.5,atoms[r1[2]].y+1.4,1.2,['alkyl']);B(r1[2],ch2);
+  A('H',atoms[ch2].x+0.9,atoms[ch2].y+0.4,1.8,['alkyl']);B(ch2,id-1);
+  A('H',atoms[ch2].x-0.9,atoms[ch2].y+0.4,1.8,['alkyl']);B(ch2,id-1);
+
+  const cx4=atoms[ch2].x,cy4=atoms[ch2].y+2.6;
+  const r4=[];
+  for(let i=0;i<6;i++){const a=Math.PI/3*i-Math.PI/6;r4.push(A('C',cx4+Math.cos(a)*1.4,cy4+Math.sin(a)*1.4,1.2,['aromatic']))}
+  B(ch2,r4[4]);
+  for(let i=0;i<6;i++)B(r4[i],r4[(i+1)%6],i%2===0?2:1);
+
+  A('O',cx4+2.4,cy4+1.4,1.2,['quinone']);B(r4[0],id-1,2);
+  A('O',cx4-2.4,cy4-1.4,1.2,['quinone']);B(r4[3],id-1,2);
+
+  let px=atoms[r3[3]].x,py=atoms[r3[3]].y,pz=0,prev=r3[3];
+  for(let i=0;i<4;i++){
+    px-=1.5;py-=0.4*(i%2===0?1:-1);pz+=0.3;
+    const c=A('C',px,py,pz,['alkyl']);B(prev,c);
+    A('H',px+0.3,py+0.9,pz+0.5,['alkyl']);B(c,id-1);
+    A('H',px+0.3,py-0.9,pz-0.5,['alkyl']);B(c,id-1);
+    prev=c;
+  }
+  const nA=A('N',px-1.5,py,pz+0.2,['amine']);B(prev,nA);
+  A('H',px-2.2,py+0.8,pz+0.3,['amine']);B(nA,id-1);
+  A('H',px-2.2,py-0.8,pz+0.3,['amine']);B(nA,id-1);
+
+  const sA=A('S',cx4,cy4+3.0,1.8,['thiol']);B(r4[1],sA);
+  A('H',cx4+0.5,cy4+4.0,2.2,['thiol']);B(sA,id-1);
+
+  const cC2=A('C',cx4-1.5,cy4-2.8,0.8,['carboxyl']);B(r4[5],cC2);
+  A('O',cx4-2.5,cy4-2.3,0.5,['carboxyl']);B(cC2,id-1,2);
+  const oH2=A('O',cx4-1.5,cy4-4.0,0.8,['carboxyl']);B(cC2,oH2);
+  A('H',cx4-0.8,cy4-4.7,0.8,['carboxyl']);B(oH2,id-1);
+
+  // Aromatic H fill
+  const bc=new Array(atoms.length).fill(0);
+  bonds.forEach(b=>{bc[b.i]++;bc[b.j]++});
+  [...r1,...r2.slice(2),...r4].forEach(ai=>{
+    if(atoms[ai].el==='C'&&bc[ai]<3){
+      const ang=Math.atan2(atoms[ai].y,atoms[ai].x);
+      const h=A('H',atoms[ai].x+Math.cos(ang)*1.0,atoms[ai].y+Math.sin(ang)*1.0,atoms[ai].z,['aromatic']);
+      B(ai,h);
+    }
+  });
+  return{atoms,bonds};
+}
+
+// ── THREE.JS ──
+const container=document.getElementById('canvas-container');
+const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x08080a,0.014);
+const camera=new THREE.PerspectiveCamera(50,innerWidth/innerHeight,0.1,200);camera.position.set(0,0,24);
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;renderer.setClearColor(0x08080a);container.appendChild(renderer.domElement);
+
+scene.add(new THREE.AmbientLight(0x222222,0.6));
+const dl=new THREE.DirectionalLight(0xfff5e6,1.2);dl.position.set(8,12,10);scene.add(dl);
+const rl=new THREE.DirectionalLight(0x6688cc,0.5);rl.position.set(-8,-5,-10);scene.add(rl);
+const pl=new THREE.PointLight(0xc8a050,0.8,40);pl.position.set(0,0,8);scene.add(pl);
+
+const molGroup=new THREE.Group();scene.add(molGroup);
+const{atoms,bonds}=buildMolecule();
+
+let cx=0,cy=0,cz=0;atoms.forEach(a=>{cx+=a.x;cy+=a.y;cz+=a.z});
+cx/=atoms.length;cy/=atoms.length;cz/=atoms.length;
+atoms.forEach(a=>{a.x-=cx;a.y-=cy;a.z-=cz});
+
+const atomMeshes=[];
+atoms.forEach(at=>{
+  const info=ELEM[at.el];
+  const mesh=new THREE.Mesh(new THREE.SphereGeometry(info.radius,24,24),
+    new THREE.MeshStandardMaterial({color:info.color,emissive:info.emissive,emissiveIntensity:0.3,roughness:0.35,metalness:0.15,transparent:true,opacity:1}));
+  mesh.position.set(at.x,at.y,at.z);
+  mesh.userData={atomData:at,baseColor:info.color,baseEmissive:info.emissive};
+  molGroup.add(mesh);atomMeshes.push(mesh);
+});
+
+const bondMeshes=[];
+bonds.forEach(bond=>{
+  const a1=atoms[bond.i],a2=atoms[bond.j];
+  const p1=new THREE.Vector3(a1.x,a1.y,a1.z),p2=new THREE.Vector3(a2.x,a2.y,a2.z);
+  const dir=new THREE.Vector3().subVectors(p2,p1);const len=dir.length();
+  const mid=new THREE.Vector3().addVectors(p1,p2).multiplyScalar(0.5);
+  const mk=off=>{
+    const mesh=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,len,8),
+      new THREE.MeshStandardMaterial({color:0x888877,roughness:0.5,metalness:0.1,emissive:0x222218,emissiveIntensity:0.15,transparent:true,opacity:1}));
+    mesh.position.copy(mid);
+    if(off){const perp=new THREE.Vector3().crossVectors(dir,new THREE.Vector3(0,0,1)).normalize().multiplyScalar(off);mesh.position.add(perp)}
+    mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.clone().normalize());
+    mesh.userData={bondData:bond};molGroup.add(mesh);bondMeshes.push(mesh);
+  };
+  if(bond.order===2){mk(0.1);mk(-0.1)}else mk(0);
+});
+
+// ── 3D LABELS ──
+const labelBox=document.createElement('div');labelBox.style.cssText='position:fixed;inset:0;z-index:8;pointer-events:none;overflow:hidden';document.body.appendChild(labelBox);
+const groupLabels=[];
+GROUPS.forEach(g=>{
+  if(!g.atomIds.length)return;
+  let gx=0,gy=0,gz=0;g.atomIds.forEach(i=>{gx+=atoms[i].x;gy+=atoms[i].y;gz+=atoms[i].z});
+  gx/=g.atomIds.length;gy/=g.atomIds.length;gz/=g.atomIds.length;
+  const el=document.createElement('div');el.className='label-3d';el.textContent=g.name;el.style.setProperty('--lc',g.color);
+  labelBox.appendChild(el);groupLabels.push({el,pos:new THREE.Vector3(gx,gy,gz),groupId:g.id});
+});
+function updateLabels(){
+  const w2=innerWidth/2,h2=innerHeight/2;
+  groupLabels.forEach(lb=>{
+    const wp=lb.pos.clone().applyMatrix4(molGroup.matrixWorld).project(camera);
+    lb.el.style.left=(wp.x*w2+w2)+'px';lb.el.style.top=(-wp.y*h2+h2)+'px';
+    lb.el.style.opacity=wp.z>1?'0':'0.85';
+  });
+}
+
+// ── GROUP LIST ──
+const groupListEl=document.getElementById('group-list');let activeGroupId=null;
+GROUPS.forEach(g=>{
+  const btn=document.createElement('div');btn.className='group-btn';btn.style.setProperty('--gc',g.color);
+  btn.innerHTML=`<div class="group-dot"></div><span class="group-name">${g.name}</span><span class="group-formula">${g.formula}</span>`;
+  btn.dataset.gid=g.id;btn.addEventListener('click',()=>selectGroup(g.id));groupListEl.appendChild(btn);
+});
+
+function selectGroup(gid){
+  if(activeGroupId===gid){closeDetail();return}
+  activeGroupId=gid;const g=GROUPS.find(x=>x.id===gid);
+  document.querySelectorAll('.group-btn').forEach(b=>b.classList.toggle('active',b.dataset.gid===gid));
+  groupLabels.forEach(lb=>lb.el.classList.toggle('highlight',lb.groupId===gid));
+  const p=document.getElementById('detail-panel');
+  document.getElementById('dd').style.cssText=`background:${g.color};box-shadow:0 0 10px ${g.color}`;
+  document.getElementById('dt').textContent=g.name;
+  document.getElementById('df').textContent=g.formula;
+  document.getElementById('ddesc').textContent=g.desc;
+  document.getElementById('drole').textContent=g.role;
+  p.classList.add('visible');
+  highlightGroup(gid);
+}
+function closeDetail(){
+  activeGroupId=null;document.getElementById('detail-panel').classList.remove('visible');
+  document.querySelectorAll('.group-btn').forEach(b=>b.classList.remove('active'));
+  groupLabels.forEach(lb=>lb.el.classList.remove('highlight'));resetHighlight();
+}
+window.closeDetail=closeDetail;
+
+function highlightGroup(gid){
+  const g=GROUPS.find(x=>x.id===gid);const ids=new Set(g.atomIds);const hc=new THREE.Color(g.color);
+  atomMeshes.forEach(m=>{const ad=m.userData.atomData;
+    if(ids.has(ad.id)){m.material.opacity=1;m.material.emissiveIntensity=0.7;m.material.emissive.copy(hc).multiplyScalar(0.4);m.scale.setScalar(1.3)}
+    else{m.material.opacity=0.1;m.material.emissiveIntensity=0.03;m.scale.setScalar(1)}
+  });
+  bondMeshes.forEach(m=>{const bd=m.userData.bondData;
+    if(ids.has(bd.i)&&ids.has(bd.j)){m.material.opacity=1;m.material.emissive.copy(hc).multiplyScalar(0.2);m.material.emissiveIntensity=0.4}
+    else{m.material.opacity=0.05;m.material.emissiveIntensity=0.02}
+  });
+}
+function resetHighlight(){
+  atomMeshes.forEach(m=>{m.material.opacity=1;m.material.emissiveIntensity=0.3;m.material.emissive.setHex(m.userData.baseEmissive);m.scale.setScalar(1)});
+  bondMeshes.forEach(m=>{m.material.opacity=1;m.material.emissive.setHex(0x222218);m.material.emissiveIntensity=0.15});
+}
+
+// ── CONTROLS ──
+let isDrag=false,pm={x:0,y:0},rv={x:0.003,y:0.005};
+renderer.domElement.addEventListener('pointerdown',e=>{isDrag=true;pm={x:e.clientX,y:e.clientY}});
+window.addEventListener('pointerup',()=>isDrag=false);
+window.addEventListener('pointermove',e=>{if(!isDrag)return;rv.y=(e.clientX-pm.x)*0.004;rv.x=(e.clientY-pm.y)*0.004;pm={x:e.clientX,y:e.clientY}});
+renderer.domElement.addEventListener('wheel',e=>{camera.position.z=Math.max(10,Math.min(45,camera.position.z+e.deltaY*0.02))});
+
+function animate(){
+  requestAnimationFrame(animate);
+  molGroup.rotation.x+=rv.x;molGroup.rotation.y+=rv.y;
+  if(!isDrag){rv.x*=0.995;rv.y*=0.995;if(Math.abs(rv.x)<0.001&&Math.abs(rv.y)<0.001)rv.y=0.003}
+  pl.position.x=Math.sin(Date.now()*0.0005)*6;pl.position.y=Math.cos(Date.now()*0.0007)*4;
+  updateLabels();renderer.render(scene,camera);
+}
+animate();
+window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+</script>
+</body>
+</html>
