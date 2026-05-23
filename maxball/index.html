@@ -53,11 +53,20 @@
         <h1 class="logo">MAX<span>BALL</span></h1>
         <p class="tagline">Swipe up. Sink it. Repeat.</p>
         <button class="primary-btn" data-action="start">TAP TO START</button>
+        <button class="secondary-btn" data-action="select">LEVEL SELECT</button>
         <div class="how-to">
           <div><span>📱</span> Touch &amp; swipe up to throw</div>
           <div><span>🖱️</span> Or click-and-drag with the mouse</div>
           <div><span>💫</span> Clean swish = 3 pts · Off the rim = 2 pts</div>
         </div>
+      </div>
+
+      <div class="overlay-card hidden" id="select-card">
+        <span class="kicker">LEVEL SELECT</span>
+        <h2>Pick a level</h2>
+        <p class="muted">Cleared levels stay unlocked.</p>
+        <div id="level-grid" class="level-grid"></div>
+        <button class="secondary-btn" data-action="back-to-title">BACK</button>
       </div>
 
       <div class="overlay-card hidden" id="intro-card">

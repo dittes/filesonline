@@ -6,27 +6,27 @@ import * as THREE from 'three';
 const GRAVITY = -22;
 const BALL_RADIUS = 0.3;
 const RIM_Y = 3.05;
-const RIM_RADIUS = 0.45;
-const RIM_TUBE = 0.04;
-const BACKBOARD_W = 1.82;
-const BACKBOARD_H = 1.22;
+const RIM_RADIUS = 0.56;
+const RIM_TUBE = 0.045;
+const BACKBOARD_W = 1.95;
+const BACKBOARD_H = 1.25;
 const BACKBOARD_THICK = 0.06;
 const BACKBOARD_Y_OFFSET = 0.55;      // backboard center above rim
-const BACKBOARD_Z_OFFSET = -0.32;     // backboard behind rim center
+const BACKBOARD_Z_OFFSET = -0.36;     // backboard behind rim center
 
 const BALL_START = new THREE.Vector3(0, 1.1, 1.4);
 const CAMERA_POS = new THREE.Vector3(0, 1.85, 2.6);
 const CAMERA_LOOK = new THREE.Vector3(0, 2.4, -7);
 
-// Level config — gradually escalating difficulty
+// Level config — friendlier difficulty curve
 const LEVELS = [
-  { name: 'Warm-up',      target: 2, balls: 5, dist: 6.5, motion: 'none' },
-  { name: 'Slide Show',   target: 3, balls: 6, dist: 7.0, motion: 'horizontal', speed: 1.0, range: 1.5 },
-  { name: 'Long Range',   target: 3, balls: 6, dist: 8.5, motion: 'horizontal', speed: 1.4, range: 2.0 },
-  { name: 'Bobbing',      target: 3, balls: 6, dist: 7.5, motion: 'vertical',   speed: 1.6, range: 0.7 },
-  { name: 'Figure Eight', target: 4, balls: 7, dist: 8.5, motion: 'figure8',    speed: 1.8, range: 2.5 },
-  { name: 'Pro Shot',     target: 5, balls: 8, dist: 9.5, motion: 'horizontal', speed: 2.2, range: 3.0 },
-  { name: 'Endless',      target: 9999, balls: 999, dist: 8.5, motion: 'random' }
+  { name: 'Warm-up',      target: 2, balls: 8,  dist: 6.5, motion: 'none' },
+  { name: 'Slide Show',   target: 2, balls: 8,  dist: 6.8, motion: 'horizontal', speed: 0.6, range: 1.0 },
+  { name: 'Long Range',   target: 2, balls: 8,  dist: 7.7, motion: 'horizontal', speed: 0.7, range: 1.3 },
+  { name: 'Bobbing',      target: 3, balls: 8,  dist: 7.2, motion: 'vertical',   speed: 0.9, range: 0.45 },
+  { name: 'Figure Eight', target: 3, balls: 9,  dist: 7.8, motion: 'figure8',    speed: 1.0, range: 1.6 },
+  { name: 'Pro Shot',     target: 4, balls: 10, dist: 8.5, motion: 'horizontal', speed: 1.3, range: 2.0 },
+  { name: 'Endless',      target: 9999, balls: 999, dist: 7.5, motion: 'random' }
 ];
 
 // =============================================================
@@ -90,14 +90,128 @@ sun.shadow.bias = -0.0005;
 scene.add(sun);
 
 // =============================================================
+// TEXTURES (procedurally generated via Canvas)
+// =============================================================
+function makeWoodTexture() {
+  const c = document.createElement('canvas');
+  c.width = 512; c.height = 512;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#b9763a';
+  ctx.fillRect(0, 0, 512, 512);
+  const plankH = 56;
+  for (let y = 0; y < 512; y += plankH) {
+    const hue = 28 + Math.random() * 6;
+    const light = 38 + Math.random() * 10;
+    ctx.fillStyle = `hsl(${hue}, 52%, ${light}%)`;
+    ctx.fillRect(0, y, 512, plankH - 2);
+    ctx.fillStyle = 'rgba(20, 10, 5, 0.55)';
+    ctx.fillRect(0, y + plankH - 2, 512, 2);
+  }
+  ctx.strokeStyle = 'rgba(60, 30, 10, 0.18)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 320; i++) {
+    const y = Math.random() * 512;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    for (let x = 0; x < 512; x += 24) {
+      ctx.lineTo(x + 24, y + (Math.random() - 0.5) * 5);
+    }
+    ctx.stroke();
+  }
+  for (let i = 0; i < 18; i++) {
+    const x = Math.random() * 512;
+    const y = Math.random() * 512;
+    const r = 4 + Math.random() * 6;
+    const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0, 'rgba(40, 20, 10, 0.35)');
+    g.addColorStop(1, 'rgba(40, 20, 10, 0)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
+  return tex;
+}
+
+function makeBasketballTexture() {
+  const c = document.createElement('canvas');
+  c.width = 1024; c.height = 512;
+  const ctx = c.getContext('2d');
+  const grad = ctx.createLinearGradient(0, 0, 0, 512);
+  grad.addColorStop(0, '#e8842a');
+  grad.addColorStop(0.5, '#d96e1e');
+  grad.addColorStop(1, '#a85013');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 1024, 512);
+  for (let i = 0; i < 14000; i++) {
+    const x = Math.random() * 1024;
+    const y = Math.random() * 512;
+    const r = Math.random() * 1.4 + 0.4;
+    const dark = Math.random() < 0.5;
+    ctx.fillStyle = dark ? 'rgba(90, 40, 10, 0.55)' : 'rgba(255, 170, 90, 0.55)';
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.strokeStyle = 'rgba(20, 10, 5, 0.85)';
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.moveTo(0, 256); ctx.lineTo(1024, 256);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(256, 0); ctx.lineTo(256, 512);
+  ctx.moveTo(768, 0); ctx.lineTo(768, 512);
+  ctx.stroke();
+  ctx.beginPath();
+  for (let x = 0; x <= 1024; x += 8) {
+    const y = 256 + Math.sin((x / 1024) * Math.PI * 2) * 90;
+    if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
+  return tex;
+}
+
+function makeBackboardTexture() {
+  const c = document.createElement('canvas');
+  c.width = 512; c.height = 320;
+  const ctx = c.getContext('2d');
+  const g = ctx.createLinearGradient(0, 0, 0, 320);
+  g.addColorStop(0, '#ffffff');
+  g.addColorStop(1, '#e8efff');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, 512, 320);
+  ctx.strokeStyle = '#0d1b3d';
+  ctx.lineWidth = 6;
+  ctx.strokeRect(8, 8, 496, 304);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+const woodTex = makeWoodTexture();
+const ballTex = makeBasketballTexture();
+const backboardTex = makeBackboardTexture();
+
+// =============================================================
 // COURT
 // =============================================================
 const COURT_W = 14;
 const COURT_L = 22;
 {
+  const ct = woodTex.clone();
+  ct.needsUpdate = true;
+  ct.wrapS = ct.wrapT = THREE.RepeatWrapping;
+  ct.repeat.set(3, 4);
   const court = new THREE.Mesh(
     new THREE.PlaneGeometry(COURT_W, COURT_L),
-    new THREE.MeshStandardMaterial({ color: 0xd98a3a, roughness: 0.9 })
+    new THREE.MeshStandardMaterial({ map: ct, roughness: 0.75 })
   );
   court.rotation.x = -Math.PI / 2;
   court.position.z = -4;
@@ -172,10 +286,10 @@ const COURT_L = 22;
 const hoopGroup = new THREE.Group();
 scene.add(hoopGroup);
 
-// Backboard (white) + red square target
+// Backboard (white with subtle border) + red square target
 const backboard = new THREE.Mesh(
   new THREE.BoxGeometry(BACKBOARD_W, BACKBOARD_H, BACKBOARD_THICK),
-  new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 })
+  new THREE.MeshStandardMaterial({ map: backboardTex, roughness: 0.35, metalness: 0.05 })
 );
 backboard.position.set(0, RIM_Y + BACKBOARD_Y_OFFSET, BACKBOARD_Z_OFFSET);
 backboard.castShadow = true;
@@ -261,22 +375,11 @@ hoopGroup.add(rim);
 const ball = new THREE.Group();
 {
   const skin = new THREE.Mesh(
-    new THREE.SphereGeometry(BALL_RADIUS, 32, 24),
-    new THREE.MeshStandardMaterial({ color: 0xff7e29, roughness: 0.65 })
+    new THREE.SphereGeometry(BALL_RADIUS, 48, 32),
+    new THREE.MeshStandardMaterial({ map: ballTex, roughness: 0.62, metalness: 0.0 })
   );
   skin.castShadow = true;
   ball.add(skin);
-
-  // Seam lines (great circles via thin tori)
-  const seamMat = new THREE.MeshBasicMaterial({ color: 0x1a1a1a });
-  const seam = (rot) => {
-    const t = new THREE.Mesh(new THREE.TorusGeometry(BALL_RADIUS + 0.001, 0.012, 6, 48), seamMat);
-    t.rotation.copy(rot);
-    return t;
-  };
-  ball.add(seam(new THREE.Euler(Math.PI / 2, 0, 0)));
-  ball.add(seam(new THREE.Euler(0, 0, 0)));
-  ball.add(seam(new THREE.Euler(0, Math.PI / 2, 0)));
 }
 scene.add(ball);
 
@@ -288,6 +391,88 @@ const shadow = new THREE.Mesh(
 shadow.rotation.x = -Math.PI / 2;
 shadow.position.y = 0.005;
 scene.add(shadow);
+
+// =============================================================
+// CONFETTI — instanced fluttering rectangles
+// =============================================================
+const CONFETTI_MAX = 120;
+const CONFETTI_COLORS = [
+  [1.00, 0.45, 0.30],
+  [1.00, 0.82, 0.30],
+  [0.32, 0.85, 0.50],
+  [0.30, 0.62, 1.00],
+  [0.90, 0.35, 0.92],
+  [1.00, 0.55, 0.15]
+];
+const confetti = new THREE.InstancedMesh(
+  new THREE.PlaneGeometry(0.10, 0.16),
+  new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, vertexColors: false }),
+  CONFETTI_MAX
+);
+confetti.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+confetti.count = 0;
+scene.add(confetti);
+
+const confettiState = [];
+const _cMat = new THREE.Matrix4();
+const _cPos = new THREE.Vector3();
+const _cQuat = new THREE.Quaternion();
+const _cEul = new THREE.Euler();
+const _cScale = new THREE.Vector3(1, 1, 1);
+const _cColor = new THREE.Color();
+const _hiddenMat = new THREE.Matrix4().compose(
+  new THREE.Vector3(1e6, 1e6, 1e6),
+  new THREE.Quaternion(),
+  new THREE.Vector3(0, 0, 0)
+);
+
+function spawnConfetti(x, y, z) {
+  const count = 60;
+  for (let i = 0; i < count; i++) {
+    if (confettiState.length >= CONFETTI_MAX) confettiState.shift();
+    const ang = Math.random() * Math.PI * 2;
+    const sp = 2.5 + Math.random() * 5.5;
+    confettiState.push({
+      pos: new THREE.Vector3(x + (Math.random() - 0.5) * 0.4, y, z + (Math.random() - 0.5) * 0.4),
+      vel: new THREE.Vector3(Math.cos(ang) * sp, 3.5 + Math.random() * 5.5, Math.sin(ang) * sp),
+      rot: new THREE.Vector3(Math.random() * 6, Math.random() * 6, Math.random() * 6),
+      rotVel: new THREE.Vector3((Math.random() - 0.5) * 14, (Math.random() - 0.5) * 14, (Math.random() - 0.5) * 14),
+      life: 1.8 + Math.random() * 0.6,
+      color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)]
+    });
+  }
+}
+
+function updateConfetti(dt) {
+  for (let i = confettiState.length - 1; i >= 0; i--) {
+    const p = confettiState[i];
+    p.vel.y += GRAVITY * 0.35 * dt;
+    p.pos.x += p.vel.x * dt;
+    p.pos.y += p.vel.y * dt;
+    p.pos.z += p.vel.z * dt;
+    p.rot.x += p.rotVel.x * dt;
+    p.rot.y += p.rotVel.y * dt;
+    p.rot.z += p.rotVel.z * dt;
+    p.life -= dt;
+    if (p.life <= 0 || p.pos.y < 0) confettiState.splice(i, 1);
+  }
+  const n = confettiState.length;
+  for (let i = 0; i < n; i++) {
+    const p = confettiState[i];
+    _cPos.copy(p.pos);
+    _cEul.set(p.rot.x, p.rot.y, p.rot.z);
+    _cQuat.setFromEuler(_cEul);
+    const fade = Math.min(1, p.life / 0.6);
+    _cScale.set(fade, fade, fade);
+    _cMat.compose(_cPos, _cQuat, _cScale);
+    confetti.setMatrixAt(i, _cMat);
+    _cColor.setRGB(p.color[0], p.color[1], p.color[2]);
+    confetti.setColorAt(i, _cColor);
+  }
+  confetti.count = n;
+  confetti.instanceMatrix.needsUpdate = true;
+  if (confetti.instanceColor) confetti.instanceColor.needsUpdate = true;
+}
 
 // Trajectory preview points
 const trajGeo = new THREE.BufferGeometry();
@@ -459,13 +644,17 @@ function playLevelUp() {
 // GAME STATE
 // =============================================================
 const state = {
-  phase: 'title',        // 'title' | 'intro' | 'play' | 'levelComplete' | 'gameOver'
+  phase: 'title',        // 'title' | 'intro' | 'play' | 'levelComplete' | 'gameOver' | 'select'
   level: 0,
   baskets: 0,            // baskets this level
   attempts: 0,           // shots taken this level
   ballsLeft: LEVELS[0].balls,
   score: 0,
   best: parseInt(localStorage.getItem('maxball.best') || '0', 10) || 0,
+  maxLevelUnlocked: Math.min(
+    parseInt(localStorage.getItem('maxball.maxLevel') || '0', 10) || 0,
+    LEVELS.length - 1
+  ),
   ballPhase: 'idle',     // 'idle' | 'flying' | 'dead'
   hoopTime: 0,
   randomTarget: { x: 0, y: 0, z: -8 }
@@ -680,6 +869,11 @@ function onScore() {
     showPopup(`+${pts}`, '');
     playScore();
   }
+  spawnConfetti(
+    hoopGroup.position.x,
+    hoopGroup.position.y + RIM_Y - 0.1,
+    hoopGroup.position.z
+  );
   updateHUD();
 }
 
@@ -736,6 +930,11 @@ function initLevel() {
 function onLevelComplete() {
   state.phase = 'levelComplete';
   playLevelUp();
+  const next = Math.min(state.level + 1, LEVELS.length - 1);
+  if (next > state.maxLevelUnlocked) {
+    state.maxLevelUnlocked = next;
+    localStorage.setItem('maxball.maxLevel', String(next));
+  }
   document.getElementById('complete-baskets').textContent = state.baskets;
   document.getElementById('complete-attempts').textContent = state.attempts;
   document.getElementById('complete-score').textContent = state.score;
@@ -766,7 +965,30 @@ function nextLevel() {
 // UI
 // =============================================================
 const overlayEl = document.getElementById('overlay');
-const cards = ['title-card', 'intro-card', 'complete-card', 'over-card'];
+const cards = ['title-card', 'intro-card', 'complete-card', 'over-card', 'select-card'];
+
+function showLevelSelect() {
+  state.phase = 'select';
+  const grid = document.getElementById('level-grid');
+  grid.innerHTML = '';
+  LEVELS.forEach((lvl, i) => {
+    const btn = document.createElement('button');
+    const unlocked = i <= state.maxLevelUnlocked;
+    const cleared = i < state.maxLevelUnlocked;
+    btn.className = 'level-btn' + (unlocked ? (cleared ? ' cleared' : '') : ' locked');
+    btn.disabled = !unlocked;
+    btn.innerHTML = `<span class="num">LV ${i + 1}</span><span class="lname">${lvl.name}</span>`;
+    if (unlocked) {
+      btn.addEventListener('click', () => {
+        state.level = i;
+        state.score = 0;
+        initLevel();
+      });
+    }
+    grid.appendChild(btn);
+  });
+  showOverlay('select-card');
+}
 
 function showOverlay(cardId) {
   overlayEl.classList.remove('hidden');
@@ -833,6 +1055,11 @@ overlayEl.addEventListener('click', (e) => {
     nextLevel();
   } else if (action === 'restart') {
     startGame();
+  } else if (action === 'select') {
+    showLevelSelect();
+  } else if (action === 'back-to-title') {
+    state.phase = 'title';
+    showOverlay('title-card');
   }
 });
 
@@ -1025,6 +1252,7 @@ function tick(now) {
   shadow.scale.set(s, s, s);
   shadow.material.opacity = 0.35 * s;
 
+  updateConfetti(dt);
   renderer.render(scene, camera);
   requestAnimationFrame(tick);
 }
