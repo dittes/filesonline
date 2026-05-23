@@ -870,27 +870,22 @@ function onPointerMove(e) {
 }
 
 function onPointerUp(e) {
-  if (!dragStart || !dragCurrent) { dragStart = null; return; }
-  const dx = dragCurrent.x - dragStart.x;
-  const dy = dragCurrent.y - dragStart.y;
+  if (!dragStart) return;
+  const cur = dragCurrent || dragStart;
+  const dx = cur.x - dragStart.x;
+  const dy = cur.y - dragStart.y;
   const dist = Math.hypot(dx, dy);
   const validSwipe = dist >= 30 && dy <= -20;
-  if (!validSwipe) {
-    dragStart = null;
-    dragCurrent = null;
-    clearAim();
-    trajPoints.visible = false;
-    return;
-  }
+  dragStart = null;
+  dragCurrent = null;
+  clearAim();
+  trajPoints.visible = false;
+  if (!validSwipe) return;
   const vel = computeVelocity(dx, dy);
   ballVel.copy(vel);
   state.ballPhase = 'flying';
   state.ballsLeft -= 1;
   state.attempts += 1;
-  dragStart = null;
-  dragCurrent = null;
-  clearAim();
-  trajPoints.visible = false;
   updateHUD();
 }
 
@@ -1039,25 +1034,3 @@ resetBall();
 updateHUD();
 showOverlay('title-card');
 requestAnimationFrame(tick);
-
-// Debug export (safe to leave in — read-only handle for tests)
-window.__maxball = {
-  state, ballPos, ballVel, hoopGroup, ball, BALL_START,
-  forceShot(side = 0, up = 9, fwd = 10) {
-    if (state.ballPhase !== 'idle') return 'busy';
-    ballVel.set(side, up, -fwd);
-    state.ballPhase = 'flying';
-    state.ballsLeft -= 1;
-    state.attempts += 1;
-    updateHUD();
-    return 'thrown';
-  },
-  stepFrame(dt = 1 / 60) {
-    if (state.phase === 'play') {
-      updateHoop(dt);
-      physicsStep(dt);
-    }
-    renderer.render(scene, camera);
-    return { pos: ball.position.toArray(), vel: ballVel.toArray(), phase: state.ballPhase, score: state.score };
-  }
-};
