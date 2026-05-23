@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#0b1020" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<title>Max Ball — 3D Basketball</title>
+<link rel="stylesheet" href="style.css" />
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+  }
+}
+</script>
+</head>
+<body>
+  <div id="game-root">
+    <canvas id="three-canvas"></canvas>
+    <canvas id="aim-canvas"></canvas>
+
+    <div id="hud">
+      <div class="hud-pill" id="hud-score">
+        <span class="label">SCORE</span>
+        <span class="value" id="score-value">0</span>
+      </div>
+      <div class="hud-pill" id="hud-level">
+        <span class="label">LEVEL</span>
+        <span class="value" id="level-value">1</span>
+        <span class="sub" id="level-name">Warm-up</span>
+      </div>
+      <div class="hud-pill" id="hud-balls">
+        <span class="label">BALLS</span>
+        <span class="value" id="balls-value">5</span>
+      </div>
+    </div>
+
+    <div id="objective" class="hidden">
+      <span id="objective-text"></span>
+    </div>
+
+    <div id="popup-layer"></div>
+
+    <div id="hint" class="hidden">Swipe up to shoot</div>
+
+    <div id="mute-btn" title="Toggle sound">🔊</div>
+
+    <!-- Overlays -->
+    <div id="overlay" class="overlay">
+      <div class="overlay-card" id="title-card">
+        <h1 class="logo">MAX<span>BALL</span></h1>
+        <p class="tagline">Swipe up. Sink it. Repeat.</p>
+        <button class="primary-btn" data-action="start">TAP TO START</button>
+        <div class="how-to">
+          <div><span>📱</span> Touch &amp; swipe up to throw</div>
+          <div><span>🖱️</span> Or click-and-drag with the mouse</div>
+          <div><span>💫</span> Clean swish = 3 pts · Off the rim = 2 pts</div>
+        </div>
+      </div>
+
+      <div class="overlay-card hidden" id="intro-card">
+        <span class="kicker">LEVEL <span id="intro-level">1</span></span>
+        <h2 id="intro-name">Warm-up</h2>
+        <p id="intro-desc">Drain <strong><span id="intro-target">2</span></strong> baskets with <strong><span id="intro-balls">5</span></strong> shots.</p>
+        <button class="primary-btn" data-action="play">PLAY</button>
+      </div>
+
+      <div class="overlay-card hidden" id="complete-card">
+        <span class="kicker">LEVEL CLEARED</span>
+        <h2>Nice bucket! 🏀</h2>
+        <p>You sank <strong><span id="complete-baskets">0</span></strong> of <strong><span id="complete-attempts">0</span></strong>.</p>
+        <p class="score-row">Total Score · <strong><span id="complete-score">0</span></strong></p>
+        <button class="primary-btn" data-action="next">NEXT LEVEL</button>
+      </div>
+
+      <div class="overlay-card hidden" id="over-card">
+        <span class="kicker">GAME OVER</span>
+        <h2 id="over-headline">Out of balls!</h2>
+        <p>Final Score · <strong><span id="over-score">0</span></strong></p>
+        <p class="muted">Best · <strong><span id="over-best">0</span></strong></p>
+        <button class="primary-btn" data-action="restart">PLAY AGAIN</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="game.js"></script>
+</body>
+</html>

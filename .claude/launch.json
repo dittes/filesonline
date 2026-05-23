@@ -6,6 +6,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["serve", "-l", "3737", "."],
       "port": 3737
+    },
+    {
+      "name": "maxball",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "-l", "3738", "maxball"],
+      "port": 3738
     }
   ]
 }
