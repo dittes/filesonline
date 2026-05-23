@@ -405,7 +405,7 @@ const CONFETTI_COLORS = [
   [1.00, 0.55, 0.15]
 ];
 const confetti = new THREE.InstancedMesh(
-  new THREE.PlaneGeometry(0.12, 0.18),
+  new THREE.PlaneGeometry(0.18, 0.28),
   new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, vertexColors: false, toneMapped: false }),
   CONFETTI_MAX
 );
@@ -434,15 +434,17 @@ const _hiddenMat = new THREE.Matrix4().compose(
 );
 
 function spawnConfetti(x, y, z) {
-  const count = 60;
+  const count = 70;
   for (let i = 0; i < count; i++) {
     if (confettiState.length >= CONFETTI_MAX) confettiState.shift();
+    const ang = Math.random() * Math.PI * 2;
+    const sp = 1.5 + Math.random() * 4.5;
     confettiState.push({
-      pos: new THREE.Vector3(x + (Math.random() - 0.5) * 1.5, y + (Math.random() - 0.5) * 1.5, z),
-      vel: new THREE.Vector3(0, 0, 0),
+      pos: new THREE.Vector3(x + (Math.random() - 0.5) * 0.5, y, z + (Math.random() - 0.5) * 0.5),
+      vel: new THREE.Vector3(Math.cos(ang) * sp, 4.0 + Math.random() * 5.5, Math.sin(ang) * sp),
       rot: new THREE.Vector3(Math.random() * 6, Math.random() * 6, Math.random() * 6),
-      rotVel: new THREE.Vector3(0, 0, 0),
-      life: 999,
+      rotVel: new THREE.Vector3((Math.random() - 0.5) * 16, (Math.random() - 0.5) * 16, (Math.random() - 0.5) * 16),
+      life: 1.8 + Math.random() * 0.8,
       color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)]
     });
   }
@@ -1267,27 +1269,3 @@ resetBall();
 updateHUD();
 showOverlay('title-card');
 requestAnimationFrame(tick);
-
-window.__test = {
-  state, ballPos, ballVel, hoopGroup, ball, BALL_START, spawnConfetti, scene,
-  forceShot(side = 0, up = 11, fwd = 11) {
-    if (state.ballPhase !== 'idle') return 'busy';
-    ballVel.set(side, up, -fwd);
-    state.ballPhase = 'flying';
-    state.ballsLeft -= 1;
-    state.attempts += 1;
-    updateHUD();
-    return 'thrown';
-  },
-  step(n = 1, dt = 1 / 60) {
-    for (let i = 0; i < n; i++) {
-      if (state.phase === 'play') {
-        updateHoop(dt);
-        physicsStep(dt);
-      }
-      updateConfetti(dt);
-      renderer.render(scene, camera);
-    }
-    return { pos: ball.position.toArray(), score: state.score, baskets: state.baskets, confettiCount: confettiState.length };
-  }
-};
