@@ -90,7 +90,7 @@ export const state = {
   /** @type {Set<string>} */
   selectedIds: new Set(),
 
-  /** @type {'browser'|'archive'|'rename'|'metadata'|'recipes'} */
+  /** @type {'browser'|'archive'|'rename'|'metadata'|'tools'|'recipes'} */
   activeModule: 'browser',
 
   /** @type {string|null} */
@@ -176,6 +176,30 @@ export function addFiles(fileEntries) {
 }
 
 /**
+ * Remove specific files from state by ID and emit events.
+ * Emits 'files:removed' with the removed entries, plus 'files:cleared'
+ * when the workspace ends up empty.
+ * @param {Iterable<string>} ids
+ */
+export function removeFiles(ids) {
+  const removed = [];
+  for (const id of ids) {
+    const entry = state.files.get(id);
+    if (!entry) continue;
+    state.files.delete(id);
+    state.selectedIds.delete(id);
+    removed.push(entry);
+  }
+  if (!removed.length) return;
+  if (state.previewFileId && removed.some(e => e.id === state.previewFileId)) {
+    closePreview();
+  }
+  emit('files:removed', removed);
+  emit('selection:change', { selectedIds: state.selectedIds });
+  if (state.files.size === 0) emit('files:cleared', null);
+}
+
+/**
  * Clear all files from state and emit event.
  */
 export function clearFiles() {
@@ -229,7 +253,7 @@ export function selectNone() {
 
 /**
  * Switch the active module.
- * @param {'browser'|'archive'|'rename'|'metadata'|'recipes'} name
+ * @param {'browser'|'archive'|'rename'|'metadata'|'tools'|'recipes'} name
  */
 export function setActiveModule(name) {
   state.activeModule = name;

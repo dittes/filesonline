@@ -5,7 +5,6 @@
 import {
   state,
   on,
-  emit,
   addFiles,
   clearFiles,
   setSelectedIds,
@@ -17,6 +16,7 @@ import {
   closePreview,
   setFilter,
   getFilteredFiles,
+  removeFiles,
   openWorkspace as stateOpenWorkspace,
   closeWorkspace as stateCloseWorkspace,
 } from './state.js';
@@ -45,6 +45,8 @@ let _folderTreeModule = null;
 let _storageModule = null;
 let _uiModule = null;
 let _browserSupportModule = null;
+let _toolsModule = null;
+let _themeModule = null;
 
 async function tryImport(path) {
   try {
@@ -66,6 +68,33 @@ const $$ = (sel, ctx = document) => ctx.querySelectorAll(sel);
 
 /** @type {{ col: string, dir: 'asc'|'desc' }} */
 let _sortState = { col: 'name', dir: 'asc' };
+
+// ─── View mode (list | grid) ──────────────────────────────────────────────────
+
+/** @type {'list'|'grid'} */
+let _viewMode = 'list';
+try {
+  if (localStorage.getItem('fo-view') === 'grid') _viewMode = 'grid';
+} catch { /* private mode */ }
+
+/** Object URLs for grid thumbnails, keyed by file id. */
+const _thumbUrls = new Map();
+
+/** Lazily load thumbnails as cards scroll into view. */
+let _thumbObserver = null;
+
+function _releaseThumb(id) {
+  const url = _thumbUrls.get(id);
+  if (url) {
+    URL.revokeObjectURL(url);
+    _thumbUrls.delete(id);
+  }
+}
+
+function _releaseAllThumbs() {
+  for (const url of _thumbUrls.values()) URL.revokeObjectURL(url);
+  _thumbUrls.clear();
+}
 
 // ─── Last clicked row index for shift-click range selection ───────────────────
 let _lastClickedIndex = -1;
@@ -105,6 +134,14 @@ export function renderFileTable(containerEl) {
           </select>
         </div>
         <div class="file-toolbar-right">
+          <div class="view-toggle" role="group" aria-label="View mode">
+            <button class="view-list-btn" title="List view" aria-label="List view">
+              <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+            <button class="view-grid-btn" title="Grid view" aria-label="Grid view">
+              <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4"/></svg>
+            </button>
+          </div>
           <button class="btn btn-sm btn-ghost toolbar-add-files" title="Add files">
             <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" width="14" height="14">
               <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -167,6 +204,7 @@ export function renderFileTable(containerEl) {
           <tbody class="file-tbody">
           </tbody>
         </table>
+        <div class="file-grid" hidden></div>
         <div class="file-empty-state" hidden>
           <div class="empty-icon">
             <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" width="64" height="64" aria-hidden="true">
@@ -305,6 +343,24 @@ function _bindFileTableEvents(containerEl) {
       openWorkspace();
     });
   }
+
+  // View mode toggle
+  const listBtn = $('.view-list-btn', containerEl);
+  const gridBtn = $('.view-grid-btn', containerEl);
+  const setView = mode => {
+    _viewMode = mode;
+    try { localStorage.setItem('fo-view', mode); } catch { /* private mode */ }
+    _refreshFileTable(containerEl);
+  };
+  if (listBtn) listBtn.addEventListener('click', () => setView('list'));
+  if (gridBtn) gridBtn.addEventListener('click', () => setView('grid'));
+
+  // Row/card interaction — bound once via delegation (rows are re-rendered,
+  // their containers are not, so binding per refresh would stack listeners)
+  const tbody = $('.file-tbody', containerEl);
+  if (tbody) _bindRowEvents(tbody);
+  const grid = $('.file-grid', containerEl);
+  if (grid) _bindRowEvents(grid);
 }
 
 /**
@@ -323,17 +379,29 @@ function _refreshFileTable(containerEl) {
   const totalFiles = state.files.size;
   const selectedCount = state.selectedIds.size;
 
-  // Empty state toggle
-  if (emptyState) {
-    emptyState.hidden = totalFiles > 0;
-    const tableContainer = $('.file-table-container > .file-table', containerEl);
-    if (tableContainer) {
-      tableContainer.style.display = totalFiles > 0 ? '' : 'none';
-    }
-  }
+  // Empty state / view visibility
+  if (emptyState) emptyState.hidden = totalFiles > 0;
+  const table = $('.file-table-container > .file-table', containerEl);
+  const grid = $('.file-grid', containerEl);
+  const showList = totalFiles > 0 && _viewMode === 'list';
+  const showGrid = totalFiles > 0 && _viewMode === 'grid';
+  if (table) table.style.display = showList ? '' : 'none';
+  if (grid) grid.hidden = !showGrid;
 
-  // Render rows
-  tbody.innerHTML = files.map((entry, index) => _buildFileRow(entry, index)).join('');
+  // View toggle button states
+  const listBtn = $('.view-list-btn', containerEl);
+  const gridBtn = $('.view-grid-btn', containerEl);
+  if (listBtn) listBtn.classList.toggle('active', _viewMode === 'list');
+  if (gridBtn) gridBtn.classList.toggle('active', _viewMode === 'grid');
+
+  // Render rows / cards
+  if (showGrid) {
+    tbody.innerHTML = '';
+    _renderGrid(grid, files);
+  } else {
+    if (grid) grid.innerHTML = '';
+    tbody.innerHTML = files.map((entry, index) => _buildFileRow(entry, index)).join('');
+  }
 
   // Update select-all checkbox state
   if (selectAllCb) {
@@ -367,9 +435,89 @@ function _refreshFileTable(containerEl) {
 
   // Update sort indicators
   _updateSortIndicators(containerEl);
+}
 
-  // Bind row events
-  _bindRowEvents(tbody, files);
+/**
+ * Render the grid (thumbnail) view.
+ * @param {HTMLElement} gridEl
+ * @param {import('./state.js').FileEntry[]} files
+ */
+function _renderGrid(gridEl, files) {
+  if (!gridEl) return;
+  gridEl.innerHTML = files.map((entry, index) => {
+    const selected = state.selectedIds.has(entry.id);
+    const isImage = entry.category === 'image';
+    return `
+      <div
+        class="file-card${selected ? ' selected' : ''}"
+        data-id="${escapeHtml(entry.id)}"
+        data-index="${index}"
+        tabindex="0"
+        aria-selected="${selected}"
+        title="${escapeHtml(entry.relativePath || entry.name)}"
+      >
+        <input
+          type="checkbox"
+          class="checkbox row-checkbox file-card-check"
+          ${selected ? 'checked' : ''}
+          aria-label="Select ${escapeHtml(entry.name)}"
+          data-id="${escapeHtml(entry.id)}"
+        />
+        <div class="file-card-thumb"${isImage ? ` data-thumb-id="${escapeHtml(entry.id)}"` : ''}>${getFileTypeIcon(entry.ext)}</div>
+        <div class="file-card-body">
+          <div class="file-card-name">${escapeHtml(entry.name)}</div>
+          <div class="file-card-meta">${escapeHtml(formatBytes(entry.size))}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  _observeThumbs(gridEl);
+}
+
+/** Lazily load image thumbnails when their cards scroll into view. */
+function _observeThumbs(gridEl) {
+  const targets = gridEl.querySelectorAll('[data-thumb-id]');
+  if (!targets.length) return;
+
+  if (!('IntersectionObserver' in window)) {
+    targets.forEach(_loadThumb);
+    return;
+  }
+
+  if (_thumbObserver) _thumbObserver.disconnect();
+  _thumbObserver = new IntersectionObserver(entries => {
+    for (const ent of entries) {
+      if (ent.isIntersecting) {
+        _thumbObserver.unobserve(ent.target);
+        _loadThumb(ent.target);
+      }
+    }
+  }, { root: gridEl, rootMargin: '200px' });
+
+  targets.forEach(el => _thumbObserver.observe(el));
+}
+
+function _loadThumb(thumbEl) {
+  const id = thumbEl.dataset.thumbId;
+  const entry = state.files.get(id);
+  if (!entry) return;
+
+  let url = _thumbUrls.get(id);
+  if (!url) {
+    url = URL.createObjectURL(entry.file);
+    _thumbUrls.set(id, url);
+  }
+
+  const img = document.createElement('img');
+  img.alt = '';
+  img.decoding = 'async';
+  img.onload = () => {
+    thumbEl.textContent = '';
+    thumbEl.appendChild(img);
+  };
+  // On decode failure keep the type icon
+  img.src = url;
 }
 
 /**
@@ -415,13 +563,13 @@ function _buildFileRow(entry, index) {
 }
 
 /**
- * Bind click, shift-click, right-click events on the tbody rows.
- * @param {HTMLElement} tbody
- * @param {import('./state.js').FileEntry[]} files
+ * Bind click, shift-click, right-click events on a rows/cards container.
+ * Uses delegation so it is bound exactly once per container.
+ * @param {HTMLElement} container  the tbody (list view) or grid element
  */
-function _bindRowEvents(tbody, files) {
-  tbody.addEventListener('click', e => {
-    const row = e.target.closest('.file-row');
+function _bindRowEvents(container) {
+  container.addEventListener('click', e => {
+    const row = e.target.closest('.file-row, .file-card');
     if (!row) return;
 
     const id = row.dataset.id;
@@ -436,6 +584,7 @@ function _bindRowEvents(tbody, files) {
 
     // Shift-click: range selection
     if (e.shiftKey && _lastClickedIndex >= 0) {
+      const files = getFilteredFiles();
       const min = Math.min(_lastClickedIndex, index);
       const max = Math.max(_lastClickedIndex, index);
       const rangeIds = files.slice(min, max + 1).map(f => f.id);
@@ -459,8 +608,8 @@ function _bindRowEvents(tbody, files) {
   });
 
   // Right-click context menu
-  tbody.addEventListener('contextmenu', e => {
-    const row = e.target.closest('.file-row');
+  container.addEventListener('contextmenu', e => {
+    const row = e.target.closest('.file-row, .file-card');
     if (!row) return;
     e.preventDefault();
     const id = row.dataset.id;
@@ -522,21 +671,7 @@ function _showContextMenu(x, y, id, entry) {
       action: () => {
         // Remove only selected files (or just this one if only one)
         const toRemove = state.selectedIds.size > 1 ? [...state.selectedIds] : [id];
-        for (const rid of toRemove) {
-          state.files.delete(rid);
-          state.selectedIds.delete(rid);
-        }
-        if (state.previewFileId && toRemove.includes(state.previewFileId)) {
-          closePreview();
-        }
-        emit('files:added', []); // trigger re-render with empty batch — abuse event slightly
-        emit('selection:change', { selectedIds: state.selectedIds });
-        // A dedicated remove event would be cleaner; re-emit files:cleared only if empty
-        if (state.files.size === 0) {
-          emit('files:cleared', null);
-        } else {
-          emit('files:added', []);
-        }
+        removeFiles(toRemove);
       },
     },
   ];
@@ -734,7 +869,7 @@ function _switchModule(moduleName) {
  * Update the workspace header status bar with current file counts.
  */
 function _updateStatusBar() {
-  const statusEl = document.querySelector('.workspace-status');
+  const statusEl = document.querySelector('#file-count-status, .workspace-status');
   if (!statusEl) return;
 
   const total = state.files.size;
@@ -819,19 +954,7 @@ function _initKeyboardShortcuts() {
       e.preventDefault();
       const count = state.selectedIds.size;
       if (confirm(`Remove ${count} selected file${count !== 1 ? 's' : ''} from the workspace?`)) {
-        for (const id of state.selectedIds) {
-          state.files.delete(id);
-        }
-        if (state.previewFileId && state.selectedIds.has(state.previewFileId)) {
-          closePreview();
-        }
-        state.selectedIds.clear();
-        if (state.files.size === 0) {
-          emit('files:cleared', null);
-        } else {
-          emit('files:added', []);
-          emit('selection:change', { selectedIds: state.selectedIds });
-        }
+        removeFiles([...state.selectedIds]);
       }
     }
   });
@@ -1135,6 +1258,12 @@ function _initBeforeUnloadWarning() {
  * Bootstrap the entire application.
  */
 async function init() {
+  // ── 0. Theme (light/dark) ─────────────────────────────────────────────────
+  _themeModule = await tryImport('./theme.js');
+  if (_themeModule && typeof _themeModule.initTheme === 'function') {
+    try { _themeModule.initTheme(); } catch (e) { /* non-fatal */ }
+  }
+
   // ── 1. Browser support detection ──────────────────────────────────────────
   _browserSupportModule = await tryImport('./browser-support.js');
   const detectFn = _browserSupportModule && (
@@ -1252,6 +1381,15 @@ async function init() {
     }
   }
 
+  // ── 13b. Tools module (insights, duplicates, image converter) ─────────────
+  _toolsModule = await tryImport('./tools.js');
+  const toolsPanel = document.querySelector('[data-module-panel="tools"]');
+  if (_toolsModule && toolsPanel) {
+    if (typeof _toolsModule.initToolsModule === 'function') {
+      try { _toolsModule.initToolsModule(toolsPanel); } catch (e) { console.warn('app: tools init error', e); }
+    }
+  }
+
   // ── 14. Landing page buttons ──────────────────────────────────────────────
   _initLandingPage();
 
@@ -1274,7 +1412,14 @@ async function init() {
     _updateStatusBar();
   });
 
+  on('files:removed', removed => {
+    for (const entry of removed) _releaseThumb(entry.id);
+    if (browsePanel) _refreshFileTable(browsePanel);
+    _updateStatusBar();
+  });
+
   on('files:cleared', () => {
+    _releaseAllThumbs();
     if (browsePanel) _refreshFileTable(browsePanel);
     _updateStatusBar();
     clearPreview();
@@ -1307,6 +1452,37 @@ async function init() {
       if (_entries.length && !state.workspaceOpen) openWorkspace();
     });
   }
+
+  // ── 21. Command palette (Cmd/Ctrl+K) ──────────────────────────────────────
+  const paletteModule = await tryImport('./command-palette.js');
+  if (paletteModule && typeof paletteModule.initCommandPalette === 'function') {
+    const isMac = /Mac|iPhone|iPad/.test(navigator.platform || '');
+    const mod = isMac ? '⌘' : 'Ctrl+';
+    const goModule = name => { openWorkspace(); _switchModule(name); };
+    try {
+      paletteModule.initCommandPalette([
+        { id: 'open-files', label: 'Open files…', hint: `${mod}O`, run: async () => { const en = await openFiles(); if (en.length) openWorkspace(); } },
+        { id: 'open-folder', label: 'Open folder…', hint: isMac ? '⇧⌘O' : 'Ctrl+Shift+O', run: async () => { const en = await openFolder(); if (en.length) openWorkspace(); } },
+        { id: 'go-browse', label: 'Go to Browse', run: () => goModule('browser') },
+        { id: 'go-archive', label: 'Go to Archive', run: () => goModule('archive') },
+        { id: 'go-rename', label: 'Go to Rename', run: () => goModule('rename') },
+        { id: 'go-metadata', label: 'Go to Metadata', run: () => goModule('metadata') },
+        { id: 'go-tools', label: 'Go to Tools', run: () => goModule('tools') },
+        { id: 'go-recipes', label: 'Go to Recipes', run: () => goModule('recipes') },
+        { id: 'toggle-theme', label: 'Toggle dark mode', run: () => { if (_themeModule) _themeModule.toggleTheme(); } },
+        { id: 'view-grid', label: 'Switch to grid view', run: () => { _viewMode = 'grid'; try { localStorage.setItem('fo-view', 'grid'); } catch { } if (browsePanel) _refreshFileTable(browsePanel); goModule('browser'); } },
+        { id: 'view-list', label: 'Switch to list view', run: () => { _viewMode = 'list'; try { localStorage.setItem('fo-view', 'list'); } catch { } if (browsePanel) _refreshFileTable(browsePanel); goModule('browser'); } },
+        { id: 'select-all', label: 'Select all files', hint: `${mod}A`, run: selectAll },
+        { id: 'select-none', label: 'Clear selection', run: selectNone },
+        { id: 'download-zip', label: 'Download selected as ZIP', run: _downloadSelectedAsZip },
+        { id: 'scan-duplicates', label: 'Scan for duplicate files', run: () => { goModule('tools'); const btn = document.getElementById('dup-scan-btn'); if (btn) btn.click(); } },
+        { id: 'browser-support', label: 'Browser support info', run: _openBrowserSupportModal },
+      ]);
+    } catch (e) { console.warn('app: command palette init error', e); }
+  }
+
+  // Debug/testing hook (no private data — everything is local anyway)
+  window.FilesOnline = { state, addFiles };
 
   console.info('Files Online: ready');
 }
