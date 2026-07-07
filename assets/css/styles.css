@@ -4742,6 +4742,13 @@ body.workspace-active .landing {
   font-size: 10px;
 }
 
+/* Feature card rendered as a link (e.g. MD Viewer) */
+a.feature-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
 .status-kbd-hint kbd {
   font-family: var(--font);
   background: var(--surface-active);

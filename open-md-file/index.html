@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1B4FD8">
+  <title>Open MD File Online – Free MD Viewer, Markdown Editor &amp; Converter</title>
+  <meta name="description" content="Open, view, edit, and convert .md Markdown files online. Free MD viewer with live preview, Markdown to PDF, Markdown to HTML, and HTML to Markdown.">
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://files-online.com/open-md-file/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://files-online.com/open-md-file/">
+  <meta property="og:title" content="Open MD File Online – Free MD Viewer, Markdown Editor &amp; Converter">
+  <meta property="og:description" content="Open, view, edit, and convert .md Markdown files online. Free MD viewer with live preview, Markdown to PDF, Markdown to HTML, and HTML to Markdown.">
+  <meta property="og:site_name" content="Files Online">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Open MD File Online – Free MD Viewer, Markdown Editor &amp; Converter">
+  <meta name="twitter:description" content="Open, view, edit, and convert .md Markdown files online. Free MD viewer with live preview, Markdown to PDF, Markdown to HTML, and HTML to Markdown.">
+
+  <!-- Theme boot: apply light/dark before first paint to avoid a flash -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('fo-theme');
+        if (t !== 'light' && t !== 'dark') {
+          t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) { /* default to light */ }
+    })();
+  </script>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="/assets/css/styles.css?v=6">
+  <link rel="stylesheet" href="/assets/css/md-viewer.css?v=1">
+
+  <!-- Structured Data: SoftwareApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "MD Viewer Online",
+    "url": "https://files-online.com/open-md-file/",
+    "description": "Open, view, edit, and convert .md Markdown files online. Free MD viewer with live preview, Markdown to PDF, Markdown to HTML, and HTML to Markdown.",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Web Browser",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "featureList": [
+      "Open and view .md Markdown files in the browser",
+      "Markdown editor with live preview",
+      "Save edited Markdown back to disk",
+      "Convert Markdown to PDF",
+      "Convert Markdown to HTML",
+      "Convert HTML to Markdown",
+      "GitHub-flavored Markdown: tables, task lists, code blocks",
+      "Dark mode, table of contents, word count"
+    ],
+    "browserRequirements": "Requires a modern web browser with JavaScript enabled"
+  }
+  </script>
+
+  <!-- Structured Data: FAQPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      { "@type": "Question", "name": "How do I open an MD file?", "acceptedAnswer": { "@type": "Answer", "text": "Click \"Choose MD File\" or drag your .md file onto the dropzone on this page. The Markdown is rendered instantly in your browser — no signup, no install, no upload." } },
+      { "@type": "Question", "name": "What app opens .md files?", "acceptedAnswer": { "@type": "Answer", "text": "Any text editor can open a .md file as plain text, but to see the formatted result you need a Markdown viewer. This free online MD viewer renders the file with headings, tables, task lists and code blocks, directly in the browser." } },
+      { "@type": "Question", "name": "Can I view MD files online?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Drop a .md or .markdown file on this page to view it online immediately. The file is processed locally in your browser and never uploaded to a server." } },
+      { "@type": "Question", "name": "Can I edit Markdown online?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. The built-in Markdown editor shows a split view with your Markdown source on the left and a live preview on the right. You can save the result back as a .md file." } },
+      { "@type": "Question", "name": "Can I convert MD to PDF?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Open or paste your Markdown, then click Export PDF. The rendered document is converted to a PDF in your browser." } },
+      { "@type": "Question", "name": "Can I convert MD to HTML?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Click Export HTML for a clean HTML file, or Export Standalone HTML for a self-contained file with inline styling." } },
+      { "@type": "Question", "name": "Can I convert HTML to Markdown?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Import an .html file or paste HTML and it is converted to Markdown that you can edit and save as .md." } },
+      { "@type": "Question", "name": "Is this MD viewer private?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. All viewing, editing and converting happens locally in your browser. There is no server that receives your files." } },
+      { "@type": "Question", "name": "Does this work on Windows, Mac, Linux, iPhone, and Android?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. It runs in any modern browser on any operating system. Saving directly back to the original file requires Chrome or Edge; other browsers download the saved file instead." } },
+      { "@type": "Question", "name": "I searched for 'viewe md online' — is this the right tool?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Whether you searched for view md online, viewer md online or viewe md online, this tool opens Markdown files directly in your browser." } }
+    ]
+  }
+  </script>
+</head>
+<body class="mdv-page">
+
+  <noscript>
+    <div style="padding:2rem;text-align:center;font-family:system-ui,sans-serif;">
+      <strong>MD Viewer Online requires JavaScript.</strong> Please enable JavaScript in your browser to use this tool.
+    </div>
+  </noscript>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/" class="logo">Files Online</a>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="#open">Open MD</a>
+        <a href="#editor">Markdown Editor</a>
+        <a href="#md-to-pdf">MD to PDF</a>
+        <a href="#md-to-html">MD to HTML</a>
+        <a href="#html-to-md">HTML to MD</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="header-actions">
+        <button class="btn btn-ghost btn-icon theme-toggle" data-action="toggle-theme" aria-label="Toggle dark mode" title="Toggle dark mode">
+          <svg class="icon-moon" viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><path d="M13.5 9.5A5.5 5.5 0 016.5 2.5a5.5 5.5 0 107 7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          <svg class="icon-sun" viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M12.6 3.4l-1.4 1.4M4.8 11.2l-1.4 1.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <button class="btn btn-primary btn-sm" id="mdv-hero-open-2">Open MD File</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero: Open MD file -->
+  <section class="hero mdv-hero" id="open">
+    <div class="hero-inner">
+      <div class="hero-badges">
+        <span class="badge badge-neutral">100% Private</span>
+        <span class="badge badge-neutral">No Upload</span>
+        <span class="badge badge-neutral">No Signup</span>
+      </div>
+      <h1 class="hero-title">Open MD File Online</h1>
+      <p class="hero-subtitle">Free online MD viewer, Markdown editor, and Markdown converter. Open, view, edit, and convert .md Markdown files online — free, private, no signup. Export to PDF, HTML, or Markdown.</p>
+
+      <div class="mdv-dropzone" id="mdv-dropzone" tabindex="0" role="button" aria-label="Drop your Markdown file here or press Enter to choose a file">
+        <svg viewBox="0 0 48 48" fill="none" width="40" height="40" aria-hidden="true">
+          <path d="M10 6h20l8 8v28H10z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M30 6v8h8" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M17 30l3-8 3 5 3-5 3 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <p class="mdv-dropzone-title">Drop your .md file here</p>
+        <div class="mdv-dropzone-actions">
+          <button class="btn btn-primary" id="mdv-choose-btn">Choose MD File</button>
+          <button class="btn btn-secondary" id="mdv-paste-btn">Paste Markdown</button>
+          <button class="btn btn-secondary" id="mdv-sample-btn">Try sample</button>
+        </div>
+        <p class="mdv-dropzone-note">Supported: <code>.md</code>, <code>.markdown</code>, <code>.txt</code>, <code>.html</code> — processed locally, never uploaded.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MD Viewer / Editor -->
+  <section class="mdv-tool" id="editor" aria-label="Markdown editor and viewer">
+
+    <div class="mdv-toolbar" role="toolbar" aria-label="Markdown tools">
+      <div class="mdv-toolbar-group">
+        <button class="btn btn-sm btn-ghost" id="mdv-open-btn" title="Open file (Ctrl+O)">Open</button>
+        <button class="btn btn-sm btn-ghost" id="mdv-save-btn" title="Save MD (Ctrl+S)">Save MD</button>
+        <button class="btn btn-sm btn-ghost" id="mdv-saveas-btn" title="Save As">Save As</button>
+        <button class="btn btn-sm btn-ghost" id="mdv-import-html-btn" title="Import an HTML file and convert it to Markdown">Import HTML</button>
+      </div>
+      <div class="mdv-toolbar-group">
+        <button class="btn btn-sm btn-ghost" id="mdv-export-pdf-btn" title="Export PDF (Ctrl+P)">Export PDF</button>
+        <button class="btn btn-sm btn-ghost" id="mdv-export-html-btn" title="Export HTML (Ctrl+E)">Export HTML</button>
+        <button class="btn btn-sm btn-ghost" id="mdv-export-standalone-btn" title="Export standalone HTML with inline CSS">Standalone HTML</button>
+        <button class="btn btn-sm btn-ghost" id="mdv-export-txt-btn" title="Export plain text">Plain Text</button>
+      </div>
+      <div class="mdv-toolbar-group">
+        <button class="btn btn-sm btn-ghost" id="mdv-copy-md-btn" title="Copy Markdown to clipboard">Copy MD</button>
+        <button class="btn btn-sm btn-ghost" id="mdv-copy-html-btn" title="Copy rendered HTML to clipboard">Copy HTML</button>
+        <button class="btn btn-sm btn-danger" id="mdv-clear-btn" title="Clear the editor">Clear</button>
+      </div>
+      <div class="mdv-toolbar-spacer"></div>
+      <div class="view-toggle mdv-view-toggle" role="group" aria-label="View mode">
+        <button data-mdv-view="split" class="active" title="Split view">Split</button>
+        <button data-mdv-view="editor" title="Editor only">Editor</button>
+        <button data-mdv-view="preview" title="Preview only">Preview</button>
+        <button data-mdv-view="raw" title="Raw HTML output">HTML</button>
+      </div>
+    </div>
+
+    <div class="mdv-stats" aria-live="polite">
+      <span id="mdv-filename">untitled.md</span>
+      <span class="mdv-dirty" id="mdv-dirty" hidden title="Unsaved changes">●</span>
+      <span class="mdv-stats-right">
+        <span id="mdv-stat-words">0 words</span> ·
+        <span id="mdv-stat-chars">0 characters</span> ·
+        <span id="mdv-stat-lines">0 lines</span>
+      </span>
+    </div>
+
+    <div class="mdv-panes" id="mdv-panes" data-view="split">
+      <textarea
+        class="mdv-editor"
+        id="mdv-editor"
+        spellcheck="false"
+        aria-label="Markdown source"
+        placeholder="# Start typing Markdown here…&#10;&#10;Or drop a .md file anywhere on this page."></textarea>
+
+      <div class="mdv-preview-pane" id="mdv-preview-pane">
+        <details class="mdv-toc" id="mdv-toc" hidden>
+          <summary>Table of contents</summary>
+          <nav id="mdv-toc-list" aria-label="Table of contents"></nav>
+        </details>
+        <article class="md-preview" id="mdv-preview" aria-label="Rendered Markdown preview">
+          <div class="mdv-empty">
+            <p>Nothing to preview yet.</p>
+            <p>Open a <code>.md</code> file, paste Markdown, or try the sample.</p>
+          </div>
+        </article>
+      </div>
+
+      <pre class="mdv-raw" id="mdv-raw" hidden aria-label="Generated HTML source"><code id="mdv-raw-code"></code></pre>
+    </div>
+  </section>
+
+  <!-- Hidden file inputs -->
+  <input type="file" id="mdv-file-input" accept=".md,.markdown,.txt,.text,text/markdown,text/plain" hidden>
+  <input type="file" id="mdv-html-input" accept=".html,.htm,text/html" hidden>
+
+  <!-- Paste / import modal -->
+  <div class="modal-overlay" id="mdv-paste-modal" hidden role="dialog" aria-modal="true" aria-labelledby="mdv-paste-title">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="mdv-paste-title">Paste Markdown or HTML</h3>
+        <button class="btn btn-ghost btn-icon modal-close" aria-label="Close dialog">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <textarea class="input mdv-paste-textarea" id="mdv-paste-textarea" rows="10" placeholder="Paste Markdown or HTML here…" aria-label="Paste content"></textarea>
+        <div class="mdv-url-row">
+          <input type="url" class="input input-sm" id="mdv-url-input" placeholder="…or import from URL (https://example.com/page.html)" aria-label="Import from URL">
+          <button class="btn btn-sm btn-secondary" id="mdv-url-fetch-btn">Fetch</button>
+        </div>
+        <p class="tool-hint">URL import only works when the source allows browser CORS.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary modal-close">Cancel</button>
+        <button class="btn btn-secondary" id="mdv-paste-html-btn" title="Convert the pasted HTML to Markdown">Convert HTML → Markdown</button>
+        <button class="btn btn-primary" id="mdv-paste-md-btn">Load as Markdown</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SEO content sections ═══════════════ -->
+
+  <section class="how-it-works-section" id="how-to-open">
+    <div class="section-inner">
+      <h2 class="section-title">How to Open an MD File</h2>
+      <p class="section-subtitle">Five steps, a few seconds, nothing installed.</p>
+      <div class="steps-list">
+        <div class="step">
+          <div class="step-number" aria-hidden="true">1</div>
+          <div class="step-content">
+            <h3 class="step-title">Click “Choose MD File”</h3>
+            <p class="step-desc">Or drag the file straight onto the dropzone at the top of this page. You can also paste Markdown text directly.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number" aria-hidden="true">2</div>
+          <div class="step-content">
+            <h3 class="step-title">Select a .md or .markdown file</h3>
+            <p class="step-desc">Plain <code>.txt</code> files with Markdown content work too, and <code>.html</code> files are converted to Markdown automatically.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number" aria-hidden="true">3</div>
+          <div class="step-content">
+            <h3 class="step-title">View the rendered Markdown instantly</h3>
+            <p class="step-desc">Headings, tables, task lists, images and syntax-highlighted code blocks render just like on GitHub.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number" aria-hidden="true">4</div>
+          <div class="step-content">
+            <h3 class="step-title">Edit if needed</h3>
+            <p class="step-desc">Use the split view to edit the Markdown source on the left and watch the live preview update on the right.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number" aria-hidden="true">5</div>
+          <div class="step-content">
+            <h3 class="step-title">Save or export to PDF/HTML</h3>
+            <p class="step-desc">Save the edited <code>.md</code> back to your disk, or export the document as PDF, HTML, standalone HTML, or plain text.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="features-section" id="what-is-md">
+    <div class="section-inner">
+      <h2 class="section-title">What Is an MD File?</h2>
+      <p class="section-subtitle">An <code>.md</code> file is a Markdown file — plain text with lightweight formatting marks.</p>
+      <div class="mdv-prose">
+        <p>Markdown files are everywhere in modern work: <strong>README files</strong> in software projects, <strong>documentation</strong>, personal <strong>notes</strong>, <strong>blog drafts</strong>, <strong>AI prompts</strong> and exported chat transcripts, and <strong>developer docs</strong> of every kind. Because a <code>.md</code> file is plain text, it opens in any editor — but you only see the raw formatting marks like <code># heading</code> and <code>**bold**</code>. A Markdown viewer renders those marks into a formatted document, the way GitHub renders a README.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="features-section" id="md-viewer">
+    <div class="section-inner">
+      <h2 class="section-title">MD Viewer Online</h2>
+      <p class="section-subtitle">The fastest way to view MD online — no app, no account.</p>
+      <div class="mdv-prose">
+        <p>This <strong>md viewer</strong> opens Markdown files directly in your browser. There is nothing to install and no signup: drop a file to <strong>view md online</strong> in a clean, readable layout. Because it is a full <strong>markdown viewer online</strong>, it supports GitHub-flavored Markdown — tables, task lists, fenced code blocks with syntax highlighting, blockquotes, and images. If you just need to <strong>open md online</strong> once to read a README someone sent you, that works too: view it, optionally export a PDF, and close the tab. Nothing is stored or uploaded.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="features-section" id="live-preview">
+    <div class="section-inner">
+      <h2 class="section-title">Markdown Editor with Live Preview</h2>
+      <p class="section-subtitle">Split view: source on the left, rendered document on the right.</p>
+      <div class="mdv-prose">
+        <p>The editor is a real <strong>online markdown editor</strong>, not just a viewer. Type or edit Markdown on the left and the <strong>markdown live preview</strong> updates as you type. Switch to editor-only or preview-only mode, check the generated HTML in the raw view, and keep an eye on word, character and line counts in the status bar. Everything is processed locally in your browser — your text never leaves your device, and with Chrome or Edge you can save changes straight back to the original file.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="features-section" id="converter">
+    <div class="section-inner">
+      <h2 class="section-title">Markdown Converter</h2>
+      <p class="section-subtitle">Three converters, one tool — everything runs in your browser.</p>
+      <div class="features-grid">
+        <div class="feature-card" id="md-to-pdf">
+          <h3 class="feature-title">Markdown to PDF</h3>
+          <p class="feature-desc">Convert md to pdf in one click. Open your Markdown, press Export PDF, and download a print-quality PDF of the rendered document.</p>
+          <button class="btn btn-secondary btn-sm mdv-card-btn" data-mdv-action="pdf">Convert MD to PDF</button>
+        </div>
+        <div class="feature-card" id="md-to-html">
+          <h3 class="feature-title">Markdown to HTML</h3>
+          <p class="feature-desc">Convert markdown to html — export a clean HTML file, or a standalone HTML file with inline CSS that looks right anywhere.</p>
+          <button class="btn btn-secondary btn-sm mdv-card-btn" data-mdv-action="html">Convert MD to HTML</button>
+        </div>
+        <div class="feature-card" id="html-to-md">
+          <h3 class="feature-title">HTML to Markdown</h3>
+          <p class="feature-desc">Convert html to markdown: import an .html file or paste HTML, and get editable Markdown you can save as .md.</p>
+          <button class="btn btn-secondary btn-sm mdv-card-btn" data-mdv-action="html2md">Convert HTML to MD</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="privacy-section" id="privacy">
+    <div class="section-inner">
+      <div class="privacy-box">
+        <div class="privacy-box-icon" aria-hidden="true">
+          <svg viewBox="0 0 20 20" fill="none" width="24" height="24">
+            <path d="M10 2l7 3v5c0 4-3 7-7 8-4-1-7-4-7-8V5l7-3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M7 10l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="privacy-box-text">
+          <h2 class="privacy-box-title">Privacy</h2>
+          <p>Your Markdown files are processed locally in your browser and are not uploaded. There is no server that could read your documents — rendering, editing and every conversion happens on your device.</p>
+          <a href="/privacy.html" class="privacy-link">Read our privacy policy →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="faq-section" id="faq">
+    <div class="section-inner">
+      <h2 class="section-title">FAQ</h2>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary class="faq-question">How do I open an MD file?</summary>
+          <div class="faq-answer"><p>Click “Choose MD File” at the top of this page, or drag your <code>.md</code> file onto the dropzone. The Markdown renders instantly in your browser — no signup, no install, no upload.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-question">What app opens .md files?</summary>
+          <div class="faq-answer"><p>Any text editor opens a <code>.md</code> file as plain text, but to see the formatted document you need a Markdown viewer. This page is a free one: it renders headings, tables, task lists and code blocks the way GitHub does.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-question">Can I view MD files online?</summary>
+          <div class="faq-answer"><p>Yes — that is exactly what this tool does. Drop a <code>.md</code> or <code>.markdown</code> file on this page to view it online immediately. The file is processed locally and never uploaded.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-question">Can I edit Markdown online?</summary>
+          <div class="faq-answer"><p>Yes. Use the split view: Markdown source on the left, live preview on the right. When you are done, save the result back as a <code>.md</code> file or export it.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-question">Can I convert MD to PDF?</summary>
+          <div class="faq-answer"><p>Yes. Open or paste your Markdown and click <strong>Export PDF</strong>. The rendered document is converted to a PDF in your browser; if PDF generation is unavailable, a print-friendly view opens instead.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-question">Can I convert MD to HTML?</summary>
+          <div class="faq-answer"><p>Yes. <strong>Export HTML</strong> produces a clean HTML file; <strong>Standalone HTML</strong> produces a self-contained file with inline CSS that you can send to anyone.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-question">Can I convert HTML to Markdown?</summary>
+          <div class="faq-answer"><p>Yes. Click <strong>Import HTML</strong> to convert an <code>.html</code> file, or use <strong>Paste Markdown → Convert HTML → Markdown</strong> for copied HTML. The result is editable Markdown you can save as <code>.md</code>.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-question">Is this MD viewer private?</summary>
+          <div class="faq-answer"><p>Yes. All viewing, editing and converting happens locally in your browser. Files are never transmitted anywhere — there is no backend that could receive them.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-question">Does this work on Windows, Mac, Linux, iPhone, and Android?</summary>
+          <div class="faq-answer"><p>Yes. It runs in any modern browser on any operating system. Saving directly back to the original file requires Chrome or Edge (File System Access API); other browsers download the saved file instead.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-question">I searched for “viewe md online” — is this the right tool?</summary>
+          <div class="faq-answer"><p>Yes. Whether you typed <em>view md online</em>, <em>viewer md online</em> or <em>viewe md online</em>, this tool opens Markdown files directly in your browser and lets you read, edit and convert them.</p></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-brand">Files Online</span>
+      <nav class="footer-nav" aria-label="Footer navigation">
+        <a href="/">File Manager</a>
+        <a href="/privacy.html">Privacy Policy</a>
+        <a href="/imprint.html">Imprint</a>
+      </nav>
+      <span class="footer-meta">Runs entirely in your browser. No server. No upload.</span>
+    </div>
+  </footer>
+
+  <!-- App entry point -->
+  <script type="module" src="/assets/js/md-viewer.js?v=1"></script>
+
+  <!-- Service Worker registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+      });
+    }
+  </script>
+
+</body>
+</html>
