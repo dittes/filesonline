@@ -1,0 +1,2521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Browser Copilot AI — a private, local-first AI copilot for local files, notes and browser workflows. No install, no backend, no forced cloud AI.">
+<meta name="theme-color" content="#4f6df5">
+<title>Browser Copilot AI — private, local-first assistant</title>
+<style>
+/* ============================================================
+   Browser Copilot AI — design system
+   CSS variables, light + dark, no external fonts/frameworks.
+   ============================================================ */
+:root {
+  --bg: #f4f6fb;
+  --bg-panel: #ffffff;
+  --bg-inset: #eef1f7;
+  --bg-hover: #e7ebf3;
+  --bg-active: #dfe6f5;
+  --border: #dde3ee;
+  --border-strong: #c3ccdd;
+  --text: #1a2233;
+  --text-dim: #5b6579;
+  --text-faint: #8b94a8;
+  --accent: #4f6df5;
+  --accent-hover: #3d5ae4;
+  --accent-soft: #e6ebff;
+  --danger: #e5484d;
+  --danger-soft: #fdebec;
+  --warn: #b98900;
+  --warn-soft: #fdf5dc;
+  --ok: #2f9e63;
+  --ok-soft: #e2f5ea;
+  --shadow: 0 1px 3px rgba(20,30,60,.08), 0 6px 20px rgba(20,30,60,.06);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+[data-theme="dark"] {
+  --bg: #0f1420;
+  --bg-panel: #171e2e;
+  --bg-inset: #10151f;
+  --bg-hover: #202940;
+  --bg-active: #26314e;
+  --border: #263149;
+  --border-strong: #35425f;
+  --text: #e8ecf5;
+  --text-dim: #a5aec4;
+  --text-faint: #6d7690;
+  --accent: #6d87ff;
+  --accent-hover: #8299ff;
+  --accent-soft: #24304f;
+  --danger: #ff6369;
+  --danger-soft: #3a2027;
+  --warn: #e2b93b;
+  --warn-soft: #37301a;
+  --ok: #46c483;
+  --ok-soft: #16301f;
+  --shadow: 0 1px 3px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  font-family: var(--font); font-size: 14.5px; line-height: 1.5;
+  background: var(--bg); color: var(--text);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+
+/* ---------- generic controls ---------- */
+button {
+  font-family: inherit; font-size: 13.5px;
+  border: 1px solid var(--border); background: var(--bg-panel); color: var(--text);
+  padding: 6px 12px; border-radius: var(--radius-sm); cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px; justify-content: center;
+  transition: background .15s, border-color .15s;
+}
+button:hover:not(:disabled) { background: var(--bg-hover); }
+button:disabled { opacity: .45; cursor: not-allowed; }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+.btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+.btn-danger-soft { color: var(--danger); }
+.btn-ghost { background: transparent; border-color: transparent; }
+.btn-ghost:hover:not(:disabled) { background: var(--bg-hover); }
+.btn-sm { padding: 3px 9px; font-size: 12px; border-radius: 6px; }
+input[type="text"], input[type="password"], select, textarea {
+  font-family: inherit; font-size: 13.5px; color: var(--text);
+  background: var(--bg-inset); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 7px 10px;
+}
+input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: -1px; }
+kbd {
+  font-family: var(--mono); font-size: 11px;
+  background: var(--bg-inset); border: 1px solid var(--border-strong);
+  border-bottom-width: 2px; border-radius: 5px; padding: 0 5px; color: var(--text-dim);
+}
+.badge {
+  font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+  padding: 2px 8px; border-radius: 999px; white-space: nowrap;
+}
+.badge.ok { background: var(--ok-soft); color: var(--ok); }
+.badge.warn { background: var(--warn-soft); color: var(--warn); }
+.badge.info { background: var(--accent-soft); color: var(--accent); }
+.badge.danger { background: var(--danger-soft); color: var(--danger); }
+
+/* ---------- header ---------- */
+header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 14px; background: var(--bg-panel);
+  border-bottom: 1px solid var(--border); flex: none; z-index: 40;
+}
+.logo { display: flex; align-items: center; gap: 9px; font-weight: 700; font-size: 15.5px; }
+.logo-badge {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent), #9d5cf5);
+  display: grid; place-items: center; color: #fff; font-size: 14px;
+}
+.logo small { font-weight: 500; color: var(--text-faint); font-size: 11px; }
+#privacyBadge { cursor: pointer; border: none; }
+.header-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+
+/* ---------- layout ---------- */
+#layout {
+  flex: 1; display: grid; min-height: 0;
+  grid-template-columns: 240px minmax(0, 1fr) 380px;
+}
+#layout.sidebar-hidden { grid-template-columns: 0 minmax(0, 1fr) 380px; }
+#layout.sidebar-hidden #sidebar { display: none; }
+@media (max-width: 1100px) {
+  #layout { grid-template-columns: 220px minmax(0, 1fr); grid-template-rows: 1fr 45%; }
+  #chatPanel { grid-column: 1 / -1; border-top: 1px solid var(--border); }
+}
+@media (max-width: 760px) {
+  #layout { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr 45%; }
+  #sidebar { max-height: 180px; border-bottom: 1px solid var(--border); }
+}
+
+/* ---------- sidebar ---------- */
+#sidebar {
+  background: var(--bg-panel); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; overflow-y: auto; min-height: 0;
+}
+.side-top { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.side-section { padding: 4px 12px 10px; }
+.side-section h3 {
+  margin: 8px 0 6px; font-size: 10.5px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .08em; color: var(--text-faint);
+}
+.side-list { display: flex; flex-direction: column; gap: 1px; }
+.side-item {
+  display: flex; align-items: center; gap: 7px;
+  padding: 5px 8px; border-radius: 7px; font-size: 13px;
+  cursor: pointer; color: var(--text-dim); border: none; background: none;
+  text-align: left; width: 100%;
+}
+.side-item:hover { background: var(--bg-hover); }
+.side-item.active { background: var(--bg-active); color: var(--text); font-weight: 600; }
+.side-item .grow { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.side-item .mini { font-size: 12px; color: var(--text-faint); background: none; border: none; padding: 2px 4px; cursor: pointer; display: none; }
+.side-item:hover .mini { display: inline; }
+.side-item .mini:hover { color: var(--danger); }
+.side-empty { font-size: 12px; color: var(--text-faint); padding: 4px 8px; font-style: italic; }
+.side-bottom { margin-top: auto; padding: 12px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
+
+/* ---------- document panel ---------- */
+#docPanel { display: flex; flex-direction: column; min-width: 0; min-height: 0; background: var(--bg); }
+#docTabs {
+  display: flex; gap: 4px; padding: 8px 12px 0; overflow-x: auto; flex: none;
+}
+.doc-tab {
+  display: flex; align-items: center; gap: 7px;
+  padding: 6px 10px; border-radius: 8px 8px 0 0;
+  border: 1px solid var(--border); border-bottom: none;
+  background: var(--bg-inset); font-size: 12.5px; color: var(--text-dim);
+  cursor: pointer; max-width: 190px; flex: none;
+}
+.doc-tab.active { background: var(--bg-panel); color: var(--text); font-weight: 600; }
+.doc-tab .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.doc-tab .x { border: none; background: none; padding: 0 2px; color: var(--text-faint); cursor: pointer; font-size: 12px; }
+.doc-tab .x:hover { color: var(--danger); }
+.doc-tab .dirty { color: var(--warn); font-weight: 700; }
+
+#docToolbar {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 10px 14px; background: var(--bg-panel);
+  border-bottom: 1px solid var(--border); flex: none;
+  margin: 0 12px; border: 1px solid var(--border); border-radius: 0 var(--radius-sm) 0 0;
+}
+#docMeta { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
+#docName { font-weight: 650; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#docBody {
+  flex: 1; min-height: 0; margin: 0 12px 12px;
+  background: var(--bg-panel); border: 1px solid var(--border); border-top: none;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  display: flex; overflow: hidden; position: relative;
+}
+#editor {
+  flex: 1; border: none; border-radius: 0; resize: none; padding: 16px 18px;
+  font-family: var(--mono); font-size: 13px; line-height: 1.6;
+  background: var(--bg-panel); color: var(--text); min-width: 0;
+}
+#editor:focus-visible { outline: none; }
+#previewPane { flex: 1; overflow-y: auto; padding: 18px 22px; min-width: 0; }
+#previewPane iframe { width: 100%; height: 100%; border: none; background: #fff; border-radius: 6px; }
+#previewPane.iframe-host { padding: 0; display: flex; }
+
+/* markdown preview typography */
+.md-render { font-size: 14.5px; max-width: 820px; }
+.md-render h1, .md-render h2, .md-render h3 { line-height: 1.3; margin: 1.2em 0 .5em; }
+.md-render h1 { font-size: 1.7em; } .md-render h2 { font-size: 1.35em; } .md-render h3 { font-size: 1.15em; }
+.md-render h1:first-child { margin-top: 0; }
+.md-render code { font-family: var(--mono); font-size: .88em; background: var(--bg-inset); padding: 1px 5px; border-radius: 5px; }
+.md-render pre { background: var(--bg-inset); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; overflow-x: auto; }
+.md-render pre code { background: none; padding: 0; }
+.md-render blockquote { margin: .8em 0; padding: 4px 14px; border-left: 3px solid var(--accent); color: var(--text-dim); background: var(--bg-inset); border-radius: 0 6px 6px 0; }
+.md-render table { border-collapse: collapse; margin: .8em 0; width: 100%; font-size: .93em; }
+.md-render th, .md-render td { border: 1px solid var(--border); padding: 5px 10px; text-align: left; }
+.md-render th { background: var(--bg-inset); }
+.md-render a { color: var(--accent); }
+.md-render li { margin: .15em 0; }
+.md-render hr { border: none; border-top: 1px solid var(--border); margin: 1.2em 0; }
+.md-render img { max-width: 100%; }
+
+/* csv preview */
+.csv-table-wrap { overflow: auto; max-width: 100%; }
+.csv-table { border-collapse: collapse; font-size: 12.5px; font-family: var(--mono); }
+.csv-table th, .csv-table td { border: 1px solid var(--border); padding: 4px 9px; white-space: nowrap; }
+.csv-table th { background: var(--bg-inset); position: sticky; top: 0; }
+
+/* json error */
+.doc-alert {
+  margin: 0 0 12px; padding: 9px 12px; border-radius: var(--radius-sm);
+  font-size: 13px;
+}
+.doc-alert.error { background: var(--danger-soft); color: var(--danger); }
+.doc-alert.ok { background: var(--ok-soft); color: var(--ok); }
+
+/* drop zone / empty state */
+#dropZone {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px; color: var(--text-faint); text-align: center; padding: 30px;
+  border: 2px dashed transparent; border-radius: var(--radius-sm); margin: 10px;
+}
+#dropZone.dragover { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+#dropZone .big { font-size: 40px; }
+#dropZone .actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+
+/* selection toolbar */
+#selToolbar {
+  position: fixed; z-index: 90; display: none;
+  background: var(--bg-panel); border: 1px solid var(--border-strong);
+  border-radius: 10px; box-shadow: var(--shadow); padding: 4px;
+  gap: 2px; align-items: center;
+}
+#selToolbar button { border: none; background: none; padding: 5px 9px; font-size: 12.5px; border-radius: 6px; }
+#selToolbar button:hover { background: var(--bg-hover); }
+
+/* ---------- chat panel ---------- */
+#chatPanel {
+  background: var(--bg-panel); border-left: 1px solid var(--border);
+  display: flex; flex-direction: column; min-height: 0; min-width: 0;
+}
+#chatHead {
+  display: flex; align-items: center; gap: 8px; padding: 10px 12px;
+  border-bottom: 1px solid var(--border); flex: none; flex-wrap: wrap;
+}
+#chatTitle {
+  font-weight: 650; font-size: 14px; background: transparent;
+  border: 1px solid transparent; border-radius: 6px; padding: 3px 8px;
+  color: var(--text); min-width: 80px; flex: 1;
+}
+#chatTitle:hover, #chatTitle:focus { border-color: var(--border-strong); background: var(--bg-inset); outline: none; }
+#modeBadge { flex: none; }
+
+#aiActions {
+  padding: 8px 12px; border-bottom: 1px solid var(--border); flex: none;
+}
+#aiActions summary { font-size: 12px; color: var(--text-faint); cursor: pointer; user-select: none; }
+.action-chips { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 8px; max-height: 150px; overflow-y: auto; }
+.chip {
+  font-size: 12px; padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--bg-inset);
+  cursor: pointer; color: var(--text-dim);
+}
+.chip:hover { border-color: var(--accent); color: var(--accent); }
+
+#messages { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 14px; min-height: 0; }
+.msg { display: flex; flex-direction: column; gap: 4px; max-width: 100%; }
+.msg .bubble {
+  border-radius: 12px; padding: 9px 13px; font-size: 13.5px;
+  word-wrap: break-word; overflow-wrap: break-word; min-width: 0;
+}
+.msg.user { align-items: flex-end; }
+.msg.user .bubble { background: var(--accent); color: #fff; border-bottom-right-radius: 4px; max-width: 90%; white-space: pre-wrap; }
+.msg.assistant .bubble { background: var(--bg-inset); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+.msg .meta { display: flex; gap: 6px; align-items: center; font-size: 11px; color: var(--text-faint); padding: 0 4px; flex-wrap: wrap; }
+.msg .meta button { border: none; background: none; padding: 1px 5px; font-size: 11px; color: var(--text-faint); cursor: pointer; border-radius: 4px; }
+.msg .meta button:hover { background: var(--bg-hover); color: var(--text); }
+.msg .bubble.md-render { font-size: 13.5px; }
+.msg .bubble.md-render pre { font-size: 12px; }
+.typing { display: inline-flex; gap: 4px; padding: 4px 2px; }
+.typing i { width: 6px; height: 6px; border-radius: 50%; background: var(--text-faint); animation: blink 1.2s infinite; }
+.typing i:nth-child(2) { animation-delay: .2s; } .typing i:nth-child(3) { animation-delay: .4s; }
+@keyframes blink { 0%,100%{opacity:.25} 50%{opacity:1} }
+
+#chatEmpty { text-align: center; color: var(--text-faint); padding: 30px 16px; font-size: 13px; }
+#chatEmpty .suggestions { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 12px; }
+
+#chatInputWrap { border-top: 1px solid var(--border); padding: 10px 12px; flex: none; display: flex; flex-direction: column; gap: 7px; }
+#ctxRow { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+#ctxRow label { font-size: 11.5px; color: var(--text-faint); }
+#ctxSelect { font-size: 12px; padding: 3px 6px; }
+#selChip {
+  display: none; align-items: center; gap: 6px;
+  font-size: 11.5px; background: var(--accent-soft); color: var(--accent);
+  padding: 2px 9px; border-radius: 999px;
+}
+#selChip button { border: none; background: none; color: var(--accent); padding: 0; font-size: 12px; cursor: pointer; }
+.input-row { display: flex; gap: 7px; align-items: flex-end; }
+#chatInput {
+  flex: 1; resize: none; min-height: 40px; max-height: 140px;
+  font-size: 13.5px; line-height: 1.45;
+}
+#btnMic.listening { background: var(--danger-soft); border-color: var(--danger); color: var(--danger); animation: pulse 1.2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+/* ---------- modals ---------- */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(10,14,25,.55);
+  display: none; place-items: center; z-index: 120; padding: 18px;
+}
+.modal-backdrop.open { display: grid; }
+.modal {
+  background: var(--bg-panel); border: 1px solid var(--border);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+  width: 100%; max-width: 560px; max-height: 86vh;
+  display: flex; flex-direction: column;
+}
+.modal.wide { max-width: 680px; }
+.modal-head { display: flex; align-items: center; gap: 8px; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+.modal-head h3 { margin: 0; font-size: 15.5px; flex: 1; }
+.modal-body { padding: 16px 18px; overflow-y: auto; font-size: 13.5px; }
+.modal-foot { padding: 12px 18px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; }
+.set-group { margin-bottom: 18px; }
+.set-group h4 { margin: 0 0 8px; font-size: 13px; }
+.set-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 0; }
+.set-row .lbl { font-size: 13.5px; }
+.set-row .sub { display: block; font-size: 11.5px; color: var(--text-faint); max-width: 340px; }
+.set-col { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
+.set-col label { font-size: 11.5px; color: var(--text-faint); }
+.diag-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.diag-table td { padding: 5px 8px; border-bottom: 1px solid var(--border); }
+.diag-table td:last-child { text-align: right; }
+.shortcut-table { width: 100%; font-size: 13px; border-collapse: collapse; }
+.shortcut-table td { padding: 6px 4px; border-bottom: 1px solid var(--border); }
+
+/* switch */
+.switch { position: relative; display: inline-block; width: 36px; height: 21px; flex: none; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider-ui { position: absolute; inset: 0; cursor: pointer; background: var(--border-strong); border-radius: 999px; transition: background .15s; }
+.slider-ui::before { content: ""; position: absolute; height: 15px; width: 15px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: transform .15s; box-shadow: 0 1px 3px rgba(0,0,0,.3); }
+.switch input:checked + .slider-ui { background: var(--accent); }
+.switch input:checked + .slider-ui::before { transform: translateX(15px); }
+.switch input:focus-visible + .slider-ui { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- toasts ---------- */
+#toasts { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 8px; z-index: 200; align-items: center; pointer-events: none; }
+.toast { background: var(--text); color: var(--bg-panel); padding: 8px 16px; border-radius: 999px; font-size: 13px; box-shadow: var(--shadow); max-width: 90vw; animation: toast-in .2s ease-out; }
+.toast.error { background: var(--danger); color: #fff; }
+@keyframes toast-in { from { opacity: 0; transform: translateY(8px); } }
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header>
+  <button id="btnSidebar" class="btn-ghost" title="Toggle sidebar (Ctrl/Cmd+B)" aria-label="Toggle sidebar">☰</button>
+  <div class="logo"><div class="logo-badge" aria-hidden="true">◆</div> Browser Copilot <small>AI</small></div>
+  <button id="privacyBadge" class="badge ok" title="Click for privacy details &amp; diagnostics">🔒 Local only</button>
+  <div class="header-right">
+    <button id="btnDemoWs" class="btn-ghost" title="Load a demo workspace to explore without opening files">✨ Load Demo Workspace</button>
+    <button id="btnShortcuts" class="btn-ghost" title="Keyboard shortcuts (Ctrl/Cmd+/)" aria-label="Keyboard shortcuts">⌨</button>
+    <button id="btnTheme" class="btn-ghost" title="Toggle dark / light mode" aria-label="Toggle theme">🌓</button>
+  </div>
+</header>
+
+<div id="layout">
+  <!-- ============ SIDEBAR ============ -->
+  <aside id="sidebar" aria-label="Navigation">
+    <div class="side-top">
+      <button id="btnNewChat" class="btn-primary">＋ New chat</button>
+      <button id="btnOpenFile">📂 Open file <kbd>⌘O</kbd></button>
+    </div>
+    <div class="side-section">
+      <h3>Recent files</h3>
+      <div id="recentFiles" class="side-list"></div>
+    </div>
+    <div class="side-section">
+      <h3>Recent chats</h3>
+      <div id="chatList" class="side-list"></div>
+    </div>
+    <div class="side-section">
+      <h3>Saved prompts</h3>
+      <div id="promptList" class="side-list"></div>
+      <button id="btnNewPrompt" class="side-item" style="color:var(--accent)">＋ Save a prompt…</button>
+    </div>
+    <div class="side-bottom">
+      <button id="btnSettings" class="side-item">⚙️ Settings &amp; privacy</button>
+      <div id="privacyMini" class="side-empty" style="font-style:normal"></div>
+    </div>
+  </aside>
+
+  <!-- ============ DOCUMENT PANEL ============ -->
+  <section id="docPanel" aria-label="Document">
+    <div id="docTabs" style="display:none"></div>
+    <div id="docToolbar" style="display:none">
+      <div id="docMeta">
+        <span id="docName"></span>
+        <span id="docType" class="badge info"></span>
+        <span id="docSize" style="font-size:11.5px;color:var(--text-faint)"></span>
+        <span id="docSaveState" style="font-size:11.5px;color:var(--text-faint)"></span>
+      </div>
+      <button id="btnViewMode" class="btn-sm" title="Switch between edit and preview">👁 Preview</button>
+      <button id="btnPrettyJson" class="btn-sm" style="display:none" title="Validate and pretty-print JSON">{ } Format</button>
+      <button id="btnSaveFile" class="btn-sm" title="Save (Ctrl/Cmd+S)">💾 Save</button>
+      <button id="btnExportDoc" class="btn-sm" title="Download a copy">⬇ Export</button>
+    </div>
+    <div id="docBody" style="display:none">
+      <textarea id="editor" spellcheck="false" aria-label="Document editor"></textarea>
+      <div id="previewPane" style="display:none"></div>
+    </div>
+    <div id="dropZone">
+      <div class="big">🗂️</div>
+      <div><strong>Drop a file here</strong> or open one to get started.<br>
+        <span style="font-size:12.5px">Supported: .txt .md .html .json .csv .js .css .log — read locally, never uploaded.</span></div>
+      <div class="actions">
+        <button id="btnOpenFile2" class="btn-primary">📂 Open file</button>
+        <button id="btnDemoWs2">✨ Load Demo Workspace</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CHAT PANEL ============ -->
+  <section id="chatPanel" aria-label="Copilot chat">
+    <div id="chatHead">
+      <input id="chatTitle" value="New chat" aria-label="Chat title" spellcheck="false">
+      <span id="modeBadge" class="badge warn">heuristic</span>
+      <button id="btnExportChat" class="btn-sm" title="Export chat">⬇</button>
+      <button id="btnSpeakStop" class="btn-sm" style="display:none" title="Stop reading aloud">🔇 Stop</button>
+    </div>
+    <details id="aiActions" open>
+      <summary>AI actions &amp; templates</summary>
+      <div class="action-chips" id="actionChips"></div>
+    </details>
+    <div id="messages" role="log" aria-live="polite"></div>
+    <div id="chatInputWrap">
+      <div id="ctxRow">
+        <label for="ctxSelect">Context:</label>
+        <select id="ctxSelect" aria-label="Chat context source">
+          <option value="doc">Current file</option>
+          <option value="all">All open files</option>
+          <option value="none">Typed text only</option>
+        </select>
+        <span id="selChip">✂️ <span id="selChipLabel"></span> <button id="selChipClear" aria-label="Clear selection context">✕</button></span>
+      </div>
+      <div class="input-row">
+        <textarea id="chatInput" rows="1" placeholder='Ask about your file… e.g. "Summarize this" or "Extract todos"' aria-label="Chat message"></textarea>
+        <button id="btnMic" title="Voice input" aria-label="Voice input">🎙</button>
+        <button id="btnSend" class="btn-primary" title="Send (Ctrl/Cmd+Enter)">Send</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- floating selection toolbar -->
+<div id="selToolbar" role="toolbar" aria-label="Selection actions">
+  <button data-selact="summarize">Summarize</button>
+  <button data-selact="rewrite">Rewrite</button>
+  <button data-selact="explain">Explain</button>
+  <button data-selact="todos">Todos</button>
+  <button data-selact="translate">Translate</button>
+  <button data-selact="ask">Ask Copilot</button>
+</div>
+
+<!-- ============ SETTINGS MODAL ============ -->
+<div class="modal-backdrop" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+  <div class="modal wide">
+    <div class="modal-head"><h3 id="settingsTitle">Settings &amp; privacy</h3>
+      <button class="btn-ghost" data-close aria-label="Close">✕</button></div>
+    <div class="modal-body">
+      <div class="set-group">
+        <h4>🔒 Privacy</h4>
+        <div class="set-row">
+          <span class="lbl">Remember document contents locally
+            <span class="sub">Off by default. When on, file contents are stored in this browser's IndexedDB so recent files reopen instantly. Nothing ever leaves your machine — but anyone with access to this browser profile could read them.</span></span>
+          <span class="switch"><input type="checkbox" id="setRemember"><span class="slider-ui"></span></span>
+        </div>
+        <div class="set-row">
+          <span class="lbl">Current mode<span class="sub" id="privacyExplain"></span></span>
+          <span id="privacyBadge2" class="badge ok">Local only</span>
+        </div>
+      </div>
+      <div class="set-group">
+        <h4>🌐 External AI (optional, off by default)</h4>
+        <div class="set-row">
+          <span class="lbl">Allow external AI requests
+            <span class="sub">Sends your prompt AND the selected document context to the endpoint below. You will be warned before the first request each session.</span></span>
+          <span class="switch"><input type="checkbox" id="setExternal"><span class="slider-ui"></span></span>
+        </div>
+        <div class="set-col">
+          <label for="setEndpoint">OpenAI-compatible endpoint</label>
+          <input type="text" id="setEndpoint" placeholder="https://api.openai.com/v1/chat/completions" spellcheck="false" autocomplete="off">
+          <label for="setApiKey">API key</label>
+          <input type="password" id="setApiKey" placeholder="sk-…" autocomplete="off">
+          <label for="setModel">Model name</label>
+          <input type="text" id="setModel" placeholder="gpt-4o-mini" spellcheck="false" autocomplete="off">
+          <div class="set-row" style="padding-top:4px">
+            <span class="lbl">Store API key in this browser
+              <span class="sub">⚠️ Stored as plain text in localStorage — anyone with access to this browser profile can read it. If off, the key is kept in memory and forgotten when the tab closes.</span></span>
+            <span class="switch"><input type="checkbox" id="setStoreKey"><span class="slider-ui"></span></span>
+          </div>
+        </div>
+      </div>
+      <div class="set-group">
+        <h4>🩺 Browser compatibility</h4>
+        <table class="diag-table" id="diagTable"></table>
+      </div>
+      <div class="set-group">
+        <h4>💾 Your data</h4>
+        <div style="display:flex; gap:8px; flex-wrap:wrap">
+          <button id="btnExportAll">⬇ Export all app data (.json)</button>
+          <button id="btnImportAll">⬆ Import app data</button>
+          <button id="btnWipe" class="btn-danger-soft">🗑 Delete all local data</button>
+        </div>
+        <p class="sub" style="font-size:11.5px;color:var(--text-faint);margin:8px 0 0">
+          Everything lives in this browser (IndexedDB + localStorage). Nothing is synced or uploaded.
+          <a href="https://4hourventure.com/imprint" target="_blank" rel="noopener" style="color:var(--text-dim)">Imprint</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SHORTCUTS MODAL ============ -->
+<div class="modal-backdrop" id="shortcutsModal" role="dialog" aria-modal="true" aria-labelledby="shortcutsTitle">
+  <div class="modal">
+    <div class="modal-head"><h3 id="shortcutsTitle">Keyboard shortcuts</h3>
+      <button class="btn-ghost" data-close aria-label="Close">✕</button></div>
+    <div class="modal-body">
+      <table class="shortcut-table">
+        <tr><td><kbd>Ctrl/⌘ O</kbd></td><td>Open file</td></tr>
+        <tr><td><kbd>Ctrl/⌘ S</kbd></td><td>Save current file</td></tr>
+        <tr><td><kbd>Ctrl/⌘ K</kbd></td><td>Focus chat input</td></tr>
+        <tr><td><kbd>Ctrl/⌘ Enter</kbd></td><td>Send chat message</td></tr>
+        <tr><td><kbd>Ctrl/⌘ B</kbd></td><td>Toggle sidebar</td></tr>
+        <tr><td><kbd>Ctrl/⌘ /</kbd></td><td>Show this dialog</td></tr>
+        <tr><td><kbd>Esc</kbd></td><td>Close dialogs and toolbars</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PROMPT EDITOR MODAL ============ -->
+<div class="modal-backdrop" id="promptModal" role="dialog" aria-modal="true" aria-labelledby="promptModalTitle">
+  <div class="modal">
+    <div class="modal-head"><h3 id="promptModalTitle">Save prompt template</h3>
+      <button class="btn-ghost" data-close aria-label="Close">✕</button></div>
+    <div class="modal-body">
+      <div class="set-col">
+        <label for="promptName">Name</label>
+        <input type="text" id="promptName" placeholder="e.g. Weekly report style">
+        <label for="promptText">Prompt (the current file / selection is appended as context)</label>
+        <textarea id="promptText" rows="5" placeholder="e.g. Rewrite this as a friendly weekly status update with 3 sections…"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button data-close>Cancel</button>
+      <button id="btnSavePrompt" class="btn-primary">Save template</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ EXTERNAL AI WARNING MODAL ============ -->
+<div class="modal-backdrop" id="externalWarnModal" role="dialog" aria-modal="true" aria-labelledby="extWarnTitle">
+  <div class="modal">
+    <div class="modal-head"><h3 id="extWarnTitle">⚠️ Send content to external AI?</h3></div>
+    <div class="modal-body">
+      <p>This will send your prompt <strong>and the selected document context</strong> to:</p>
+      <p><code id="extWarnEndpoint" style="font-family:var(--mono);font-size:12px"></code></p>
+      <p>The provider will receive and process that text under its own terms. Only continue with content you're comfortable sharing.</p>
+    </div>
+    <div class="modal-foot">
+      <button id="extWarnCancel">Cancel</button>
+      <button id="extWarnOk" class="btn-primary">Send it</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="fileInput" multiple accept=".txt,.md,.markdown,.html,.htm,.json,.csv,.js,.css,.log" style="display:none" aria-hidden="true">
+<input type="file" id="importInput" accept=".json" style="display:none" aria-hidden="true">
+<div id="toasts" aria-live="polite"></div>
+
+<script>
+'use strict';
+/* ============================================================
+   Browser Copilot AI — architecture
+     Support / DiagnosticsController — feature detection
+     StorageController  — IndexedDB with localStorage fallback
+     AppState           — single source of truth
+     AIAdapter          — Chrome built-in AI / external / heuristics
+     FileController     — FS Access API + File API fallback
+     DocumentRenderer   — md / html / json / csv previews
+     ChatController     — conversations, streaming, history
+     PromptTemplateController — built-in + custom templates
+     VoiceController    — speech-to-text + read aloud
+     ExportController   — downloads, copy, backup/restore
+     UIController       — theme, modals, toasts, shortcuts
+   ============================================================ */
+
+const $  = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+
+/* ---------- small helpers ---------- */
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function fmtSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1048576).toFixed(1) + ' MB';
+}
+function uid() { return 'id-' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36); }
+function toast(msg, isError = false) {
+  const el = document.createElement('div');
+  el.className = 'toast' + (isError ? ' error' : '');
+  el.textContent = msg;
+  $('#toasts').appendChild(el);
+  setTimeout(() => el.remove(), 3800);
+}
+function download(filename, content, mime) {
+  const blob = content instanceof Blob ? content : new Blob([content], { type: mime || 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+async function copyText(text, label) {
+  if (!text) { toast('Nothing to copy.', true); return; }
+  try { await navigator.clipboard.writeText(text); toast((label || 'Text') + ' copied'); }
+  catch (e) { window.prompt('Clipboard unavailable — copy manually:', text); }
+}
+
+/* ============================================================
+   SUPPORT / DIAGNOSTICS
+   ============================================================ */
+const Support = {
+  fsAccess: 'showOpenFilePicker' in window,
+  speechRec: !!(window.SpeechRecognition || window.webkitSpeechRecognition),
+  speechSynth: 'speechSynthesis' in window,
+  idb: 'indexedDB' in window,
+  clipboard: !!(navigator.clipboard && navigator.clipboard.writeText),
+  serviceWorker: 'serviceWorker' in navigator,
+  webgpu: !!navigator.gpu,
+  worker: typeof Worker !== 'undefined',
+  // Chrome built-in AI — API shapes differ across versions; probe defensively.
+  promptApi: !!(window.LanguageModel || (window.ai && window.ai.languageModel)),
+  summarizerApi: !!(window.Summarizer || (window.ai && window.ai.summarizer)),
+  writerApi: !!(window.Writer || (window.ai && window.ai.writer)),
+  rewriterApi: !!(window.Rewriter || (window.ai && window.ai.rewriter)),
+  translatorApi: !!(window.Translator || (window.translation && window.translation.createTranslator)),
+  langDetectApi: !!(window.LanguageDetector || (window.translation && window.translation.createDetector)),
+  promptReady: false, // async-probed: on-device model actually usable
+
+  /* Some Chromium builds expose the Prompt API without a usable on-device
+     model (they echo the prompt back). Probe real availability. */
+  async probe() {
+    try {
+      if (window.LanguageModel && LanguageModel.availability) {
+        this.promptReady = (await LanguageModel.availability()) === 'available';
+      } else if (window.ai && window.ai.languageModel && window.ai.languageModel.capabilities) {
+        this.promptReady = (await window.ai.languageModel.capabilities()).available === 'readily';
+      } else {
+        this.promptReady = this.promptApi;
+      }
+    } catch (e) { this.promptReady = false; }
+    return this.promptReady;
+  },
+};
+
+const DiagnosticsController = {
+  render() {
+    const rows = [
+      ['File System Access API', Support.fsAccess, 'Direct save to disk. Fallback: download a copy.'],
+      ['Web Speech recognition', Support.speechRec, 'Voice input. Chrome/Edge only.'],
+      ['Speech synthesis', Support.speechSynth, 'Read answers aloud.'],
+      ['IndexedDB', Support.idb, 'Local history storage. Fallback: localStorage.'],
+      ['Clipboard API', Support.clipboard, 'Copy buttons. Fallback: manual copy prompt.'],
+      ['Service Worker (offline)', Support.serviceWorker && location.protocol.startsWith('http'), 'Requires http(s), not file://.'],
+      ['Web Workers', Support.worker, 'Background parsing for large files.'],
+      ['WebGPU', Support.webgpu, 'Future local LLM acceleration — detected only, no model shipped yet.'],
+      ['Chrome Prompt API', Support.promptReady, 'Built-in browser AI for generation.'],
+      ['Chrome Summarizer API', Support.summarizerApi, ''],
+      ['Chrome Writer / Rewriter', Support.writerApi || Support.rewriterApi, ''],
+      ['Chrome Translator API', Support.translatorApi, ''],
+      ['Chrome Language Detector', Support.langDetectApi, ''],
+      ['External AI', AppState.settings.external.enabled ? 'enabled' : 'disabled', 'Off by default. Opt-in in the section above.'],
+    ];
+    $('#diagTable').innerHTML = rows.map(([name, ok, note]) => {
+      const badge = typeof ok === 'string'
+        ? `<span class="badge ${ok === 'enabled' ? 'danger' : 'ok'}">${ok}</span>`
+        : `<span class="badge ${ok ? 'ok' : 'warn'}">${ok ? 'supported' : 'not available'}</span>`;
+      return `<tr><td title="${escapeHtml(note)}">${escapeHtml(name)}</td><td>${badge}</td></tr>`;
+    }).join('');
+  },
+};
+
+/* ============================================================
+   STORAGE CONTROLLER — IndexedDB (kv store) w/ localStorage fallback
+   ============================================================ */
+const StorageController = {
+  db: null, ok: false,
+  async init() {
+    if (!Support.idb) { this.ok = false; return; }
+    try {
+      this.db = await new Promise((res, rej) => {
+        const req = indexedDB.open('browser-copilot', 1);
+        req.onupgradeneeded = () => req.result.createObjectStore('kv');
+        req.onsuccess = () => res(req.result);
+        req.onerror = () => rej(req.error);
+      });
+      this.ok = true;
+    } catch (e) {
+      this.ok = false;
+      toast('IndexedDB unavailable — using localStorage (smaller capacity).', true);
+    }
+  },
+  async get(key) {
+    if (!this.ok) {
+      try { return JSON.parse(localStorage.getItem('bc-' + key) || 'null'); } catch (e) { return null; }
+    }
+    return new Promise((res) => {
+      const tx = this.db.transaction('kv', 'readonly').objectStore('kv').get(key);
+      tx.onsuccess = () => res(tx.result === undefined ? null : tx.result);
+      tx.onerror = () => res(null);
+    });
+  },
+  async set(key, value) {
+    if (!this.ok) {
+      try { localStorage.setItem('bc-' + key, JSON.stringify(value)); } catch (e) { /* quota */ }
+      return;
+    }
+    return new Promise((res) => {
+      const tx = this.db.transaction('kv', 'readwrite').objectStore('kv').put(value, key);
+      tx.onsuccess = () => res();
+      tx.onerror = () => res();
+    });
+  },
+  async del(key) {
+    if (!this.ok) { localStorage.removeItem('bc-' + key); return; }
+    return new Promise((res) => {
+      const tx = this.db.transaction('kv', 'readwrite').objectStore('kv').delete(key);
+      tx.onsuccess = () => res(); tx.onerror = () => res();
+    });
+  },
+  async wipe() {
+    const keys = ['chats', 'recents', 'prompts', 'settings'];
+    for (const k of keys) await this.del(k);
+    localStorage.removeItem('bc-api-key');
+    localStorage.removeItem('bc-theme');
+  },
+};
+
+/* ============================================================
+   APP STATE
+   ============================================================ */
+const AppState = {
+  docs: [],            // { id, name, ext, size, content, handle|null, dirty, view }
+  activeDocId: null,
+  chats: [],           // { id, title, createdAt, messages: [{role, text, mode, task, ts}] }
+  activeChatId: null,
+  recents: [],         // { name, ext, size, openedAt, content|null }
+  customPrompts: [],   // { id, name, text }
+  settings: {
+    rememberContents: false,
+    external: { enabled: false, endpoint: '', model: 'gpt-4o-mini', storeKey: false },
+  },
+  session: {
+    apiKey: '',            // memory-only unless storeKey enabled
+    externalConfirmed: false,
+    selection: '',         // selection captured for chat context
+    busy: false,
+    lastOutputs: {},       // task -> text (summary, todos, brief, rewrite …)
+  },
+
+  activeDoc() { return this.docs.find(d => d.id === this.activeDocId) || null; },
+  activeChat() { return this.chats.find(c => c.id === this.activeChatId) || null; },
+
+  async persist() {
+    await StorageController.set('chats', this.chats);
+    await StorageController.set('prompts', this.customPrompts);
+    await StorageController.set('settings', this.settings);
+    // Recent files: strip contents unless the user opted in.
+    const recents = this.recents.slice(0, 12).map(r => ({
+      ...r, content: this.settings.rememberContents ? r.content : null,
+    }));
+    await StorageController.set('recents', recents);
+  },
+  async restore() {
+    this.chats = (await StorageController.get('chats')) || [];
+    this.customPrompts = (await StorageController.get('prompts')) || [];
+    this.recents = (await StorageController.get('recents')) || [];
+    const s = await StorageController.get('settings');
+    if (s) {
+      this.settings = { ...this.settings, ...s, external: { ...this.settings.external, ...(s.external || {}) } };
+    }
+    if (this.settings.external.storeKey) {
+      this.session.apiKey = localStorage.getItem('bc-api-key') || '';
+    }
+  },
+};
+
+/* ============================================================
+   BACKGROUND WORKER — heavy parsing off the main thread.
+   Built from a Blob so the app stays a single file; falls back
+   to inline parsing when Workers are unavailable.
+   ============================================================ */
+const BgWorker = {
+  worker: null, jobs: new Map(),
+  SRC: `
+    function parseCSV(text, delim) {
+      const rows = [[]]; let cur = '', inQ = false;
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        if (inQ) { if (c === '"') { if (text[i+1] === '"') { cur += '"'; i++; } else inQ = false; } else cur += c; }
+        else if (c === '"') inQ = true;
+        else if (c === delim) { rows[rows.length-1].push(cur); cur = ''; }
+        else if (c === '\\n') { rows[rows.length-1].push(cur); cur = ''; rows.push([]); }
+        else if (c !== '\\r') cur += c;
+      }
+      rows[rows.length-1].push(cur);
+      if (rows.length && rows[rows.length-1].length === 1 && rows[rows.length-1][0] === '') rows.pop();
+      return rows;
+    }
+    self.onmessage = (e) => {
+      const { id, type, payload } = e.data;
+      try {
+        let result = null;
+        if (type === 'csv') result = parseCSV(payload.text, payload.delim);
+        self.postMessage({ id, result });
+      } catch (err) { self.postMessage({ id, error: String(err) }); }
+    };`,
+  init() {
+    if (!Support.worker) return;
+    try {
+      const url = URL.createObjectURL(new Blob([this.SRC], { type: 'text/javascript' }));
+      this.worker = new Worker(url);
+      this.worker.onmessage = (e) => {
+        const job = this.jobs.get(e.data.id);
+        if (!job) return;
+        this.jobs.delete(e.data.id);
+        e.data.error ? job.reject(new Error(e.data.error)) : job.resolve(e.data.result);
+      };
+    } catch (e) { this.worker = null; }
+  },
+  run(type, payload) {
+    if (!this.worker) return Promise.reject(new Error('no-worker'));
+    return new Promise((resolve, reject) => {
+      const id = uid();
+      this.jobs.set(id, { resolve, reject });
+      this.worker.postMessage({ id, type, payload });
+    });
+  },
+};
+
+/* ============================================================
+   AI ADAPTER
+   Mode A: Chrome built-in AI (Prompt/Summarizer/Rewriter/Translator)
+   Mode B: WebGPU placeholder (detection only — clean seam for a
+           future local model; see LocalModelBackend below)
+   Mode C: deterministic heuristics (always available)
+   External OpenAI-compatible endpoint: strictly opt-in.
+   ============================================================ */
+
+/* Placeholder seam for a future WebGPU local model (e.g. WebLLM).
+   Not implemented in the MVP — detection only, honest in the UI. */
+const LocalModelBackend = {
+  available: false, // becomes true when a real model integration lands
+  async load() { throw new Error('Local WebGPU model not shipped in this version.'); },
+  async generate() { throw new Error('Local WebGPU model not shipped in this version.'); },
+};
+
+class AIAdapter {
+  constructor() {
+    this.stops = new Set(('a an and are as at be but by for from has have i if in into is it its of on or so that the their ' +
+      'then there these they this to was we were what when which will with you your not can our just about over under very ' +
+      'um uh like okay ok also may might would could should shall do does did been being had must need needs ' +
+      'will want wants get gets got make makes made new more most some any all each every because while still').split(' '));
+  }
+
+  /* ---------- mode selection ---------- */
+  mode() {
+    if (AppState.settings.external.enabled && this.externalConfigured()) return 'external';
+    if (Support.promptReady) return 'browser-ai';
+    return 'heuristic';
+  }
+  externalConfigured() {
+    return !!(AppState.session.apiKey && (AppState.settings.external.endpoint || true));
+  }
+  modeLabel(mode) {
+    return { external: 'external AI', 'browser-ai': 'browser AI', heuristic: 'heuristic' }[mode] || mode;
+  }
+
+  /* ---------- public API ---------- */
+  async generate(prompt, options = {}) {
+    const task = options.task || 'generate';
+    const context = options.context || '';
+    const mode = this.mode();
+    if (mode === 'external') {
+      const ok = await UIController.confirmExternal();
+      if (ok) {
+        try {
+          const out = await this.callExternal(prompt, context);
+          return { text: out, mode: 'external' };
+        } catch (e) {
+          toast('External AI request failed (' + e.message + ') — falling back to local mode.', true);
+        }
+      }
+    }
+    if (Support.promptReady) {
+      try {
+        const out = await this.callPromptApi(prompt, context);
+        return { text: out, mode: 'browser-ai' };
+      } catch (e) { /* fall through to heuristics */ }
+    }
+    return { text: this.heuristicGenerate(task, prompt, context, options), mode: 'heuristic' };
+  }
+
+  async summarize(text, options = {}) {
+    // Prefer the dedicated Summarizer API when present.
+    if (this.mode() !== 'external' && Support.summarizerApi) {
+      try {
+        let s = null;
+        if (window.Summarizer && Summarizer.create) {
+          if (Summarizer.availability && (await Summarizer.availability()) !== 'available') throw new Error('na');
+          s = await Summarizer.create({ type: 'key-points', length: 'medium' });
+        } else if (window.ai && window.ai.summarizer) {
+          s = await window.ai.summarizer.create();
+        }
+        if (s) {
+          const out = String(await s.summarize(text.slice(0, 20000))).trim();
+          if (s.destroy) s.destroy();
+          if (out) return { text: out, mode: 'browser-ai' };
+        }
+      } catch (e) { /* fall through */ }
+    }
+    return this.generate('Summarize the following text concisely.', { ...options, task: 'summarize', context: text });
+  }
+
+  async rewrite(text, instruction = 'Rewrite this more clearly.') {
+    if (this.mode() !== 'external' && Support.rewriterApi) {
+      try {
+        let r = null;
+        if (window.Rewriter && Rewriter.create) {
+          if (Rewriter.availability && (await Rewriter.availability()) !== 'available') throw new Error('na');
+          r = await Rewriter.create();
+        } else if (window.ai && window.ai.rewriter) {
+          r = await window.ai.rewriter.create();
+        }
+        if (r) {
+          const out = String(await r.rewrite(text.slice(0, 20000), { context: instruction })).trim();
+          if (r.destroy) r.destroy();
+          if (out) return { text: out, mode: 'browser-ai' };
+        }
+      } catch (e) { /* fall through */ }
+    }
+    return this.generate(instruction, { task: 'rewrite', context: text, instruction });
+  }
+
+  async extractTodos(text) { return this.generate('Extract all action items as a Markdown checklist.', { task: 'todos', context: text }); }
+  async explain(text, context = '') { return this.generate('Explain the following.', { task: 'explain', context: text, extra: context }); }
+
+  async translate(text, targetLanguage) {
+    const target = /german|deutsch|\bde\b/i.test(targetLanguage) ? 'de' : 'en';
+    if (this.mode() !== 'external' && Support.translatorApi) {
+      try {
+        let tr = null;
+        const source = await this.detectLanguage(text) || (target === 'de' ? 'en' : 'de');
+        if (window.Translator && Translator.create) {
+          tr = await Translator.create({ sourceLanguage: source, targetLanguage: target });
+        } else if (window.translation && window.translation.createTranslator) {
+          tr = await window.translation.createTranslator({ sourceLanguage: source, targetLanguage: target });
+        }
+        if (tr) {
+          const out = String(await tr.translate(text.slice(0, 20000))).trim();
+          if (tr.destroy) tr.destroy();
+          if (out) return { text: out, mode: 'browser-ai' };
+        }
+      } catch (e) { /* fall through */ }
+    }
+    return this.generate('Translate to ' + targetLanguage + '.', { task: 'translate', context: text, target });
+  }
+
+  async detectLanguage(text) {
+    try {
+      if (window.LanguageDetector && LanguageDetector.create) {
+        const d = await LanguageDetector.create();
+        const res = await d.detect(text.slice(0, 2000));
+        if (d.destroy) d.destroy();
+        return res && res[0] && res[0].detectedLanguage;
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  /* ---------- Mode A: Chrome Prompt API ---------- */
+  async callPromptApi(prompt, context) {
+    let session = null;
+    if (window.LanguageModel && LanguageModel.create) session = await LanguageModel.create();
+    else if (window.ai && window.ai.languageModel) session = await window.ai.languageModel.create();
+    if (!session) throw new Error('Prompt API unavailable');
+    const full = prompt + (context ? '\n\n---\n' + context.slice(0, 12000) : '');
+    const out = String(await session.prompt(full)).trim();
+    if (session.destroy) session.destroy();
+    // Model-less Chromium builds echo the prompt back — treat as failure.
+    if (!out || out.includes('echoing back the input') || out.includes(prompt.slice(0, 40))) {
+      throw new Error('on-device model not usable');
+    }
+    return out;
+  }
+
+  /* ---------- External: OpenAI-compatible (opt-in only) ---------- */
+  async callExternal(prompt, context) {
+    const endpoint = AppState.settings.external.endpoint.trim() || 'https://api.openai.com/v1/chat/completions';
+    const resp = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + AppState.session.apiKey },
+      body: JSON.stringify({
+        model: AppState.settings.external.model || 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: 'You are a concise, helpful copilot for documents and notes. Answer in Markdown.' },
+          { role: 'user', content: prompt + (context ? '\n\n---\nContext:\n' + context.slice(0, 24000) : '') },
+        ],
+        temperature: 0.4,
+      }),
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    const out = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+    if (!out) throw new Error('empty response');
+    return out.trim();
+  }
+
+  /* ============================================================
+     Mode C: deterministic heuristics (honest local fallback)
+     ============================================================ */
+  /* Strip Markdown decorations so headings/tables don't pollute sentence analysis. */
+  plain(text) {
+    return String(text)
+      .replace(/```[\s\S]*?```/g, ' ')            // fenced code blocks
+      .replace(/^#{1,6}\s.*$/gm, '')              // headings are titles, not sentences
+      .replace(/^\s*\|.*\|\s*$/gm, ' ')           // table rows
+      .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')    // links -> text
+      .replace(/[*_`>#|]+/g, ' ');
+  }
+  sentences(text) {
+    return (this.plain(text).replace(/\s+/g, ' ').match(/[^.!?]+[.!?]*/g) || [])
+      .map(s => s.trim()).filter(s => s.length > 8);
+  }
+  words(text) { return text.toLowerCase().match(/[a-zà-öø-ÿäöüß][a-zà-öø-ÿäöüß'-]{2,}/gi) || []; }
+  keywords(text, n = 8) {
+    const freq = {};
+    this.words(text).forEach(w => { if (!this.stops.has(w)) freq[w] = (freq[w] || 0) + 1; });
+    return Object.entries(freq).sort((a, b) => b[1] - a[1]).slice(0, n).map(e => e[0]);
+  }
+  cap(w) { return w.charAt(0).toUpperCase() + w.slice(1); }
+
+  ACTION_RX = /\b(todo|to-do|must|should|need(s)? to|have to|next step|follow(-| )up|deadline|due|action|assign|remember to|don'?t forget|fix|implement|schedule|prepare|review|send|update|finish|complete)\b/i;
+  RISK_RX = /\b(risk|issue|problem|blocked|blocker|delay(ed)?|unclear|missing|dependency|dependencies|concern|bottleneck|overdue|budget|cost overrun|failure|bug|critical|urgent|shortage)\b/i;
+
+  heuristicSummarize(text, maxSent = 5) {
+    const sents = this.sentences(text);
+    if (sents.length <= 3) return sents.join(' ') || text.slice(0, 400);
+    const kws = this.keywords(text, 14);
+    const scored = sents.map((s, i) => {
+      const lower = s.toLowerCase();
+      let score = kws.reduce((acc, k, ki) => acc + (lower.includes(k) ? (kws.length - ki) : 0), 0);
+      score /= Math.sqrt(s.split(/\s+/).length);            // don't over-reward long sentences
+      if (/\d/.test(s)) score *= 1.25;                       // numbers = facts
+      if (/\b(decid|agree|conclud|launch|approv|reject)/i.test(lower)) score *= 1.3; // decisions
+      if (/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|monday|q[1-4]|deadline|\d{4})\b/i.test(lower)) score *= 1.15; // dates
+      if (this.ACTION_RX.test(s)) score *= 1.2;              // action verbs
+      if (i === 0) score *= 1.2;                             // opening frames topic
+      return { s, i, score };
+    });
+    const n = Math.max(3, Math.min(7, Math.ceil(sents.length / 5), maxSent));
+    return scored.sort((a, b) => b.score - a.score).slice(0, n)
+      .sort((a, b) => a.i - b.i).map(x => '- ' + x.s).join('\n');
+  }
+
+  heuristicTodos(text) {
+    const lines = text.split(/\n/).flatMap(l => this.sentences(l).length ? this.sentences(l) : [l.trim()]);
+    const seen = new Set(); const todos = [];
+    lines.forEach(l => {
+      const clean = l.replace(/^[-*•\d.)\s\[\]x]+/i, '').trim();
+      if (!clean || clean.length < 6) return;
+      if ((this.ACTION_RX.test(l) || /^[-*•]\s*\[ \]/.test(l.trim())) && !seen.has(clean.toLowerCase())) {
+        seen.add(clean.toLowerCase());
+        todos.push('- [ ] ' + clean.replace(/[.!?]+$/, ''));
+      }
+    });
+    return todos.length ? todos.join('\n') : '_No obvious action items found. Try selecting a section that contains tasks, deadlines or “should/must/need to” phrasing._';
+  }
+
+  heuristicRisks(text) {
+    const hits = this.sentences(text).filter(s => this.RISK_RX.test(s));
+    if (!hits.length) return '_No obvious risk language found (looked for: risk, issue, blocked, delay, unclear, missing, dependency, deadline, cost…)._';
+    return hits.map(s => {
+      const m = s.match(this.RISK_RX);
+      return '- ⚠️ **' + this.cap(m[0].toLowerCase()) + ':** ' + s.replace(/[.!?]+$/, '');
+    }).join('\n');
+  }
+
+  heuristicRewrite(text, instruction = '') {
+    // Deterministic cleanup: whitespace, capitalization, sentence splitting, tone templates.
+    let out = text.replace(/[ \t]+/g, ' ').replace(/ ?\n ?/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+    out = out.split(/\n/).map(line => {
+      let l = line.trim();
+      if (!l) return '';
+      // capitalize line starts and each new sentence
+      l = l.charAt(0).toUpperCase() + l.slice(1);
+      l = l.replace(/([.!?]\s+)([a-z])/g, (m, p, c) => p + c.toUpperCase());
+      // split run-on sentences at ", and/so/but" when very long
+      if (l.length > 220) l = l.replace(/,\s+(and|so|but)\s+/gi, '. $1 '.replace(/\b\w/, c => c));
+      return l;
+    }).join('\n');
+    const instr = instruction.toLowerCase();
+    if (/professional|formal/.test(instr)) {
+      out = out.replace(/\b(gonna|wanna)\b/gi, m => ({ gonna: 'going to', wanna: 'want to' }[m.toLowerCase()]))
+               .replace(/\b(a lot of)\b/gi, 'numerous').replace(/\b(really|very)\s+/gi, '')
+               .replace(/!+/g, '.').replace(/\b(stuff|things)\b/gi, 'items');
+    } else if (/casual/.test(instr)) {
+      out = out.replace(/\b(therefore|thus)\b/gi, 'so').replace(/\b(utilize)\b/gi, 'use')
+               .replace(/\b(regarding)\b/gi, 'about');
+    } else if (/short/.test(instr)) {
+      const sents = this.sentences(out);
+      out = sents.slice(0, Math.max(2, Math.ceil(sents.length / 2))).join(' ');
+    } else if (/clear/.test(instr)) {
+      out = out.replace(/\b(in order to)\b/gi, 'to').replace(/\b(at this point in time)\b/gi, 'now')
+               .replace(/\b(due to the fact that)\b/gi, 'because').replace(/\b(utilize)\b/gi, 'use');
+    }
+    return out;
+  }
+
+  heuristicExplain(text, extra = '', style = '') {
+    const doc = AppState.activeDoc();
+    const looksLikeCode = /[{};]|\bfunction\b|\bconst\b|=>|<\/?[a-z]+>/i.test(text) || (doc && ['js', 'css', 'html', 'json'].includes(doc.ext));
+    const kws = this.keywords(text, 6);
+    let md = '';
+    if (looksLikeCode) {
+      const fns = (text.match(/function\s+([a-zA-Z_$][\w$]*)/g) || []).map(m => m.replace('function ', ''));
+      const consts = (text.match(/(?:const|let|var|class)\s+([A-Za-z_$][\w$]*)/g) || []).slice(0, 8);
+      md += '### What this code appears to do\n\n';
+      md += '- Type: ' + (doc ? '`.' + doc.ext + '` file' : 'code snippet') + ', ~' + text.split('\n').length + ' lines\n';
+      if (fns.length) md += '- Functions defined: ' + fns.slice(0, 8).map(f => '`' + f + '`').join(', ') + '\n';
+      if (consts.length) md += '- Declarations: ' + consts.map(c => '`' + c.split(/\s+/)[1] + '`').join(', ') + '\n';
+      if (kws.length) md += '- Recurring terms: ' + kws.join(', ') + '\n';
+      md += '\n' + (style === 'nontechnical'
+        ? '**In plain words:** this file contains instructions the browser or computer follows step by step. The names above are the main “verbs” and “nouns” of those instructions.'
+        : '**Reading guide:** start at the top-level declarations above, then trace where each function is called to understand the data flow.');
+    } else {
+      md += '### Key points\n\n' + this.heuristicSummarize(text, 4) + '\n\n';
+      md += '**Main topics:** ' + (kws.join(', ') || '—') + '\n\n';
+      md += style === 'nontechnical'
+        ? '**In plain words:** the text is mostly about ' + (kws.slice(0, 2).join(' and ') || 'the topics above') + '. The bullet points above are the sentences that carry the core message.'
+        : '**Structure:** ' + this.sentences(text).length + ' sentences, ' + text.split(/\n\s*\n/).length + ' paragraphs. The bullets above are the highest-signal sentences by keyword weight.';
+    }
+    if (extra) md += '\n\n_Context note: ' + extra + '_';
+    return md;
+  }
+
+  heuristicTitle(text) {
+    const kws = this.keywords(text, 4).map(k => this.cap(k));
+    if (!kws.length) return 'Untitled document';
+    return [
+      kws.slice(0, 3).join(' · '),
+      kws[0] + (kws[1] ? ': ' + kws[1] + ' & ' + (kws[2] || 'Notes') : ''),
+      'Notes on ' + kws.slice(0, 2).join(' and '),
+    ].map((t, i) => (i + 1) + '. ' + t).join('\n');
+  }
+
+  heuristicGenerate(task, prompt, context, options = {}) {
+    const text = context || prompt;
+    switch (task) {
+      case 'summarize': return '### Summary\n\n' + this.heuristicSummarize(text);
+      case 'todos': return '### Action items\n\n' + this.heuristicTodos(text);
+      case 'risks': return '### Potential risks\n\n' + this.heuristicRisks(text);
+      case 'rewrite': return this.heuristicRewrite(text, options.instruction || prompt);
+      case 'explain': return this.heuristicExplain(text, options.extra || '', options.style || '');
+      case 'title': return '### Title suggestions\n\n' + this.heuristicTitle(text);
+      case 'translate':
+        return '⚠️ **Heuristic mode cannot translate.** Real translation needs the Chrome Translator API (chrome://flags → “Translation API”) or an external AI endpoint (Settings → External AI).\n\nOriginal text kept unchanged:\n\n> ' + text.slice(0, 500).replace(/\n/g, '\n> ');
+      case 'email': {
+        const summary = this.heuristicSummarize(text, 3).replace(/^- /gm, '');
+        const todos = this.heuristicTodos(text);
+        return 'Subject: ' + this.keywords(text, 3).map(k => this.cap(k)).join(' / ') + '\n\nHi,\n\nquick update:\n\n' +
+          summary + '\n\n' + (todos.startsWith('_') ? '' : 'Open items:\n' + todos.replace(/- \[ \]/g, '•') + '\n\n') +
+          'Let me know if you have questions.\n\nBest regards';
+      }
+      case 'checklist': {
+        const t = this.heuristicTodos(text);
+        return '### Checklist\n\n' + (t.startsWith('_')
+          ? this.sentences(text).slice(0, 8).map(s => '- [ ] ' + s.replace(/[.!?]+$/, '')).join('\n')
+          : t);
+      }
+      case 'bullets': return this.sentences(text).map(s => '- ' + s.replace(/[.!?]+$/, '')).join('\n');
+      case 'meeting-notes':
+        return '# Meeting notes\n\n**Date:** ' + new Date().toISOString().slice(0, 10) +
+          '\n\n## Key points\n\n' + this.heuristicSummarize(text, 5) +
+          '\n\n## Decisions\n\n' + (this.sentences(text).filter(s => /\b(decid|agree|conclud|approv)/i.test(s)).map(s => '- ' + s).join('\n') || '- _none detected_') +
+          '\n\n## Action items\n\n' + this.heuristicTodos(text);
+      case 'investor-update':
+        return '# Investor update — ' + new Date().toISOString().slice(0, 7) +
+          '\n\n## Highlights\n\n' + this.heuristicSummarize(text, 4) +
+          '\n\n## Numbers\n\n' + (this.sentences(text).filter(s => /\d/.test(s)).slice(0, 5).map(s => '- ' + s).join('\n') || '- _no metrics found in the source_') +
+          '\n\n## Risks\n\n' + this.heuristicRisks(text) +
+          '\n\n## Next steps\n\n' + this.heuristicTodos(text);
+      case 'brief':
+        return '# Project brief\n\n## Overview\n\n' + this.heuristicSummarize(text, 3) +
+          '\n\n## Goals\n\n' + (this.sentences(text).filter(s => /\b(goal|aim|objective|purpose|target)\b/i.test(s)).map(s => '- ' + s).join('\n') || '- _derive from summary above_') +
+          '\n\n## Key topics\n\n' + this.keywords(text, 6).map(k => '- ' + this.cap(k)).join('\n') +
+          '\n\n## Risks\n\n' + this.heuristicRisks(text) +
+          '\n\n## Open tasks\n\n' + this.heuristicTodos(text);
+      case 'blog-outline': {
+        const kws = this.keywords(text, 6).map(k => this.cap(k));
+        return '# Blog post outline\n\n## Working title\n\n' + (kws.slice(0, 2).join(' & ') || 'Draft') +
+          '\n\n## Sections\n\n' + ['Hook / why this matters', ...kws.slice(0, 4).map(k => k + ' — what we learned'), 'Takeaways & next steps']
+            .map((s, i) => (i + 1) + '. ' + s).join('\n');
+      }
+      case 'faq': {
+        const kws = this.keywords(text, 5).map(k => this.cap(k));
+        const sents = this.sentences(text);
+        return '# FAQ\n\n' + kws.map(k => {
+          const a = sents.find(s => s.toLowerCase().includes(k.toLowerCase()));
+          return '**Q: What about ' + k + '?**\n\nA: ' + (a || 'See the source document.') + '\n';
+        }).join('\n');
+      }
+      case 'notes-to-md': {
+        return text.split(/\n/).map(l => {
+          const t = l.trim();
+          if (!t) return '';
+          if (/^[A-Z][A-Za-z0-9 ]{2,48}:?$/.test(t) && !/[.!?]$/.test(t)) return '\n## ' + t.replace(/:$/, '') + '\n';
+          if (/^[-*•]/.test(t)) return '- ' + t.replace(/^[-*•]\s*/, '');
+          return t;
+        }).join('\n').replace(/\n{3,}/g, '\n\n').trim();
+      }
+      case 'md-to-html': return '```html\n' + DocumentRenderer.mdToHtml(text) + '\n```';
+      case 'improve-md':
+        return text.replace(/^(#{1,6})([^ #])/gm, '$1 $2')     // "#Title" -> "# Title"
+          .replace(/^[*•]\s+/gm, '- ')                          // normalize bullets
+          .replace(/\n{3,}/g, '\n\n')
+          .replace(/^(#{1,6} .+)\n(?!\n)/gm, '$1\n\n');         // blank line after headings
+      default: {
+        // Free-form question: answer with the most relevant sentences.
+        const q = this.keywords(prompt, 6);
+        const sents = this.sentences(text);
+        const rel = sents.map(s => ({ s, score: q.reduce((a, k) => a + (s.toLowerCase().includes(k) ? 1 : 0), 0) }))
+          .filter(x => x.score > 0).sort((a, b) => b.score - a.score).slice(0, 5).map(x => '- ' + x.s);
+        if (rel.length) return '### Most relevant passages\n\n' + rel.join('\n') + '\n\n_Heuristic mode matches your question against the document — it cannot truly reason. Enable a real AI mode for deeper answers._';
+        return '### Document at a glance\n\n' + this.heuristicSummarize(text, 4) +
+          '\n\n_Heuristic mode could not match your question to specific passages. Try “summarize”, “extract todos”, “find risks”, or enable a real AI mode in Settings._';
+      }
+    }
+  }
+}
+const Adapter = new AIAdapter();
+
+/* ============================================================
+   DOCUMENT RENDERER — markdown / html / json / csv previews
+   ============================================================ */
+const DocumentRenderer = {
+  /* Minimal but safe Markdown renderer:
+     ALL input is HTML-escaped first; only our own tags are emitted. */
+  mdToHtml(md) {
+    const codeBlocks = [];
+    let src = String(md).replace(/```([\w-]*)\r?\n([\s\S]*?)```/g, (m, lang, code) => {
+      codeBlocks.push('<pre><code>' + escapeHtml(code) + '</code></pre>');
+      return 'B' + (codeBlocks.length - 1) + '';
+    });
+    src = escapeHtml(src);
+
+    const inline = (s) => s
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+      .replace(/(^|\W)\*([^*\n]+)\*(?=\W|$)/g, '$1<em>$2</em>')
+      .replace(/~~([^~]+)~~/g, '<del>$1</del>')
+      .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+|mailto:[^)\s]+)\)/g,
+        '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+
+    const lines = src.split(/\r?\n/);
+    const out = [];
+    let list = null, para = [], table = [];
+
+    const flushPara = () => { if (para.length) { out.push('<p>' + inline(para.join(' ')) + '</p>'); para = []; } };
+    const flushList = () => { if (list) { out.push('</' + list + '>'); list = null; } };
+    const flushTable = () => {
+      if (table.length >= 2 && /^\s*\|?[\s:|-]+\|?\s*$/.test(table[1])) {
+        const parseRow = r => r.replace(/^\||\|$/g, '').split('|').map(c => inline(c.trim()));
+        let html = '<table><thead><tr>' + parseRow(table[0]).map(c => '<th>' + c + '</th>').join('') + '</tr></thead><tbody>';
+        table.slice(2).forEach(r => { html += '<tr>' + parseRow(r).map(c => '<td>' + c + '</td>').join('') + '</tr>'; });
+        out.push(html + '</tbody></table>');
+      } else {
+        table.forEach(t => para.push(t)); flushPara();
+      }
+      table = [];
+    };
+
+    for (const raw of lines) {
+      const line = raw;
+      const bMatch = line.match(/^B(\d+)\s*$/);
+      if (bMatch) { flushPara(); flushList(); if (table.length) flushTable(); out.push(codeBlocks[+bMatch[1]]); continue; }
+      if (/^\s*\|.*\|?\s*$/.test(line) && line.includes('|')) { flushPara(); flushList(); table.push(line); continue; }
+      if (table.length) flushTable();
+
+      const h = line.match(/^(#{1,6})\s+(.*)$/);
+      if (h) { flushPara(); flushList(); out.push('<h' + h[1].length + '>' + inline(h[2]) + '</h' + h[1].length + '>'); continue; }
+      if (/^\s*(---+|\*\*\*+)\s*$/.test(line)) { flushPara(); flushList(); out.push('<hr>'); continue; }
+      if (/^&gt;\s?/.test(line.trim())) { flushPara(); flushList(); out.push('<blockquote>' + inline(line.trim().replace(/^&gt;\s?/, '')) + '</blockquote>'); continue; }
+
+      const task = line.match(/^\s*[-*]\s+\[( |x|X)\]\s+(.*)$/);
+      const ul = line.match(/^\s*[-*+]\s+(.*)$/);
+      const ol = line.match(/^\s*\d+[.)]\s+(.*)$/);
+      if (task) {
+        flushPara(); if (list !== 'ul') { flushList(); out.push('<ul>'); list = 'ul'; }
+        out.push('<li><input type="checkbox" disabled' + (task[1].trim() ? ' checked' : '') + '> ' + inline(task[2]) + '</li>'); continue;
+      }
+      if (ul) { flushPara(); if (list !== 'ul') { flushList(); out.push('<ul>'); list = 'ul'; } out.push('<li>' + inline(ul[1]) + '</li>'); continue; }
+      if (ol) { flushPara(); if (list !== 'ol') { flushList(); out.push('<ol>'); list = 'ol'; } out.push('<li>' + inline(ol[1]) + '</li>'); continue; }
+      if (!line.trim()) { flushPara(); flushList(); continue; }
+      para.push(line.trim());
+    }
+    if (table.length) flushTable();
+    flushPara(); flushList();
+    return out.join('\n');
+  },
+
+  async render(doc) {
+    const pane = $('#previewPane');
+    pane.classList.remove('iframe-host');
+    pane.innerHTML = '';
+    if (doc.ext === 'md' || doc.ext === 'markdown') {
+      const div = document.createElement('div');
+      div.className = 'md-render';
+      div.innerHTML = this.mdToHtml(doc.content);
+      pane.appendChild(div);
+    } else if (doc.ext === 'html' || doc.ext === 'htm') {
+      // Sandboxed iframe: no scripts, no same-origin access, no navigation.
+      pane.classList.add('iframe-host');
+      const frame = document.createElement('iframe');
+      frame.setAttribute('sandbox', '');
+      frame.setAttribute('title', 'HTML preview (sandboxed)');
+      frame.srcdoc = doc.content;
+      pane.appendChild(frame);
+    } else if (doc.ext === 'json') {
+      const alertEl = document.createElement('div');
+      try {
+        JSON.parse(doc.content);
+        alertEl.className = 'doc-alert ok';
+        alertEl.textContent = '✅ Valid JSON';
+      } catch (e) {
+        alertEl.className = 'doc-alert error';
+        alertEl.textContent = '❌ Invalid JSON: ' + e.message;
+      }
+      const pre = document.createElement('pre');
+      pre.style.cssText = 'font-family:var(--mono);font-size:12.5px;overflow:auto;margin:0';
+      pre.textContent = doc.content;
+      pane.append(alertEl, pre);
+    } else if (doc.ext === 'csv') {
+      await this.renderCsv(doc, pane);
+    } else {
+      const pre = document.createElement('pre');
+      pre.style.cssText = 'font-family:var(--mono);font-size:12.5px;white-space:pre-wrap;margin:0';
+      pre.textContent = doc.content;
+      pane.appendChild(pre);
+    }
+  },
+
+  parseCsvInline(text, delim) {
+    const rows = [[]]; let cur = '', inQ = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (inQ) { if (c === '"') { if (text[i + 1] === '"') { cur += '"'; i++; } else inQ = false; } else cur += c; }
+      else if (c === '"') inQ = true;
+      else if (c === delim) { rows[rows.length - 1].push(cur); cur = ''; }
+      else if (c === '\n') { rows[rows.length - 1].push(cur); cur = ''; rows.push([]); }
+      else if (c !== '\r') cur += c;
+    }
+    rows[rows.length - 1].push(cur);
+    if (rows.length && rows[rows.length - 1].length === 1 && rows[rows.length - 1][0] === '') rows.pop();
+    return rows;
+  },
+
+  async renderCsv(doc, pane) {
+    const firstLine = doc.content.split('\n')[0] || '';
+    const delim = (firstLine.split(';').length > firstLine.split(',').length) ? ';' : ',';
+    let rows;
+    try {
+      rows = doc.content.length > 200000
+        ? await BgWorker.run('csv', { text: doc.content, delim }).catch(() => this.parseCsvInline(doc.content, delim))
+        : this.parseCsvInline(doc.content, delim);
+    } catch (e) { rows = null; }
+    if (!rows || !rows.length || rows.every(r => r.length <= 1 && !r[0])) {
+      const alertEl = document.createElement('div');
+      alertEl.className = 'doc-alert error';
+      alertEl.textContent = 'Could not parse this as CSV — showing raw text below.';
+      const pre = document.createElement('pre');
+      pre.style.cssText = 'font-family:var(--mono);font-size:12.5px;white-space:pre-wrap';
+      pre.textContent = doc.content;
+      pane.append(alertEl, pre);
+      return;
+    }
+    // Header heuristic: first row has no purely numeric cells, second row does.
+    const isNum = v => v !== '' && !isNaN(Number(v));
+    const hasHeader = rows.length > 1 && !rows[0].some(isNum) && rows[1].some(isNum);
+    const info = document.createElement('div');
+    info.className = 'doc-alert ok';
+    info.textContent = `📊 ${rows.length} rows × ${rows[0].length} columns` +
+      (hasHeader ? ' — header row detected' : '') + (delim === ';' ? ' — “;” delimiter' : '');
+    const wrap = document.createElement('div');
+    wrap.className = 'csv-table-wrap';
+    const table = document.createElement('table');
+    table.className = 'csv-table';
+    const MAX = 500;
+    rows.slice(0, MAX).forEach((r, i) => {
+      const tr = document.createElement('tr');
+      r.forEach(cell => {
+        const td = document.createElement(hasHeader && i === 0 ? 'th' : 'td');
+        td.textContent = cell;
+        tr.appendChild(td);
+      });
+      table.appendChild(tr);
+    });
+    wrap.appendChild(table);
+    pane.append(info, wrap);
+    if (rows.length > MAX) {
+      const more = document.createElement('div');
+      more.className = 'doc-alert ok';
+      more.textContent = `Showing first ${MAX} of ${rows.length} rows.`;
+      pane.appendChild(more);
+    }
+  },
+};
+
+/* ============================================================
+   FILE CONTROLLER — open / edit / save local files
+   ============================================================ */
+const FileController = {
+  SUPPORTED: ['txt', 'md', 'markdown', 'html', 'htm', 'json', 'csv', 'js', 'css', 'log'],
+  MAX_SIZE: 10 * 1024 * 1024, // 10 MB
+
+  init() {
+    ['#btnOpenFile', '#btnOpenFile2'].forEach(sel => $(sel).addEventListener('click', () => this.open()));
+    $('#fileInput').addEventListener('change', (e) => {
+      [...e.target.files].forEach(f => this.ingestFile(f, null));
+      e.target.value = '';
+    });
+    // drag & drop onto the whole document panel
+    const dz = $('#docPanel');
+    ['dragover', 'dragenter'].forEach(ev => dz.addEventListener(ev, (e) => {
+      e.preventDefault(); $('#dropZone').classList.add('dragover');
+    }));
+    ['dragleave', 'drop'].forEach(ev => dz.addEventListener(ev, (e) => {
+      if (ev === 'drop') e.preventDefault();
+      $('#dropZone').classList.remove('dragover');
+    }));
+    dz.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      const items = e.dataTransfer.items ? [...e.dataTransfer.items] : [];
+      for (const item of items) {
+        // Prefer FS handles so drops are directly saveable.
+        if (Support.fsAccess && item.getAsFileSystemHandle) {
+          try {
+            const handle = await item.getAsFileSystemHandle();
+            if (handle && handle.kind === 'file') {
+              const f = await handle.getFile();
+              this.ingestFile(f, handle);
+              continue;
+            }
+          } catch (err) { /* fall back below */ }
+        }
+        const f = item.getAsFile && item.getAsFile();
+        if (f) this.ingestFile(f, null);
+      }
+      if (!items.length && e.dataTransfer.files) [...e.dataTransfer.files].forEach(f => this.ingestFile(f, null));
+    });
+
+    $('#editor').addEventListener('input', () => {
+      const doc = AppState.activeDoc();
+      if (!doc) return;
+      doc.content = $('#editor').value;
+      doc.dirty = true;
+      doc.size = new Blob([doc.content]).size;
+      this.renderToolbar(doc);
+    });
+    $('#btnViewMode').addEventListener('click', () => this.toggleView());
+    $('#btnSaveFile').addEventListener('click', () => this.save());
+    $('#btnExportDoc').addEventListener('click', () => this.exportCopy());
+    $('#btnPrettyJson').addEventListener('click', () => this.prettyJson());
+  },
+
+  async open() {
+    if (Support.fsAccess) {
+      try {
+        const handles = await window.showOpenFilePicker({
+          multiple: true,
+          types: [{ description: 'Text documents', accept: { 'text/*': this.SUPPORTED.map(e => '.' + e) } }],
+        });
+        for (const h of handles) this.ingestFile(await h.getFile(), h);
+      } catch (err) {
+        if (err && err.name === 'AbortError') return; // user cancelled — not an error
+        toast('Could not open file: ' + (err && err.message || err), true);
+      }
+    } else {
+      $('#fileInput').click();
+    }
+  },
+
+  async ingestFile(file, handle) {
+    const ext = (file.name.split('.').pop() || '').toLowerCase();
+    if (!this.SUPPORTED.includes(ext)) {
+      toast(`“${file.name}”: .${ext} is not supported. Try: ${this.SUPPORTED.join(', ')}`, true);
+      return;
+    }
+    if (file.size > this.MAX_SIZE) {
+      toast(`“${file.name}” is ${fmtSize(file.size)} — max is ${fmtSize(this.MAX_SIZE)}.`, true);
+      return;
+    }
+    let content;
+    try { content = await file.text(); }
+    catch (err) { toast('Could not read “' + file.name + '”: ' + (err && err.message), true); return; }
+
+    const doc = {
+      id: uid(), name: file.name, ext: ext === 'markdown' ? 'md' : ext === 'htm' ? 'html' : ext,
+      size: file.size, content, handle: handle || null, dirty: false, view: 'edit',
+    };
+    AppState.docs.push(doc);
+    AppState.activeDocId = doc.id;
+    // Track in recents (content only stored if the user opted in — see persist()).
+    AppState.recents = [{ name: doc.name, ext: doc.ext, size: doc.size, openedAt: Date.now(), content: doc.content },
+      ...AppState.recents.filter(r => r.name !== doc.name)];
+    AppState.persist();
+    // Default view: preview for renderable formats.
+    if (['md', 'html', 'csv'].includes(doc.ext)) doc.view = 'preview';
+    this.renderAll();
+    UIController.renderSidebar();
+    toast('Opened ' + doc.name);
+  },
+
+  setActive(id) {
+    AppState.activeDocId = id;
+    this.renderAll();
+  },
+
+  closeDoc(id) {
+    const doc = AppState.docs.find(d => d.id === id);
+    if (doc && doc.dirty && !confirm(`“${doc.name}” has unsaved changes. Close anyway?`)) return;
+    AppState.docs = AppState.docs.filter(d => d.id !== id);
+    if (AppState.activeDocId === id) AppState.activeDocId = AppState.docs.length ? AppState.docs[AppState.docs.length - 1].id : null;
+    this.renderAll();
+  },
+
+  async save() {
+    const doc = AppState.activeDoc();
+    if (!doc) { toast('No file open.', true); return; }
+    if (doc.handle && Support.fsAccess) {
+      try {
+        const writable = await doc.handle.createWritable();
+        await writable.write(doc.content);
+        await writable.close();
+        doc.dirty = false;
+        this.renderToolbar(doc);
+        this.renderTabs();
+        toast('Saved ' + doc.name + ' to disk');
+        return;
+      } catch (err) {
+        if (err && err.name === 'AbortError') return;
+        toast('Direct save failed (' + (err && err.name) + ') — downloading a copy instead.', true);
+      }
+    }
+    this.exportCopy();
+    doc.dirty = false;
+    this.renderToolbar(doc);
+    this.renderTabs();
+  },
+
+  exportCopy() {
+    const doc = AppState.activeDoc();
+    if (!doc) { toast('No file open.', true); return; }
+    download(doc.name, doc.content, 'text/plain;charset=utf-8');
+  },
+
+  prettyJson() {
+    const doc = AppState.activeDoc();
+    if (!doc || doc.ext !== 'json') return;
+    try {
+      doc.content = JSON.stringify(JSON.parse(doc.content), null, 2);
+      doc.dirty = true;
+      $('#editor').value = doc.content;
+      if (doc.view === 'preview') DocumentRenderer.render(doc);
+      this.renderToolbar(doc);
+      toast('JSON formatted');
+    } catch (e) {
+      toast('Invalid JSON: ' + e.message, true);
+    }
+  },
+
+  toggleView() {
+    const doc = AppState.activeDoc();
+    if (!doc) return;
+    doc.view = doc.view === 'edit' ? 'preview' : 'edit';
+    this.renderBody(doc);
+  },
+
+  insertIntoDoc(text) {
+    const doc = AppState.activeDoc();
+    if (!doc) { toast('No file open to insert into.', true); return; }
+    const ed = $('#editor');
+    if (doc.view === 'preview') { doc.view = 'edit'; this.renderBody(doc); }
+    const start = ed.selectionStart ?? ed.value.length;
+    ed.value = ed.value.slice(0, start) + '\n' + text + '\n' + ed.value.slice(ed.selectionEnd ?? start);
+    doc.content = ed.value;
+    doc.dirty = true;
+    doc.size = new Blob([doc.content]).size;
+    this.renderToolbar(doc);
+    this.renderTabs();
+    toast('Inserted into ' + doc.name);
+  },
+
+  /* ---------- rendering ---------- */
+  renderAll() {
+    this.renderTabs();
+    const doc = AppState.activeDoc();
+    const has = !!doc;
+    $('#docToolbar').style.display = has ? 'flex' : 'none';
+    $('#docBody').style.display = has ? 'flex' : 'none';
+    $('#dropZone').style.display = has ? 'none' : 'flex';
+    $('#docTabs').style.display = AppState.docs.length ? 'flex' : 'none';
+    if (doc) { this.renderToolbar(doc); this.renderBody(doc); }
+  },
+  renderTabs() {
+    const tabs = $('#docTabs');
+    tabs.innerHTML = '';
+    AppState.docs.forEach(d => {
+      const tab = document.createElement('div');
+      tab.className = 'doc-tab' + (d.id === AppState.activeDocId ? ' active' : '');
+      tab.setAttribute('role', 'tab');
+      const name = document.createElement('span');
+      name.className = 'name'; name.textContent = d.name;
+      tab.appendChild(name);
+      if (d.dirty) { const dot = document.createElement('span'); dot.className = 'dirty'; dot.textContent = '●'; tab.appendChild(dot); }
+      const x = document.createElement('button');
+      x.className = 'x'; x.textContent = '✕'; x.setAttribute('aria-label', 'Close ' + d.name);
+      x.addEventListener('click', (e) => { e.stopPropagation(); this.closeDoc(d.id); });
+      tab.appendChild(x);
+      tab.addEventListener('click', () => this.setActive(d.id));
+      tabs.appendChild(tab);
+    });
+  },
+  renderToolbar(doc) {
+    $('#docName').textContent = doc.name;
+    $('#docType').textContent = '.' + doc.ext;
+    $('#docSize').textContent = fmtSize(doc.size);
+    $('#docSaveState').textContent = doc.dirty ? '● unsaved changes' : (doc.handle ? 'saved · direct save available' : 'save = download copy');
+    $('#btnPrettyJson').style.display = doc.ext === 'json' ? '' : 'none';
+    $('#btnViewMode').style.display = ['md', 'html', 'csv', 'json'].includes(doc.ext) ? '' : 'none';
+  },
+  renderBody(doc) {
+    const editing = doc.view === 'edit';
+    $('#editor').style.display = editing ? '' : 'none';
+    $('#previewPane').style.display = editing ? 'none' : '';
+    $('#btnViewMode').textContent = editing ? '👁 Preview' : '✏️ Edit';
+    if (editing) { $('#editor').value = doc.content; }
+    else DocumentRenderer.render(doc);
+  },
+};
+
+/* ============================================================
+   CHAT CONTROLLER
+   ============================================================ */
+const ChatController = {
+  init() {
+    $('#btnNewChat').addEventListener('click', () => this.newChat());
+    $('#btnSend').addEventListener('click', () => this.send());
+    $('#chatInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); this.send(); }
+    });
+    $('#chatInput').addEventListener('input', (e) => {
+      e.target.style.height = 'auto';
+      e.target.style.height = Math.min(140, e.target.scrollHeight) + 'px';
+    });
+    $('#chatTitle').addEventListener('change', () => {
+      const chat = AppState.activeChat();
+      if (chat) { chat.title = $('#chatTitle').value.trim() || 'Untitled chat'; AppState.persist(); UIController.renderSidebar(); }
+    });
+    $('#selChipClear').addEventListener('click', () => this.setSelection(''));
+    $('#btnExportChat').addEventListener('click', () => ExportController.exportChatMenu());
+    if (!AppState.chats.length) this.newChat(false);
+    else AppState.activeChatId = AppState.chats[0].id;
+    this.render();
+  },
+
+  newChat(focus = true) {
+    const chat = { id: uid(), title: 'New chat', createdAt: Date.now(), messages: [] };
+    AppState.chats.unshift(chat);
+    AppState.activeChatId = chat.id;
+    AppState.persist();
+    this.render();
+    UIController.renderSidebar();
+    if (focus) $('#chatInput').focus();
+  },
+
+  switchChat(id) {
+    AppState.activeChatId = id;
+    this.render();
+    UIController.renderSidebar();
+  },
+
+  deleteChat(id) {
+    if (!confirm('Delete this conversation? This cannot be undone.')) return;
+    AppState.chats = AppState.chats.filter(c => c.id !== id);
+    if (AppState.activeChatId === id) {
+      if (AppState.chats.length) AppState.activeChatId = AppState.chats[0].id;
+      else { this.newChat(false); }
+    }
+    AppState.persist();
+    this.render();
+    UIController.renderSidebar();
+  },
+
+  renameChat(id) {
+    const chat = AppState.chats.find(c => c.id === id);
+    if (!chat) return;
+    const name = prompt('Rename conversation:', chat.title);
+    if (name && name.trim()) { chat.title = name.trim(); AppState.persist(); this.render(); UIController.renderSidebar(); }
+  },
+
+  setSelection(text) {
+    AppState.session.selection = text || '';
+    const chip = $('#selChip');
+    if (text) {
+      chip.style.display = 'inline-flex';
+      $('#selChipLabel').textContent = 'Selection (' + text.length + ' chars)';
+    } else chip.style.display = 'none';
+  },
+
+  /* Build the context text based on the selector + captured selection. */
+  buildContext() {
+    if (AppState.session.selection) return { label: 'selection', text: AppState.session.selection };
+    const mode = $('#ctxSelect').value;
+    if (mode === 'none') return { label: 'none', text: '' };
+    if (mode === 'all') {
+      const all = AppState.docs.map(d => `--- FILE: ${d.name} ---\n${d.content}`).join('\n\n');
+      return { label: 'all files', text: all };
+    }
+    const doc = AppState.activeDoc();
+    return { label: doc ? doc.name : 'none', text: doc ? doc.content : '' };
+  },
+
+  /* Map free-text commands to adapter tasks. */
+  routeIntent(text) {
+    const t = text.toLowerCase();
+    const has = (...words) => words.some(w => t.includes(w));
+    if (has('summar', 'tl;dr', 'tldr')) return { task: 'summarize' };
+    if (has('todo', 'to-do', 'action item', 'task list', 'extract task')) return { task: 'todos' };
+    if (has('risk', 'blocker', 'what could go wrong')) return { task: 'risks' };
+    if (has('checklist')) return { task: 'checklist' };
+    if (has('bullet')) return { task: 'bullets' };
+    if (has('translate')) {
+      const target = has('german', 'deutsch') ? 'German' : has('english', 'englisch') ? 'English' : 'German';
+      return { task: 'translate', target };
+    }
+    if (has('email', 'e-mail')) return { task: 'email' };
+    if (has('meeting note')) return { task: 'meeting-notes' };
+    if (has('investor update')) return { task: 'investor-update' };
+    if (has('project brief', 'brief')) return { task: 'brief' };
+    if (has('blog')) return { task: 'blog-outline' };
+    if (has('faq')) return { task: 'faq' };
+    if (has('title', 'headline')) return { task: 'title' };
+    if (has('improve') && has('markdown', ' md')) return { task: 'improve-md' };
+    if (has('convert') && has('markdown') && has('html')) return { task: 'md-to-html' };
+    if (has('convert', 'turn') && has('markdown')) return { task: 'notes-to-md' };
+    if (has('explain like') && has('non-technical', 'not technical', "i'm five", 'im five')) return { task: 'explain', style: 'nontechnical' };
+    if (has('explain')) return { task: 'explain', style: has('technical') ? 'technical' : '' };
+    if (has('shorter', 'shorten', 'condense')) return { task: 'rewrite', instruction: 'Make this shorter.' };
+    if (has('clearer', 'clarify', 'simplify')) return { task: 'rewrite', instruction: 'Make this clearer.' };
+    if (has('professional', 'formal')) return { task: 'rewrite', instruction: 'Rewrite this professionally.' };
+    if (has('casual', 'friendly')) return { task: 'rewrite', instruction: 'Rewrite this casually.' };
+    if (has('rewrite', 'rephrase', 'reword')) return { task: 'rewrite', instruction: text };
+    return { task: 'generate' };
+  },
+
+  async send(presetText) {
+    if (AppState.session.busy) { toast('Copilot is still answering…'); return; }
+    const input = $('#chatInput');
+    const text = (presetText || input.value).trim();
+    if (!text) return;
+    const chat = AppState.activeChat();
+    if (!chat) return;
+    const ctx = this.buildContext();
+    if (!ctx.text && !['none'].includes(ctx.label)) {
+      // no doc open — proceed, heuristics will answer on the typed text alone
+    }
+    chat.messages.push({ role: 'user', text, ts: Date.now() });
+    if (chat.title === 'New chat') {
+      chat.title = text.slice(0, 42) + (text.length > 42 ? '…' : '');
+      $('#chatTitle').value = chat.title;
+    }
+    if (!presetText) { input.value = ''; input.style.height = 'auto'; }
+    this.render();
+
+    const intent = this.routeIntent(text);
+    AppState.session.busy = true;
+    const typingEl = this.showTyping();
+    try {
+      let res;
+      const source = ctx.text || text;
+      if (intent.task === 'summarize') res = await Adapter.summarize(source);
+      else if (intent.task === 'todos') res = await Adapter.extractTodos(source);
+      else if (intent.task === 'rewrite') res = await Adapter.rewrite(AppState.session.selection || source, intent.instruction);
+      else if (intent.task === 'translate') res = await Adapter.translate(AppState.session.selection || source, intent.target);
+      else if (intent.task === 'explain') res = await Adapter.generate(text, { task: 'explain', context: source, style: intent.style });
+      else res = await Adapter.generate(text, { task: intent.task, context: ctx.text });
+
+      AppState.session.lastOutputs[intent.task] = res.text;
+      const msg = { role: 'assistant', text: res.text, mode: res.mode, task: intent.task, ts: Date.now() };
+      chat.messages.push(msg);
+      typingEl.remove();
+      await this.streamMessage(msg);
+      UIController.updatePrivacyBadge(res.mode);
+    } catch (err) {
+      typingEl.remove();
+      chat.messages.push({ role: 'assistant', text: '⚠️ Something went wrong: ' + (err && err.message || err), mode: 'error', ts: Date.now() });
+      this.render();
+    } finally {
+      AppState.session.busy = false;
+      this.setSelection('');
+      AppState.persist();
+    }
+  },
+
+  showTyping() {
+    const el = document.createElement('div');
+    el.className = 'msg assistant';
+    el.innerHTML = '<div class="bubble"><span class="typing"><i></i><i></i><i></i></span></div>';
+    $('#messages').appendChild(el);
+    $('#messages').scrollTop = $('#messages').scrollHeight;
+    return el;
+  },
+
+  /* Fake streaming: reveal the (already computed) answer word by word. */
+  streamMessage(msg) {
+    return new Promise((resolve) => {
+      const host = $('#messages');
+      const el = this.buildMessageEl(msg, true);
+      host.appendChild(el);
+      const bubble = el.querySelector('.bubble');
+      const words = msg.text.split(/(\s+)/);
+      let i = 0, acc = '';
+      const step = () => {
+        const batch = Math.max(2, Math.round(words.length / 60));
+        acc += words.slice(i, i + batch).join('');
+        i += batch;
+        bubble.innerHTML = DocumentRenderer.mdToHtml(acc);
+        host.scrollTop = host.scrollHeight;
+        if (i < words.length) setTimeout(step, 24);
+        else { this.render(); resolve(); }
+      };
+      step();
+    });
+  },
+
+  buildMessageEl(msg, streaming = false) {
+    const el = document.createElement('div');
+    el.className = 'msg ' + msg.role;
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble' + (msg.role === 'assistant' ? ' md-render' : '');
+    if (msg.role === 'assistant' && !streaming) bubble.innerHTML = DocumentRenderer.mdToHtml(msg.text);
+    else if (msg.role === 'user') bubble.textContent = msg.text;
+    el.appendChild(bubble);
+
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    if (msg.role === 'assistant' && msg.mode && msg.mode !== 'error') {
+      const b = document.createElement('span');
+      b.className = 'badge ' + (msg.mode === 'heuristic' ? 'warn' : msg.mode === 'external' ? 'danger' : 'ok');
+      b.textContent = Adapter.modeLabel(msg.mode);
+      b.title = msg.mode === 'heuristic' ? 'Using local heuristic mode. Results are not generated by a full AI model.' : '';
+      meta.appendChild(b);
+    }
+    if (msg.role === 'assistant') {
+      const mk = (label, title, fn) => {
+        const b = document.createElement('button');
+        b.textContent = label; b.title = title;
+        b.addEventListener('click', fn);
+        meta.appendChild(b);
+      };
+      mk('📋 Copy', 'Copy answer', () => copyText(msg.text, 'Answer'));
+      mk('📄 Insert', 'Insert into current document', () => FileController.insertIntoDoc(msg.text));
+      if (Support.speechSynth) mk('🔊 Read', 'Read aloud', () => VoiceController.speak(msg.text));
+    }
+    el.appendChild(meta);
+    return el;
+  },
+
+  render() {
+    const chat = AppState.activeChat();
+    const host = $('#messages');
+    host.innerHTML = '';
+    $('#chatTitle').value = chat ? chat.title : '';
+    if (!chat || !chat.messages.length) {
+      const empty = document.createElement('div');
+      empty.id = 'chatEmpty';
+      empty.innerHTML = '<div style="font-size:30px">🤖</div><p><strong>Ask the Copilot about your files.</strong><br>Everything runs locally unless you enable external AI.</p>';
+      const sug = document.createElement('div');
+      sug.className = 'suggestions';
+      ['Summarize this', 'Extract todos', 'Find risks', 'Explain this code', 'Generate a title'].forEach(s => {
+        const c = document.createElement('button');
+        c.className = 'chip'; c.textContent = s;
+        c.addEventListener('click', () => { $('#chatInput').value = s; this.send(); });
+        sug.appendChild(c);
+      });
+      empty.appendChild(sug);
+      host.appendChild(empty);
+      return;
+    }
+    chat.messages.forEach(m => host.appendChild(this.buildMessageEl(m)));
+    host.scrollTop = host.scrollHeight;
+  },
+};
+
+/* ============================================================
+   PROMPT TEMPLATE CONTROLLER
+   ============================================================ */
+const PromptTemplateController = {
+  BUILTIN: [
+    { name: 'Summarize document', msg: 'Summarize this' },
+    { name: 'Extract action items', msg: 'Extract todos' },
+    { name: 'Rewrite professionally', msg: 'Rewrite this professionally' },
+    { name: 'Rewrite casually', msg: 'Rewrite this casually' },
+    { name: 'Make shorter', msg: 'Make this shorter' },
+    { name: 'Make clearer', msg: 'Make this clearer' },
+    { name: 'Explain code', msg: 'Explain this code' },
+    { name: 'Create email draft', msg: 'Turn this into an email' },
+    { name: 'Create meeting notes', msg: 'Create meeting notes from this' },
+    { name: 'Create investor update', msg: 'Create an investor update from this' },
+    { name: 'Create project brief', msg: 'Create a project brief from this' },
+    { name: 'Blog post outline', msg: 'Create a blog post outline from this' },
+    { name: 'Create checklist', msg: 'Create a checklist from this' },
+    { name: 'Extract risks', msg: 'Find risks in this' },
+    { name: 'Translate to German', msg: 'Translate this to German' },
+    { name: 'Translate to English', msg: 'Translate this to English' },
+    { name: 'Notes → Markdown', msg: 'Convert these notes to Markdown' },
+    { name: 'Markdown → HTML', msg: 'Convert this Markdown to HTML' },
+    { name: 'Generate FAQ', msg: 'Generate a FAQ from this' },
+    { name: 'Generate a title', msg: 'Generate a title' },
+  ],
+  editingId: null,
+
+  init() {
+    this.renderChips();
+    this.renderSaved();
+    $('#btnNewPrompt').addEventListener('click', () => this.openEditor());
+    $('#btnSavePrompt').addEventListener('click', () => this.saveFromModal());
+  },
+
+  renderChips() {
+    const host = $('#actionChips');
+    host.innerHTML = '';
+    this.BUILTIN.forEach(t => {
+      const c = document.createElement('button');
+      c.className = 'chip'; c.textContent = t.name;
+      c.title = 'Runs on the current selection, or the whole file if nothing is selected.';
+      c.addEventListener('click', () => ChatController.send(t.msg));
+      host.appendChild(c);
+    });
+    AppState.customPrompts.forEach(p => {
+      const c = document.createElement('button');
+      c.className = 'chip'; c.textContent = '★ ' + p.name;
+      c.addEventListener('click', () => ChatController.send(p.text));
+      host.appendChild(c);
+    });
+  },
+
+  renderSaved() {
+    const host = $('#promptList');
+    host.innerHTML = '';
+    if (!AppState.customPrompts.length) {
+      host.innerHTML = '<div class="side-empty">No saved prompts yet.</div>';
+      return;
+    }
+    AppState.customPrompts.forEach(p => {
+      const item = document.createElement('div');
+      item.className = 'side-item';
+      const run = document.createElement('span');
+      run.className = 'grow'; run.textContent = '★ ' + p.name; run.title = p.text;
+      run.style.cursor = 'pointer';
+      run.addEventListener('click', () => ChatController.send(p.text));
+      const edit = document.createElement('button');
+      edit.className = 'mini'; edit.textContent = '✎'; edit.title = 'Edit';
+      edit.addEventListener('click', () => this.openEditor(p));
+      const del = document.createElement('button');
+      del.className = 'mini'; del.textContent = '✕'; del.title = 'Delete';
+      del.addEventListener('click', () => {
+        AppState.customPrompts = AppState.customPrompts.filter(x => x.id !== p.id);
+        AppState.persist(); this.renderSaved(); this.renderChips();
+      });
+      item.append(run, edit, del);
+      host.appendChild(item);
+    });
+  },
+
+  openEditor(p = null) {
+    this.editingId = p ? p.id : null;
+    $('#promptModalTitle').textContent = p ? 'Edit prompt template' : 'Save prompt template';
+    $('#promptName').value = p ? p.name : '';
+    $('#promptText').value = p ? p.text : ($('#chatInput').value || '');
+    UIController.openModal('#promptModal');
+    $('#promptName').focus();
+  },
+
+  saveFromModal() {
+    const name = $('#promptName').value.trim();
+    const text = $('#promptText').value.trim();
+    if (!name || !text) { toast('Please fill in a name and prompt text.', true); return; }
+    if (this.editingId) {
+      const p = AppState.customPrompts.find(x => x.id === this.editingId);
+      if (p) { p.name = name; p.text = text; }
+    } else {
+      AppState.customPrompts.push({ id: uid(), name, text });
+    }
+    AppState.persist();
+    this.renderSaved(); this.renderChips();
+    UIController.closeModals();
+    toast('Prompt template saved');
+  },
+};
+
+/* ============================================================
+   SELECTION TOOLBAR — floating actions over selected text
+   ============================================================ */
+const SelectionToolbar = {
+  init() {
+    const tb = $('#selToolbar');
+    document.addEventListener('mouseup', (e) => {
+      if (tb.contains(e.target)) return;
+      setTimeout(() => this.maybeShow(e), 10);
+    });
+    document.addEventListener('mousedown', (e) => { if (!tb.contains(e.target)) this.hide(); });
+    tb.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-selact]');
+      if (!btn) return;
+      const text = this.currentSelection;
+      this.hide();
+      if (!text) return;
+      const act = btn.dataset.selact;
+      ChatController.setSelection(text);
+      if (act === 'ask') { $('#chatInput').focus(); toast('Selection attached — type your question.'); return; }
+      const msgs = { summarize: 'Summarize this', rewrite: 'Rewrite this clearly', explain: 'Explain this', todos: 'Extract todos', translate: 'Translate this to German' };
+      ChatController.send(msgs[act]);
+    });
+  },
+  currentSelection: '',
+  maybeShow(e) {
+    let text = '';
+    const ed = $('#editor');
+    if (document.activeElement === ed) {
+      text = ed.value.slice(ed.selectionStart, ed.selectionEnd);
+    } else {
+      const sel = window.getSelection();
+      if (sel && !sel.isCollapsed && $('#docPanel').contains(sel.anchorNode)) text = sel.toString();
+    }
+    text = (text || '').trim();
+    if (text.length < 8) { this.hide(); return; }
+    this.currentSelection = text;
+    const tb = $('#selToolbar');
+    tb.style.display = 'flex';
+    const w = tb.offsetWidth || 320;
+    tb.style.left = Math.max(8, Math.min(e.clientX - w / 2, innerWidth - w - 8)) + 'px';
+    tb.style.top = Math.max(8, e.clientY - 48) + 'px';
+  },
+  hide() { $('#selToolbar').style.display = 'none'; },
+};
+
+/* ============================================================
+   VOICE CONTROLLER — speech-to-text + read aloud
+   ============================================================ */
+const VoiceController = {
+  recognition: null, listening: false,
+  init() {
+    const btn = $('#btnMic');
+    if (!Support.speechRec) {
+      btn.disabled = true;
+      btn.title = 'Voice input is not supported in this browser (Web Speech API missing — try Chrome or Edge).';
+    } else {
+      btn.addEventListener('click', () => this.toggle());
+    }
+    $('#btnSpeakStop').addEventListener('click', () => this.stopSpeaking());
+  },
+  toggle() { this.listening ? this.stop() : this.start(); },
+  start() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const rec = new SR();
+    this.recognition = rec;
+    rec.continuous = true; rec.interimResults = true;
+    rec.lang = navigator.language || 'en-US';
+    const input = $('#chatInput');
+    const base = input.value ? input.value + ' ' : '';
+    rec.onresult = (e) => {
+      let final = '', interim = '';
+      for (let i = 0; i < e.results.length; i++) {
+        const r = e.results[i];
+        if (r.isFinal) final += r[0].transcript + ' ';
+        else interim += r[0].transcript;
+      }
+      input.value = (base + final + interim).trimStart();
+      input.dispatchEvent(new Event('input'));
+    };
+    rec.onerror = (e) => {
+      this.stop();
+      if (e.error === 'not-allowed') toast('Microphone permission denied — voice input unavailable.', true);
+      else if (e.error !== 'aborted' && e.error !== 'no-speech') toast('Speech recognition error: ' + e.error, true);
+    };
+    rec.onend = () => { this.listening = false; $('#btnMic').classList.remove('listening'); };
+    try {
+      rec.start();
+      this.listening = true;
+      $('#btnMic').classList.add('listening');
+      toast('Listening… click 🎙 again to stop.');
+    } catch (e) { toast('Could not start voice input.', true); }
+  },
+  stop() {
+    if (this.recognition) { try { this.recognition.stop(); } catch (e) {} }
+    this.listening = false;
+    $('#btnMic').classList.remove('listening');
+  },
+  speak(text) {
+    if (!Support.speechSynth) { toast('Speech synthesis is not supported here.', true); return; }
+    speechSynthesis.cancel();
+    // Strip markdown decorations for nicer speech.
+    const plain = text.replace(/[#*_`>|-]+/g, ' ').replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/\s+/g, ' ').trim();
+    const utter = new SpeechSynthesisUtterance(plain.slice(0, 3000));
+    utter.onend = () => { $('#btnSpeakStop').style.display = 'none'; };
+    utter.onerror = () => { $('#btnSpeakStop').style.display = 'none'; };
+    speechSynthesis.speak(utter);
+    $('#btnSpeakStop').style.display = '';
+  },
+  stopSpeaking() {
+    if (Support.speechSynth) speechSynthesis.cancel();
+    $('#btnSpeakStop').style.display = 'none';
+  },
+};
+
+/* ============================================================
+   EXPORT CONTROLLER
+   ============================================================ */
+const ExportController = {
+  init() {
+    $('#btnExportAll').addEventListener('click', () => this.exportAll());
+    $('#btnImportAll').addEventListener('click', () => $('#importInput').click());
+    $('#importInput').addEventListener('change', (e) => {
+      if (e.target.files[0]) this.importAll(e.target.files[0]);
+      e.target.value = '';
+    });
+    $('#btnWipe').addEventListener('click', async () => {
+      if (!confirm('Delete ALL local data (chats, prompts, recents, settings)? This cannot be undone.')) return;
+      await StorageController.wipe();
+      location.reload();
+    });
+  },
+
+  chatToMarkdown(chat) {
+    let md = '# ' + chat.title + '\n\n_Exported from Browser Copilot AI — ' + new Date().toLocaleString() + '_\n\n';
+    chat.messages.forEach(m => {
+      md += (m.role === 'user' ? '## 🧑 You' : '## 🤖 Copilot' + (m.mode ? ' _(' + Adapter.modeLabel(m.mode) + ')_' : '')) + '\n\n' + m.text + '\n\n';
+    });
+    return md;
+  },
+
+  exportChatMenu() {
+    const chat = AppState.activeChat();
+    if (!chat || !chat.messages.length) { toast('This chat is empty.', true); return; }
+    const md = this.chatToMarkdown(chat);
+    const choice = prompt('Export chat as: type "md", "txt" or "copy"', 'md');
+    if (!choice) return;
+    const name = chat.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 50) || 'chat';
+    if (choice === 'txt') download(name + '.txt', md.replace(/[#*_`]/g, ''), 'text/plain');
+    else if (choice === 'copy') copyText(md, 'Chat');
+    else download(name + '.md', md, 'text/markdown');
+  },
+
+  async exportAll() {
+    const data = {
+      app: 'browser-copilot-ai', version: 1, exportedAt: new Date().toISOString(),
+      chats: AppState.chats, prompts: AppState.customPrompts,
+      recents: AppState.recents.map(r => ({ ...r, content: AppState.settings.rememberContents ? r.content : null })),
+      settings: AppState.settings,
+    };
+    download('browser-copilot-backup.json', JSON.stringify(data, null, 2), 'application/json');
+    toast('Backup downloaded — API keys are never included.');
+  },
+
+  async importAll(file) {
+    let data;
+    try { data = JSON.parse(await file.text()); }
+    catch (e) { toast('Import failed: not valid JSON (' + e.message + ')', true); return; }
+    if (!data || data.app !== 'browser-copilot-ai') { toast('Import failed: not a Browser Copilot backup file.', true); return; }
+    AppState.chats = Array.isArray(data.chats) ? data.chats : [];
+    AppState.customPrompts = Array.isArray(data.prompts) ? data.prompts : [];
+    AppState.recents = Array.isArray(data.recents) ? data.recents : [];
+    if (data.settings) AppState.settings = { ...AppState.settings, ...data.settings, external: { ...AppState.settings.external, ...(data.settings.external || {}) } };
+    AppState.activeChatId = AppState.chats.length ? AppState.chats[0].id : null;
+    if (!AppState.chats.length) ChatController.newChat(false);
+    await AppState.persist();
+    ChatController.render();
+    UIController.renderSidebar();
+    UIController.applySettingsToUI();
+    PromptTemplateController.renderSaved();
+    PromptTemplateController.renderChips();
+    toast('Workspace imported');
+  },
+};
+
+/* ============================================================
+   UI CONTROLLER — theme, modals, shortcuts, sidebar, privacy
+   ============================================================ */
+const UIController = {
+  externalResolver: null,
+
+  init() {
+    /* theme */
+    const stored = localStorage.getItem('bc-theme');
+    const prefersDark = matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.dataset.theme = stored || (prefersDark ? 'dark' : 'light');
+    $('#btnTheme').addEventListener('click', () => {
+      const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = next;
+      localStorage.setItem('bc-theme', next);
+    });
+
+    /* sidebar + header buttons */
+    $('#btnSidebar').addEventListener('click', () => $('#layout').classList.toggle('sidebar-hidden'));
+    ['#btnDemoWs', '#btnDemoWs2'].forEach(s => $(s).addEventListener('click', () => DemoWorkspace.load()));
+    $('#btnShortcuts').addEventListener('click', () => this.openModal('#shortcutsModal'));
+    ['#privacyBadge', '#btnSettings'].forEach(s => $(s).addEventListener('click', () => this.openSettings()));
+
+    /* modals: close buttons + backdrop click */
+    $$('.modal-backdrop').forEach(bd => {
+      bd.addEventListener('click', (e) => { if (e.target === bd) this.closeModals(); });
+      bd.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => this.closeModals()));
+    });
+
+    /* external AI warning modal */
+    $('#extWarnOk').addEventListener('click', () => { this.closeModals(); if (this.externalResolver) this.externalResolver(true); });
+    $('#extWarnCancel').addEventListener('click', () => { this.closeModals(); if (this.externalResolver) this.externalResolver(false); });
+
+    /* settings wiring */
+    $('#setRemember').addEventListener('change', (e) => {
+      AppState.settings.rememberContents = e.target.checked;
+      AppState.persist();
+      if (!e.target.checked) toast('Stored file contents will be dropped on next save of recents.');
+    });
+    $('#setExternal').addEventListener('change', (e) => {
+      AppState.settings.external.enabled = e.target.checked;
+      AppState.session.externalConfirmed = false;
+      AppState.persist();
+      this.updatePrivacyBadge();
+      DiagnosticsController.render();
+    });
+    $('#setEndpoint').addEventListener('change', (e) => { AppState.settings.external.endpoint = e.target.value.trim(); AppState.persist(); });
+    $('#setModel').addEventListener('change', (e) => { AppState.settings.external.model = e.target.value.trim(); AppState.persist(); });
+    $('#setApiKey').addEventListener('change', (e) => {
+      AppState.session.apiKey = e.target.value.trim();
+      if (AppState.settings.external.storeKey) localStorage.setItem('bc-api-key', AppState.session.apiKey);
+    });
+    $('#setStoreKey').addEventListener('change', (e) => {
+      AppState.settings.external.storeKey = e.target.checked;
+      AppState.persist();
+      if (e.target.checked) {
+        localStorage.setItem('bc-api-key', AppState.session.apiKey);
+        toast('⚠️ API key stored as plain text in this browser profile.', true);
+      } else {
+        localStorage.removeItem('bc-api-key');
+        toast('API key removed from storage (kept in memory for this tab).');
+      }
+    });
+
+    /* keyboard shortcuts */
+    document.addEventListener('keydown', (e) => {
+      const mod = e.metaKey || e.ctrlKey;
+      if (e.key === 'Escape') { this.closeModals(); SelectionToolbar.hide(); return; }
+      if (!mod) return;
+      const k = e.key.toLowerCase();
+      if (k === 'o') { e.preventDefault(); FileController.open(); }
+      else if (k === 's') { e.preventDefault(); FileController.save(); }
+      else if (k === 'k') { e.preventDefault(); $('#chatInput').focus(); }
+      else if (k === 'b') { e.preventDefault(); $('#layout').classList.toggle('sidebar-hidden'); }
+      else if (k === '/') { e.preventDefault(); this.openModal('#shortcutsModal'); }
+      else if (k === 'enter') {
+        if (document.activeElement === $('#chatInput')) { e.preventDefault(); ChatController.send(); }
+      }
+    });
+
+    this.applySettingsToUI();
+    this.updatePrivacyBadge();
+    this.renderSidebar();
+  },
+
+  openModal(sel) { this.closeModals(); $(sel).classList.add('open'); },
+  closeModals() { $$('.modal-backdrop').forEach(m => m.classList.remove('open')); },
+  openSettings() { DiagnosticsController.render(); this.openModal('#settingsModal'); },
+
+  applySettingsToUI() {
+    $('#setRemember').checked = AppState.settings.rememberContents;
+    $('#setExternal').checked = AppState.settings.external.enabled;
+    $('#setEndpoint').value = AppState.settings.external.endpoint;
+    $('#setModel').value = AppState.settings.external.model;
+    $('#setStoreKey').checked = AppState.settings.external.storeKey;
+    $('#setApiKey').value = AppState.session.apiKey;
+  },
+
+  /* Warn (once per session) before any external request. */
+  confirmExternal() {
+    if (AppState.session.externalConfirmed) return Promise.resolve(true);
+    $('#extWarnEndpoint').textContent = AppState.settings.external.endpoint || 'https://api.openai.com/v1/chat/completions';
+    this.openModal('#externalWarnModal');
+    return new Promise((resolve) => {
+      this.externalResolver = (ok) => {
+        if (ok) AppState.session.externalConfirmed = true;
+        this.externalResolver = null;
+        resolve(ok);
+      };
+    });
+  },
+
+  updatePrivacyBadge(lastMode) {
+    const ext = AppState.settings.external.enabled;
+    let label, cls, explain;
+    if (ext) {
+      label = '🌐 External AI enabled'; cls = 'badge danger';
+      explain = 'Prompts + document context are sent to your configured endpoint when you chat.';
+    } else if (Support.promptReady) {
+      label = '🔒 Browser AI'; cls = 'badge info';
+      explain = 'Uses Chrome’s built-in on-device model. Nothing leaves your machine.';
+    } else {
+      label = '🔒 Local only'; cls = 'badge ok';
+      explain = 'Heuristic mode: deterministic local text analysis. No AI model, no network requests.';
+    }
+    ['#privacyBadge', '#privacyBadge2'].forEach(s => { const el = $(s); el.textContent = label; el.className = cls; });
+    $('#privacyBadge').classList.add('badge');
+    $('#privacyExplain').textContent = explain;
+    $('#privacyMini').textContent = ext ? '🌐 External AI on' : '🔒 100% local — no uploads';
+  },
+
+  renderSidebar() {
+    /* recent files */
+    const rf = $('#recentFiles');
+    rf.innerHTML = '';
+    if (!AppState.recents.length) rf.innerHTML = '<div class="side-empty">No files opened yet.</div>';
+    AppState.recents.slice(0, 8).forEach(r => {
+      const item = document.createElement('button');
+      item.className = 'side-item';
+      item.innerHTML = `<span>📄</span><span class="grow">${escapeHtml(r.name)}</span><span style="font-size:10.5px;color:var(--text-faint)">${fmtSize(r.size)}</span>`;
+      item.title = r.name + ' — opened ' + new Date(r.openedAt).toLocaleString();
+      item.addEventListener('click', () => {
+        const open = AppState.docs.find(d => d.name === r.name);
+        if (open) { FileController.setActive(open.id); return; }
+        if (r.content != null) {
+          AppState.docs.push({ id: uid(), name: r.name, ext: r.ext, size: r.size, content: r.content, handle: null, dirty: false, view: ['md','html','csv'].includes(r.ext) ? 'preview' : 'edit' });
+          AppState.activeDocId = AppState.docs[AppState.docs.length - 1].id;
+          FileController.renderAll();
+        } else {
+          toast('Contents were not stored (privacy setting is off) — please reopen the file.', true);
+          FileController.open();
+        }
+      });
+      rf.appendChild(item);
+    });
+
+    /* recent chats */
+    const cl = $('#chatList');
+    cl.innerHTML = '';
+    if (!AppState.chats.length) cl.innerHTML = '<div class="side-empty">No chats yet.</div>';
+    AppState.chats.slice(0, 10).forEach(c => {
+      const item = document.createElement('div');
+      item.className = 'side-item' + (c.id === AppState.activeChatId ? ' active' : '');
+      const go = document.createElement('span');
+      go.className = 'grow'; go.textContent = c.title; go.style.cursor = 'pointer';
+      go.addEventListener('click', () => ChatController.switchChat(c.id));
+      const ren = document.createElement('button');
+      ren.className = 'mini'; ren.textContent = '✎'; ren.title = 'Rename';
+      ren.addEventListener('click', () => ChatController.renameChat(c.id));
+      const del = document.createElement('button');
+      del.className = 'mini'; del.textContent = '✕'; del.title = 'Delete';
+      del.addEventListener('click', () => ChatController.deleteChat(c.id));
+      item.append(go, ren, del);
+      cl.appendChild(item);
+    });
+  },
+};
+
+/* ============================================================
+   DEMO WORKSPACE
+   ============================================================ */
+const DemoWorkspace = {
+  load() {
+    const md = `# Project Falcon — Q3 Launch Plan
+
+## Overview
+
+Project Falcon is our new customer onboarding flow. The goal is to reduce time-to-first-value from 9 days to 2 days. We decided in the June review to launch the beta on **August 15** with the top 20 design partners.
+
+## Current status
+
+- Design is complete and approved by the product council.
+- Backend migration is 70% done, but the billing dependency is blocked by the payments team.
+- We need to finish the audit log integration before the security review.
+- Anna should send the beta invite emails by Friday.
+- There is a risk that the data export feature slips, because the API contract is still unclear.
+
+## Metrics
+
+| Metric | Before | Target |
+|--------|--------|--------|
+| Time to first value | 9 days | 2 days |
+| Onboarding completion | 43% | 75% |
+| Support tickets / week | 31 | 12 |
+
+## Next steps
+
+1. Must finalize the pricing page copy by July 12.
+2. Follow up with the payments team about the billing blocker.
+3. Schedule the security review — deadline is July 30.
+4. TODO: prepare the demo script for the all-hands.
+
+> Note: budget for contractor support is missing from the current plan.
+`;
+    const csv = `week,signups,activated,churned
+2026-06-01,120,51,8
+2026-06-08,134,58,11
+2026-06-15,151,70,9
+2026-06-22,168,81,12
+2026-06-29,190,95,10`;
+
+    // demo docs (no file handles — save falls back to download)
+    AppState.docs = AppState.docs.filter(d => !d.name.startsWith('demo-'));
+    const mdDoc = { id: uid(), name: 'demo-launch-plan.md', ext: 'md', size: new Blob([md]).size, content: md, handle: null, dirty: false, view: 'preview' };
+    const csvDoc = { id: uid(), name: 'demo-metrics.csv', ext: 'csv', size: new Blob([csv]).size, content: csv, handle: null, dirty: false, view: 'preview' };
+    AppState.docs.push(mdDoc, csvDoc);
+    AppState.activeDocId = mdDoc.id;
+    AppState.recents = [
+      { name: mdDoc.name, ext: 'md', size: mdDoc.size, openedAt: Date.now(), content: md },
+      { name: csvDoc.name, ext: 'csv', size: csvDoc.size, openedAt: Date.now(), content: csv },
+      ...AppState.recents.filter(r => !r.name.startsWith('demo-')),
+    ];
+
+    // demo chat with representative outputs (generated live by the adapter)
+    const chat = { id: uid(), title: 'Demo: launch plan review', createdAt: Date.now(), messages: [] };
+    AppState.chats.unshift(chat);
+    AppState.activeChatId = chat.id;
+    FileController.renderAll();
+    ChatController.render();
+    UIController.renderSidebar();
+    AppState.persist();
+    toast('Demo workspace loaded — try “Summarize this” or “Extract todos”.');
+    // Kick off a real demo exchange through the adapter so outputs are honest.
+    setTimeout(() => ChatController.send('Summarize this'), 400);
+  },
+};
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+(async function boot() {
+  await StorageController.init();
+  await AppState.restore();
+  BgWorker.init();
+
+  UIController.init();
+  FileController.init();
+  ChatController.init();
+  PromptTemplateController.init();
+  SelectionToolbar.init();
+  VoiceController.init();
+  ExportController.init();
+  DiagnosticsController.render();
+  FileController.renderAll();
+
+  // Async probe for Chrome built-in AI, then refresh badges.
+  Support.probe().then(() => {
+    UIController.updatePrivacyBadge();
+    DiagnosticsController.render();
+  });
+
+  // PWA: register the service worker for offline use (http/https only).
+  if (Support.serviceWorker && location.protocol.startsWith('http')) {
+    navigator.serviceWorker.register('sw.js').catch(() => { /* offline support unavailable — non-fatal */ });
+  }
+
+  // Warn about unsaved changes.
+  window.addEventListener('beforeunload', (e) => {
+    if (AppState.docs.some(d => d.dirty)) { e.preventDefault(); e.returnValue = ''; }
+  });
+})();
+</script>
+</body>
+</html>

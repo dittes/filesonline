@@ -18,6 +18,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["serve", "-l", "3739", "screenscribe"],
       "port": 3739
+    },
+    {
+      "name": "browser-copilot",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "-l", "3740", "browser-copilot"],
+      "port": 3740
     }
   ]
 }
