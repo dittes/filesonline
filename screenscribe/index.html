@@ -1,0 +1,1991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="ScreenScribe AI — record your screen, webcam and mic in the browser and turn recordings into tutorials, summaries and shareable clips. Local-first, privacy-friendly.">
+<title>ScreenScribe AI — Record. Transcribe. Document.</title>
+<style>
+/* ============================================================
+   ScreenScribe AI — Design system
+   All colors/spacing via CSS variables, light + dark themes.
+   ============================================================ */
+:root {
+  --bg: #f5f7fb;
+  --bg-panel: #ffffff;
+  --bg-inset: #eef1f7;
+  --bg-hover: #e7ebf3;
+  --border: #dde3ee;
+  --border-strong: #c3ccdd;
+  --text: #1a2233;
+  --text-dim: #5b6579;
+  --text-faint: #8b94a8;
+  --accent: #4f6df5;
+  --accent-hover: #3d5ae4;
+  --accent-soft: #e6ebff;
+  --danger: #e5484d;
+  --danger-soft: #fdebec;
+  --warn: #b98900;
+  --warn-soft: #fdf5dc;
+  --ok: #2f9e63;
+  --ok-soft: #e2f5ea;
+  --rec: #e5484d;
+  --shadow: 0 1px 3px rgba(20, 30, 60, .08), 0 6px 20px rgba(20, 30, 60, .06);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+[data-theme="dark"] {
+  --bg: #0f1420;
+  --bg-panel: #171e2e;
+  --bg-inset: #10151f;
+  --bg-hover: #202940;
+  --border: #263149;
+  --border-strong: #35425f;
+  --text: #e8ecf5;
+  --text-dim: #a5aec4;
+  --text-faint: #6d7690;
+  --accent: #6d87ff;
+  --accent-hover: #8299ff;
+  --accent-soft: #24304f;
+  --danger: #ff6369;
+  --danger-soft: #3a2027;
+  --warn: #e2b93b;
+  --warn-soft: #37301a;
+  --ok: #46c483;
+  --ok-soft: #16301f;
+  --shadow: 0 1px 3px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- Header ---------- */
+header {
+  display: flex; align-items: center; gap: 14px;
+  padding: 10px 20px;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 50;
+}
+.logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 17px; }
+.logo-badge {
+  width: 30px; height: 30px; border-radius: 9px;
+  background: linear-gradient(135deg, var(--accent), #9d5cf5);
+  display: grid; place-items: center; color: #fff; font-size: 15px;
+}
+.logo small { font-weight: 500; color: var(--text-faint); font-size: 12px; margin-left: 2px; }
+.header-spacer { flex: 1; }
+.privacy-pill {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--text-dim);
+  background: var(--ok-soft); color: var(--ok);
+  border: 1px solid transparent;
+  padding: 4px 12px; border-radius: 999px;
+  max-width: 420px;
+}
+@media (max-width: 900px) { .privacy-pill span { display: none; } }
+
+/* ---------- Buttons ---------- */
+button {
+  font-family: inherit; font-size: 14px;
+  border: 1px solid var(--border);
+  background: var(--bg-panel); color: var(--text);
+  padding: 7px 14px; border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background .15s, border-color .15s, transform .05s;
+  display: inline-flex; align-items: center; gap: 7px; justify-content: center;
+}
+button:hover:not(:disabled) { background: var(--bg-hover); }
+button:active:not(:disabled) { transform: translateY(1px); }
+button:disabled { opacity: .45; cursor: not-allowed; }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+.btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+.btn-danger { background: var(--danger); border-color: var(--danger); color: #fff; font-weight: 600; }
+.btn-danger:hover:not(:disabled) { filter: brightness(1.1); background: var(--danger); }
+.btn-ghost { background: transparent; }
+.btn-big { padding: 13px 22px; font-size: 16px; border-radius: var(--radius); width: 100%; }
+.btn-icon { padding: 7px 10px; }
+kbd {
+  font-family: var(--mono); font-size: 11px;
+  background: var(--bg-inset); border: 1px solid var(--border-strong);
+  border-bottom-width: 2px; border-radius: 5px; padding: 0 5px;
+  color: var(--text-dim);
+}
+
+/* ---------- Layout ---------- */
+main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 290px minmax(0, 1fr) 360px;
+  gap: 16px;
+  padding: 16px 20px;
+  width: 100%;
+  max-width: 1700px;
+  margin: 0 auto;
+  align-items: start;
+}
+@media (max-width: 1200px) {
+  main { grid-template-columns: 260px minmax(0, 1fr); }
+  #panel-right { grid-column: 1 / -1; }
+}
+@media (max-width: 800px) {
+  main { grid-template-columns: 1fr; padding: 12px; }
+  #panel-left, #panel-right { grid-column: 1; }
+}
+
+.panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.panel-section { padding: 16px; border-bottom: 1px solid var(--border); }
+.panel-section:last-child { border-bottom: none; }
+.panel h2 {
+  margin: 0 0 12px; font-size: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .07em; color: var(--text-faint);
+}
+.hint { font-size: 12px; color: var(--text-faint); margin: 6px 0 0; }
+
+/* ---------- Toggles ---------- */
+.toggle-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 7px 0; gap: 10px;
+}
+.toggle-row .label { font-size: 14px; display: flex; align-items: center; gap: 8px; }
+.toggle-row .sub { display: block; font-size: 11.5px; color: var(--text-faint); }
+.switch { position: relative; display: inline-block; width: 38px; height: 22px; flex: none; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider-ui {
+  position: absolute; inset: 0; cursor: pointer;
+  background: var(--border-strong); border-radius: 999px; transition: background .15s;
+}
+.slider-ui::before {
+  content: ""; position: absolute; height: 16px; width: 16px;
+  left: 3px; top: 3px; background: #fff; border-radius: 50%;
+  transition: transform .15s; box-shadow: 0 1px 3px rgba(0,0,0,.3);
+}
+.switch input:checked + .slider-ui { background: var(--accent); }
+.switch input:checked + .slider-ui::before { transform: translateX(16px); }
+.switch input:focus-visible + .slider-ui { outline: 2px solid var(--accent); outline-offset: 2px; }
+.switch input:disabled + .slider-ui { opacity: .4; cursor: not-allowed; }
+
+/* ---------- Support badges ---------- */
+.support-list { display: flex; flex-direction: column; gap: 6px; font-size: 12.5px; }
+.support-item { display: flex; align-items: center; gap: 8px; color: var(--text-dim); }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.dot.ok { background: var(--ok); }
+.dot.no { background: var(--danger); }
+.dot.warn { background: var(--warn); }
+
+/* ---------- Status / errors ---------- */
+.status-box {
+  font-size: 13px; border-radius: var(--radius-sm); padding: 10px 12px;
+  margin-top: 10px; display: none;
+}
+.status-box.error { display: block; background: var(--danger-soft); color: var(--danger); }
+.status-box.warn  { display: block; background: var(--warn-soft); color: var(--warn); }
+.status-box.ok    { display: block; background: var(--ok-soft); color: var(--ok); }
+
+/* ---------- Timer & meter ---------- */
+.rec-status {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 12px; min-height: 28px;
+}
+.rec-dot {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--text-faint); flex: none;
+}
+.rec-dot.live { background: var(--rec); animation: pulse 1.2s infinite; }
+.rec-dot.paused { background: var(--warn); animation: none; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+#timer { font-family: var(--mono); font-size: 22px; font-weight: 600; letter-spacing: .02em; }
+.rec-state-label { font-size: 12px; color: var(--text-faint); text-transform: uppercase; letter-spacing: .06em; }
+
+.meter-wrap { margin-top: 10px; }
+.meter-label { font-size: 11.5px; color: var(--text-faint); display: flex; justify-content: space-between; margin-bottom: 4px; }
+.meter { height: 8px; background: var(--bg-inset); border-radius: 999px; overflow: hidden; border: 1px solid var(--border); }
+.meter-bar {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--ok), #d7c400 70%, var(--danger));
+  border-radius: 999px; transition: width .08s linear;
+}
+
+.controls-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.controls-grid .full { grid-column: 1 / -1; }
+
+.marker-list { margin: 10px 0 0; padding: 0; list-style: none; font-size: 13px; max-height: 150px; overflow-y: auto; }
+.marker-list li {
+  display: flex; align-items: center; gap: 8px; padding: 4px 6px;
+  border-radius: 6px;
+}
+.marker-list li:hover { background: var(--bg-hover); }
+.marker-list .t { font-family: var(--mono); color: var(--accent); font-size: 12px; flex: none; cursor: pointer; }
+.marker-list .lbl { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.marker-list .del { background: none; border: none; color: var(--text-faint); padding: 0 4px; font-size: 14px; }
+.marker-list .del:hover { color: var(--danger); }
+
+/* ---------- Preview stage ---------- */
+#stage-wrap { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.stage {
+  position: relative;
+  background: #0a0d14;
+  border-radius: var(--radius);
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--border);
+}
+.stage video { width: 100%; height: 100%; object-fit: contain; display: block; background: #0a0d14; }
+.stage-empty {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 10px;
+  color: #8b94a8; text-align: center; padding: 20px;
+}
+.stage-empty .big-ico { font-size: 42px; opacity: .8; }
+
+/* webcam overlay (draggable) */
+#camOverlay {
+  position: absolute; width: 22%; min-width: 120px; aspect-ratio: 4/3;
+  right: 2%; bottom: 3%;
+  border-radius: 10px; overflow: hidden;
+  border: 2px solid rgba(255,255,255,.7);
+  box-shadow: 0 4px 16px rgba(0,0,0,.5);
+  cursor: grab; display: none; z-index: 6;
+  touch-action: none;
+}
+#camOverlay.dragging { cursor: grabbing; }
+#camOverlay video { width: 100%; height: 100%; object-fit: cover; }
+
+/* cursor highlight simulation */
+#cursorHalo {
+  position: absolute; width: 44px; height: 44px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 214, 64, .45) 0%, rgba(255,214,64,.15) 55%, transparent 70%);
+  border: 2px solid rgba(255, 214, 64, .7);
+  transform: translate(-50%, -50%);
+  pointer-events: none; display: none; z-index: 7;
+}
+
+/* blur boxes */
+.blur-box {
+  position: absolute;
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  background: rgba(120,130,150,.25);
+  border: 1.5px dashed rgba(255,255,255,.8);
+  border-radius: 6px; cursor: move; z-index: 8;
+  touch-action: none;
+}
+.blur-box .bb-del {
+  position: absolute; top: -10px; right: -10px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--danger); color: #fff; border: none;
+  font-size: 11px; line-height: 1; padding: 0;
+  display: grid; place-items: center;
+}
+.blur-box .bb-resize {
+  position: absolute; right: -6px; bottom: -6px;
+  width: 14px; height: 14px; border-radius: 3px;
+  background: #fff; border: 1px solid var(--border-strong);
+  cursor: nwse-resize;
+}
+
+/* stage toolbar */
+.stage-tools {
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+}
+.stage-tools .spacer { flex: 1; }
+.badge-experimental {
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em;
+  background: var(--warn-soft); color: var(--warn);
+  padding: 2px 8px; border-radius: 999px; font-weight: 600;
+}
+
+/* ---------- Results dashboard ---------- */
+#results { display: none; }
+.results-head { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+#videoTitle {
+  font-size: 17px; font-weight: 650; flex: 1; min-width: 200px;
+  background: transparent; border: 1px solid transparent; border-radius: var(--radius-sm);
+  color: var(--text); padding: 6px 10px; font-family: inherit;
+}
+#videoTitle:hover, #videoTitle:focus { border-color: var(--border-strong); background: var(--bg-inset); outline: none; }
+
+.trim-row { display: flex; flex-direction: column; gap: 4px; margin-top: 12px; }
+.trim-row label { font-size: 12px; color: var(--text-faint); display: flex; justify-content: space-between; }
+input[type="range"] { width: 100%; accent-color: var(--accent); }
+
+.dl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin-top: 4px; }
+
+/* ---------- Right panel: tabs ---------- */
+.tabs { display: flex; border-bottom: 1px solid var(--border); overflow-x: auto; }
+.tab {
+  border: none; background: none; padding: 11px 14px;
+  font-size: 13.5px; color: var(--text-dim); border-radius: 0;
+  border-bottom: 2px solid transparent; flex: none;
+}
+.tab:hover { background: var(--bg-hover); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+.tab-body { display: none; padding: 14px 16px; }
+.tab-body.active { display: block; }
+
+/* transcript */
+#transcriptList { display: flex; flex-direction: column; gap: 2px; max-height: 46vh; overflow-y: auto; }
+.tr-chunk { display: flex; gap: 10px; padding: 5px 6px; border-radius: 6px; font-size: 13.5px; }
+.tr-chunk:hover { background: var(--bg-hover); }
+.tr-chunk .t { font-family: var(--mono); font-size: 11.5px; color: var(--accent); flex: none; padding-top: 2px; cursor: pointer; }
+.tr-chunk .txt { flex: 1; outline: none; border-radius: 4px; min-width: 0; }
+.tr-chunk .txt:focus { background: var(--bg-inset); box-shadow: 0 0 0 1px var(--border-strong); padding: 2px 4px; }
+.tr-interim { color: var(--text-faint); font-style: italic; font-size: 13.5px; padding: 4px 6px; }
+#manualTranscript {
+  width: 100%; min-height: 140px; resize: vertical;
+  background: var(--bg-inset); color: var(--text);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  font-family: inherit; font-size: 13.5px; padding: 10px;
+}
+#manualTranscript:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+
+/* AI output cards */
+.ai-card { border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 12px; overflow: hidden; }
+.ai-card-head {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; background: var(--bg-inset);
+  font-size: 12.5px; font-weight: 650;
+}
+.ai-card-head .spacer { flex: 1; }
+.ai-card-head button { padding: 3px 10px; font-size: 12px; }
+.ai-card-body {
+  padding: 10px 12px; font-size: 13px; white-space: pre-wrap;
+  max-height: 260px; overflow-y: auto;
+  font-family: var(--font); color: var(--text-dim);
+}
+.ai-card-body:empty::before { content: "Nothing generated yet."; color: var(--text-faint); font-style: italic; }
+.ai-provider-row { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.ai-provider-row input[type="text"], .ai-provider-row input[type="password"] {
+  width: 100%; padding: 7px 10px; font-size: 13px;
+  background: var(--bg-inset); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text); font-family: inherit;
+}
+
+/* ---------- Toasts ---------- */
+#toasts {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; gap: 8px; z-index: 200; align-items: center;
+  pointer-events: none;
+}
+.toast {
+  background: var(--text); color: var(--bg-panel);
+  padding: 9px 18px; border-radius: 999px; font-size: 13.5px;
+  box-shadow: var(--shadow); max-width: 90vw;
+  animation: toast-in .2s ease-out;
+}
+.toast.error { background: var(--danger); color: #fff; }
+@keyframes toast-in { from { opacity: 0; transform: translateY(8px); } }
+
+/* ---------- Modal ---------- */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(10,14,25,.6);
+  display: none; place-items: center; z-index: 150; padding: 20px;
+}
+.modal-backdrop.open { display: grid; }
+.modal {
+  background: var(--bg-panel); border: 1px solid var(--border);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+  max-width: 440px; width: 100%; padding: 22px;
+}
+.modal h3 { margin: 0 0 8px; font-size: 16px; }
+.modal p { margin: 0 0 16px; font-size: 14px; color: var(--text-dim); }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+/* ---------- Footer ---------- */
+footer {
+  padding: 14px 20px; font-size: 12.5px; color: var(--text-faint);
+  display: flex; gap: 16px; flex-wrap: wrap; align-items: center;
+  border-top: 1px solid var(--border);
+}
+footer a { color: var(--text-dim); }
+.shortcut-hints { display: flex; gap: 12px; flex-wrap: wrap; }
+@media (max-width: 700px) { .shortcut-hints { display: none; } }
+
+/* visually hidden (for a11y labels) */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+</style>
+</head>
+<body>
+
+<!-- ================= HEADER ================= -->
+<header>
+  <div class="logo">
+    <div class="logo-badge" aria-hidden="true">▶</div>
+    ScreenScribe <small>AI</small>
+  </div>
+  <div class="header-spacer"></div>
+  <div class="privacy-pill" title="Recordings stay in your browser unless you explicitly export them or use external AI.">
+    🔒 <span>Recordings stay in your browser unless you export them or use external AI.</span>
+  </div>
+  <button id="btnDemo" class="btn-ghost" title="Load fake transcript, markers and AI outputs to explore the app without recording">
+    ✨ Load demo
+  </button>
+  <button id="btnTheme" class="btn-icon" aria-label="Toggle dark / light mode" title="Toggle dark / light mode">🌓</button>
+</header>
+
+<main>
+  <!-- ================= LEFT: RECORDING CONTROLS ================= -->
+  <div id="panel-left" class="panel">
+    <section class="panel-section">
+      <h2>Sources</h2>
+      <div class="toggle-row">
+        <span class="label">🖥️ Screen capture
+          <span class="sub"></span>
+        </span>
+        <span style="font-size:12px;color:var(--text-faint)">picker on start</span>
+      </div>
+      <p class="hint" style="margin-top:-2px">You choose screen, window or tab in the browser dialog when recording starts.</p>
+      <div class="toggle-row">
+        <label class="label" for="optMic">🎙️ Microphone</label>
+        <span class="switch"><input type="checkbox" id="optMic" checked><span class="slider-ui"></span></span>
+      </div>
+      <div class="toggle-row">
+        <label class="label" for="optSysAudio">🔊 System audio <span class="sub">tab/system sound, if supported</span></label>
+        <span class="switch"><input type="checkbox" id="optSysAudio" checked><span class="slider-ui"></span></span>
+      </div>
+      <div class="toggle-row">
+        <label class="label" for="optCam">📷 Webcam overlay <span class="sub">preview only, not baked into export</span></label>
+        <span class="switch"><input type="checkbox" id="optCam"><span class="slider-ui"></span></span>
+      </div>
+      <div class="toggle-row">
+        <label class="label" for="optCursor">✨ Cursor highlight <span class="sub">simulated halo in preview</span></label>
+        <span class="switch"><input type="checkbox" id="optCursor"><span class="slider-ui"></span></span>
+      </div>
+      <div class="toggle-row">
+        <label class="label" for="optReminder">⚠️ Sensitive-info reminder <span class="sub">confirm before recording starts</span></label>
+        <span class="switch"><input type="checkbox" id="optReminder"><span class="slider-ui"></span></span>
+      </div>
+      <div id="permStatus" class="status-box" role="status" aria-live="polite"></div>
+    </section>
+
+    <section class="panel-section">
+      <h2>Recording</h2>
+      <div class="rec-status">
+        <span id="recDot" class="rec-dot" aria-hidden="true"></span>
+        <span id="timer" aria-label="Recording time">00:00</span>
+        <span id="recStateLabel" class="rec-state-label">idle</span>
+      </div>
+      <button id="btnStart" class="btn-primary btn-big">● Start Recording</button>
+      <div class="controls-grid">
+        <button id="btnPause" disabled title="Pause / resume (Space)">⏸ Pause</button>
+        <button id="btnStop" disabled title="Stop recording (S)">⏹ Stop</button>
+        <button id="btnMarker" class="full" disabled title="Mark an important moment (M)">🚩 Add Marker <kbd>M</kbd></button>
+      </div>
+      <div class="meter-wrap">
+        <div class="meter-label"><span>Mic level</span><span id="meterState">off</span></div>
+        <div class="meter" role="img" aria-label="Microphone level meter"><div id="meterBar" class="meter-bar"></div></div>
+      </div>
+      <div id="recError" class="status-box" role="alert"></div>
+    </section>
+
+    <section class="panel-section">
+      <h2>Markers</h2>
+      <ul id="markerList" class="marker-list" aria-label="Markers"></ul>
+      <p class="hint" id="markerHint">Press <kbd>M</kbd> while recording to mark key moments. Markers become chapters.</p>
+    </section>
+
+    <section class="panel-section">
+      <h2>Browser support</h2>
+      <div class="support-list" id="supportList" aria-label="Browser feature support"></div>
+    </section>
+  </div>
+
+  <!-- ================= CENTER: PREVIEW / RESULTS ================= -->
+  <div id="stage-wrap">
+    <div class="panel" style="padding:14px">
+      <div class="stage" id="stage">
+        <video id="previewVideo" autoplay muted playsinline></video>
+        <video id="playbackVideo" controls playsinline style="display:none"></video>
+        <div class="stage-empty" id="stageEmpty">
+          <div class="big-ico">🎬</div>
+          <div><strong>Ready when you are.</strong><br>
+          <span style="font-size:13px">Pick your sources on the left, then hit <em>Start Recording</em>.<br>
+          Your screen never leaves this browser tab.</span></div>
+        </div>
+        <div id="camOverlay" title="Drag to reposition"><video autoplay muted playsinline id="camVideo"></video></div>
+        <div id="cursorHalo"></div>
+      </div>
+      <div class="stage-tools" style="margin-top:12px">
+        <button id="btnBlurBox" title="Add a draggable blur rectangle over the preview">▦ Add blur box</button>
+        <span class="badge-experimental" title="Blur regions are saved as metadata; they are not yet rendered into the exported video file.">metadata only — not baked into export</span>
+        <span class="spacer"></span>
+        <span id="blurCount" class="hint" style="margin:0"></span>
+      </div>
+    </div>
+
+    <!-- Results dashboard (appears after recording) -->
+    <div id="results" class="panel">
+      <section class="panel-section">
+        <div class="results-head">
+          <input id="videoTitle" value="Untitled recording" aria-label="Recording title" spellcheck="false">
+          <button id="btnDlVideo" class="btn-primary">⬇ Video .webm</button>
+        </div>
+        <div class="dl-grid">
+          <button id="btnDlTranscript">⬇ Transcript .txt</button>
+          <button id="btnDlTutorial">⬇ Tutorial .md</button>
+          <button id="btnDlChapters">⬇ Chapters .json</button>
+          <button id="btnCopySummary">📋 Copy summary</button>
+          <button id="btnCopySteps">📋 Copy steps</button>
+          <button id="btnCopySocial">📋 Copy social post</button>
+          <button id="btnCopyBug">📋 Copy bug report</button>
+          <button id="btnAddMarkerPost" title="Add a marker at the current playback position">🚩 Marker @ playhead</button>
+        </div>
+        <div class="trim-row">
+          <label><span>Trim start <span class="badge-experimental" style="margin-left:6px">metadata only</span></span><span id="trimStartLabel">00:00</span></label>
+          <input type="range" id="trimStart" min="0" max="100" value="0" step="0.1" aria-label="Trim start time">
+          <label><span>Trim end</span><span id="trimEndLabel">00:00</span></label>
+          <input type="range" id="trimEnd" min="0" max="100" value="100" step="0.1" aria-label="Trim end time">
+          <p class="hint">Trimming adjusts chapters, tutorial and export metadata. The video file itself is not re-encoded in this version.</p>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- ================= RIGHT: TRANSCRIPT + AI ================= -->
+  <div id="panel-right" class="panel">
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-tab="transcript" role="tab" aria-selected="true">Transcript</button>
+      <button class="tab" data-tab="ai" role="tab" aria-selected="false">AI Outputs</button>
+      <button class="tab" data-tab="settings" role="tab" aria-selected="false">AI Settings</button>
+    </div>
+
+    <!-- Transcript tab -->
+    <div class="tab-body active" data-tab-body="transcript">
+      <div id="speechUnavailable" class="status-box warn" style="display:none;margin:0 0 10px">
+        Live transcription (Web Speech API) is not available in this browser.
+        You can type or paste a transcript below — AI features will use it.
+      </div>
+      <div id="transcriptList" aria-label="Transcript" aria-live="polite"></div>
+      <div id="interimLine" class="tr-interim"></div>
+      <p class="hint" id="transcriptHint">Live transcript appears here while recording. Click any line to edit it afterwards.</p>
+      <div id="manualWrap" style="display:none">
+        <label for="manualTranscript" class="hint" style="display:block;margin-bottom:6px">Manual transcript</label>
+        <textarea id="manualTranscript" placeholder="Type or paste what was said during the recording… Each line becomes a transcript chunk."></textarea>
+        <button id="btnApplyManual" style="margin-top:8px">Apply to transcript</button>
+      </div>
+      <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap">
+        <button id="btnToggleManual" class="btn-ghost" style="font-size:12.5px">✏️ Paste / type transcript manually</button>
+        <button id="btnClearTranscript" class="btn-ghost" style="font-size:12.5px">🗑 Clear</button>
+      </div>
+    </div>
+
+    <!-- AI outputs tab -->
+    <div class="tab-body" data-tab-body="ai">
+      <div style="display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap">
+        <button id="btnGenerate" class="btn-primary" style="flex:1">✨ Generate all</button>
+        <span class="hint" style="margin:0;align-self:center" id="aiEngineLabel"></span>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-head">📝 Title <span class="spacer"></span><button data-copy="title">Copy</button></div>
+        <div class="ai-card-body" id="out-title"></div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-head">🧾 Summary <span class="spacer"></span><button data-copy="summary">Copy</button></div>
+        <div class="ai-card-body" id="out-summary"></div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-head">👣 Step-by-step <span class="spacer"></span><button data-copy="steps">Copy</button></div>
+        <div class="ai-card-body" id="out-steps"></div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-head">📚 Chapters <span class="spacer"></span><button data-copy="chapters">Copy</button></div>
+        <div class="ai-card-body" id="out-chapters"></div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-head">🎓 Tutorial (Markdown) <span class="spacer"></span><button data-copy="tutorial">Copy</button></div>
+        <div class="ai-card-body" id="out-tutorial"></div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-head">📣 Social post <span class="spacer"></span><button data-copy="social">Copy</button></div>
+        <div class="ai-card-body" id="out-social"></div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-head">🐞 Bug report <span class="spacer"></span><button data-copy="bug">Copy</button></div>
+        <div class="ai-card-body" id="out-bug"></div>
+      </div>
+    </div>
+
+    <!-- AI settings tab -->
+    <div class="tab-body" data-tab-body="settings">
+      <div class="ai-provider-row">
+        <div class="toggle-row" style="padding:0">
+          <label class="label" for="optExternalAI">Use external AI
+            <span class="sub">Sends transcript text (never video/audio) to the endpoint below. Off = everything stays local.</span>
+          </label>
+          <span class="switch"><input type="checkbox" id="optExternalAI"><span class="slider-ui"></span></span>
+        </div>
+      </div>
+      <div class="ai-provider-row">
+        <label class="hint" for="aiEndpoint" style="margin:0">OpenAI-compatible endpoint (optional)</label>
+        <input type="text" id="aiEndpoint" placeholder="https://api.openai.com/v1/chat/completions" autocomplete="off" spellcheck="false">
+        <label class="hint" for="aiKey" style="margin:0">API key (kept in memory only, never persisted)</label>
+        <input type="password" id="aiKey" placeholder="sk-…" autocomplete="off">
+        <label class="hint" for="aiModel" style="margin:0">Model</label>
+        <input type="text" id="aiModel" value="gpt-4o-mini" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="status-box ok" style="display:block" id="builtinAiStatus"></div>
+      <p class="hint">Priority when generating: external API (if enabled &amp; key set) → Chrome built-in AI (if available) → local heuristics (always available, fully offline).</p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <span>🔒 Local-first: recordings stay in your browser unless you explicitly export them or use external AI.</span>
+  <span class="shortcut-hints">
+    <span><kbd>Space</kbd> pause/resume</span>
+    <span><kbd>M</kbd> marker</span>
+    <span><kbd>S</kbd> stop</span>
+    <span><kbd>T</kbd> focus transcript</span>
+  </span>
+  <span style="flex:1"></span>
+  <a href="https://4hourventure.com/imprint" target="_blank" rel="noopener">Imprint</a>
+</footer>
+
+<!-- Sensitive info reminder modal -->
+<div class="modal-backdrop" id="reminderModal" role="dialog" aria-modal="true" aria-labelledby="reminderTitle">
+  <div class="modal">
+    <h3 id="reminderTitle">⚠️ Before you record</h3>
+    <p>Check your screen for sensitive information: passwords, tokens, private messages, customer data, notification pop-ups.
+       You can add blur boxes to the preview, or pause the recording before sensitive steps.</p>
+    <div class="modal-actions">
+      <button id="reminderCancel">Cancel</button>
+      <button id="reminderContinue" class="btn-primary">Looks clean — start recording</button>
+    </div>
+  </div>
+</div>
+
+<div id="toasts" aria-live="polite"></div>
+
+<script>
+'use strict';
+/* ============================================================
+   ScreenScribe AI
+   Local-first screen recorder + AI documentation generator.
+
+   Architecture (no framework, no build step):
+     State                — single source of truth
+     Support              — feature detection
+     UIController         — DOM wiring, toasts, theme, tabs, shortcuts
+     RecorderController   — getDisplayMedia/getUserMedia/MediaRecorder
+     TranscriptController — Web Speech API + manual fallback + editing
+     AIController         — adapter: local heuristics / Chrome AI / OpenAI-compatible
+     ExportController     — downloads + clipboard
+   ============================================================ */
+
+const $  = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+
+/* ---------- tiny helpers ---------- */
+function fmtTime(sec) {
+  sec = Math.max(0, Math.floor(sec));
+  const m = Math.floor(sec / 60), s = sec % 60;
+  return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+}
+function toast(msg, isError = false) {
+  const el = document.createElement('div');
+  el.className = 'toast' + (isError ? ' error' : '');
+  el.textContent = msg;
+  $('#toasts').appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+function download(filename, content, mime) {
+  const blob = content instanceof Blob ? content : new Blob([content], { type: mime || 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+async function copyText(text, label) {
+  if (!text) { toast('Nothing to copy yet — generate outputs first.', true); return; }
+  try {
+    await navigator.clipboard.writeText(text);
+    toast((label || 'Text') + ' copied to clipboard');
+  } catch (e) {
+    // Clipboard API can fail without focus/permission — fall back to a prompt.
+    window.prompt('Copy manually (Ctrl/Cmd+C):', text);
+  }
+}
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const State = {
+  phase: 'idle',            // idle | recording | paused | review
+  elapsed: 0,               // accumulated recorded seconds (excludes pauses)
+  lastResumeAt: 0,          // epoch ms of last start/resume
+  markers: [],              // { time: seconds, label: string }
+  blurRegions: [],          // { x, y, w, h } as fractions of the stage (metadata only)
+  transcriptChunks: [],     // { t: seconds, text: string }
+  media: {
+    displayStream: null, micStream: null, camStream: null,
+    recorder: null, blobs: [], blob: null, url: null, mimeType: '',
+  },
+  meta: { title: 'Untitled recording', duration: 0, trimStart: 0, trimEnd: 0 },
+  ai: { outputs: {} },      // title, summary, steps, chapters(+Json), tutorial, social, bug
+};
+
+/** Current recording time in seconds (live). */
+function currentTime() {
+  if (State.phase === 'recording') return State.elapsed + (Date.now() - State.lastResumeAt) / 1000;
+  return State.elapsed;
+}
+/** Full transcript as plain text. */
+function transcriptText() {
+  return State.transcriptChunks.map(c => c.text).join(' ').trim();
+}
+
+/* ============================================================
+   SUPPORT — feature detection with graceful degradation
+   ============================================================ */
+const Support = {
+  displayMedia: !!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia),
+  userMedia: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
+  mediaRecorder: typeof MediaRecorder !== 'undefined',
+  speech: !!(window.SpeechRecognition || window.webkitSpeechRecognition),
+  webCodecs: typeof window.VideoEncoder !== 'undefined',
+  clipboard: !!(navigator.clipboard && navigator.clipboard.writeText),
+  // Chrome built-in AI (Prompt API) — shape has changed across versions, probe both.
+  chromeAI: !!(window.LanguageModel || (window.ai && (window.ai.languageModel || window.ai.assistant))),
+  chromeAIReady: false, // set async by probeChromeAI(): true only if the on-device model is usable
+
+  /** Some Chromium builds expose the Prompt API without an on-device model
+      (it then just echoes the input back). Probe actual availability. */
+  async probeChromeAI() {
+    if (!this.chromeAI) return false;
+    try {
+      if (window.LanguageModel && LanguageModel.availability) {
+        this.chromeAIReady = (await LanguageModel.availability()) === 'available';
+      } else if (window.ai && window.ai.languageModel && window.ai.languageModel.capabilities) {
+        this.chromeAIReady = (await window.ai.languageModel.capabilities()).available === 'readily';
+      } else {
+        this.chromeAIReady = this.chromeAI; // old API shape without a probe — try at generation time
+      }
+    } catch (e) { this.chromeAIReady = false; }
+    return this.chromeAIReady;
+  },
+
+  /** Pick the best supported MediaRecorder mimeType. */
+  pickMimeType() {
+    if (!this.mediaRecorder) return '';
+    const candidates = [
+      'video/webm;codecs=vp9,opus',
+      'video/webm;codecs=vp8,opus',
+      'video/webm',
+      'video/mp4', // Safari
+    ];
+    return candidates.find(t => {
+      try { return MediaRecorder.isTypeSupported(t); } catch (e) { return false; }
+    }) || '';
+  },
+
+  renderBadges() {
+    const rows = [
+      ['Screen capture', this.displayMedia, 'Required for recording'],
+      ['MediaRecorder', this.mediaRecorder, 'Required for recording'],
+      ['Microphone / webcam', this.userMedia, ''],
+      ['Live transcription', this.speech, 'Chrome/Edge only — manual transcript fallback available'],
+      ['WebCodecs', this.webCodecs, 'Optional, not required'],
+      ['Chrome built-in AI', this.chromeAIReady, 'Optional — local heuristics used otherwise'],
+    ];
+    $('#supportList').innerHTML = rows.map(([name, ok, note]) => `
+      <div class="support-item" title="${escapeHtml(note)}">
+        <span class="dot ${ok ? 'ok' : (name.includes('Required') ? 'no' : 'warn')}"></span>
+        ${escapeHtml(name)} — ${ok ? 'available' : 'not available'}
+      </div>`).join('');
+  },
+};
+
+/* ============================================================
+   UI CONTROLLER
+   ============================================================ */
+const UIController = {
+  init() {
+    Support.renderBadges();
+    this.initTheme();
+    this.initTabs();
+    this.initShortcuts();
+    this.updatePhase();
+
+    // Hard requirements missing → clear warning, but the page must not crash.
+    if (!Support.displayMedia || !Support.mediaRecorder) {
+      const box = $('#recError');
+      box.className = 'status-box error';
+      box.textContent = !Support.displayMedia
+        ? 'This browser does not support screen capture (getDisplayMedia). Please use a recent Chrome, Edge or Firefox on desktop.'
+        : 'This browser does not support MediaRecorder, so recording is unavailable.';
+      $('#btnStart').disabled = true;
+    }
+    if (!Support.speech) {
+      $('#speechUnavailable').style.display = 'block';
+      $('#manualWrap').style.display = 'block';
+    }
+    $('#builtinAiStatus').textContent = 'ℹ️ Checking for Chrome built-in AI…';
+    Support.probeChromeAI().then(ready => {
+      $('#builtinAiStatus').textContent = ready
+        ? '✅ Chrome built-in AI is ready — it will be used automatically for generation.'
+        : 'ℹ️ Chrome built-in AI not usable in this browser. Local heuristics will be used (fully offline).';
+      Support.renderBadges();
+      AIController.updateEngineLabel();
+    });
+  },
+
+  /* ----- theme ----- */
+  initTheme() {
+    const stored = localStorage.getItem('sscribe-theme');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.dataset.theme = stored || (prefersDark ? 'dark' : 'light');
+    $('#btnTheme').addEventListener('click', () => {
+      const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = next;
+      localStorage.setItem('sscribe-theme', next);
+    });
+  },
+
+  /* ----- tabs ----- */
+  initTabs() {
+    $$('.tab').forEach(tab => tab.addEventListener('click', () => this.showTab(tab.dataset.tab)));
+  },
+  showTab(name) {
+    $$('.tab').forEach(t => {
+      const active = t.dataset.tab === name;
+      t.classList.toggle('active', active);
+      t.setAttribute('aria-selected', String(active));
+    });
+    $$('.tab-body').forEach(b => b.classList.toggle('active', b.dataset.tabBody === name));
+  },
+
+  /* ----- keyboard shortcuts ----- */
+  initShortcuts() {
+    document.addEventListener('keydown', (e) => {
+      // Never hijack keys while the user is typing.
+      const t = e.target;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+      switch (e.key) {
+        case ' ':
+          if (State.phase === 'recording' || State.phase === 'paused') {
+            e.preventDefault();
+            RecorderController.togglePause();
+          }
+          break;
+        case 'm': case 'M':
+          if (State.phase === 'recording' || State.phase === 'paused') RecorderController.addMarker();
+          break;
+        case 's': case 'S':
+          if (State.phase === 'recording' || State.phase === 'paused') RecorderController.stop();
+          break;
+        case 't': case 'T': {
+          e.preventDefault();
+          this.showTab('transcript');
+          const firstEditable = $('#transcriptList .txt') || $('#manualTranscript');
+          if (firstEditable) firstEditable.focus();
+          break;
+        }
+      }
+    });
+  },
+
+  /* ----- phase-driven UI updates ----- */
+  updatePhase() {
+    const p = State.phase;
+    $('#btnStart').disabled = (p === 'recording' || p === 'paused') || !Support.displayMedia || !Support.mediaRecorder;
+    $('#btnPause').disabled = !(p === 'recording' || p === 'paused');
+    $('#btnStop').disabled = !(p === 'recording' || p === 'paused');
+    $('#btnMarker').disabled = !(p === 'recording' || p === 'paused');
+    $('#btnPause').innerHTML = p === 'paused' ? '▶ Resume' : '⏸ Pause';
+    $('#btnStart').innerHTML = p === 'review' ? '● New Recording' : '● Start Recording';
+
+    const dot = $('#recDot');
+    dot.className = 'rec-dot' + (p === 'recording' ? ' live' : p === 'paused' ? ' paused' : '');
+    $('#recStateLabel').textContent = ({ idle: 'idle', recording: 'recording', paused: 'paused', review: 'done' })[p];
+
+    $('#stageEmpty').style.display = (p === 'idle' && !State.media.url) ? 'flex' : 'none';
+    $('#btnAddMarkerPost').style.display = p === 'review' ? '' : 'none';
+  },
+
+  updateTimer() { $('#timer').textContent = fmtTime(currentTime()); },
+
+  renderMarkers() {
+    const list = $('#markerList');
+    list.innerHTML = '';
+    State.markers.forEach((m, i) => {
+      const li = document.createElement('li');
+      const t = document.createElement('span');
+      t.className = 't'; t.textContent = fmtTime(m.time);
+      t.title = 'Jump playback here';
+      t.addEventListener('click', () => {
+        const v = $('#playbackVideo');
+        if (v.style.display !== 'none' && v.src) { v.currentTime = m.time; v.play().catch(()=>{}); }
+      });
+      const lbl = document.createElement('span');
+      lbl.className = 'lbl'; lbl.textContent = m.label; lbl.title = m.label;
+      const del = document.createElement('button');
+      del.className = 'del'; del.textContent = '✕';
+      del.setAttribute('aria-label', 'Delete marker at ' + fmtTime(m.time));
+      del.addEventListener('click', () => { State.markers.splice(i, 1); this.renderMarkers(); });
+      li.append(t, lbl, del);
+      list.appendChild(li);
+    });
+    $('#markerHint').style.display = State.markers.length ? 'none' : '';
+  },
+
+  showRecError(msg) {
+    const box = $('#recError');
+    box.className = 'status-box error';
+    box.textContent = msg;
+  },
+  clearRecError() { $('#recError').className = 'status-box'; $('#recError').textContent = ''; },
+
+  setPermStatus(msg, kind) {
+    const box = $('#permStatus');
+    box.className = 'status-box ' + (kind || 'ok');
+    box.textContent = msg;
+  },
+};
+
+/* ============================================================
+   RECORDER CONTROLLER
+   Screen + mic + system audio capture, MediaRecorder, timer,
+   level meter, webcam overlay, cursor halo, blur boxes.
+   ============================================================ */
+const RecorderController = {
+  timerInterval: null,
+  audioCtx: null,
+  analyser: null,
+  meterRAF: null,
+
+  init() {
+    $('#btnStart').addEventListener('click', () => this.start());
+    $('#btnPause').addEventListener('click', () => this.togglePause());
+    $('#btnStop').addEventListener('click', () => this.stop());
+    $('#btnMarker').addEventListener('click', () => this.addMarker());
+    $('#btnAddMarkerPost').addEventListener('click', () => this.addMarkerAtPlayhead());
+    $('#optCam').addEventListener('change', () => this.syncWebcam());
+    $('#optCursor').addEventListener('change', () => this.syncCursorHalo());
+    $('#btnBlurBox').addEventListener('click', () => BlurBoxes.add());
+    $('#reminderCancel').addEventListener('click', () => $('#reminderModal').classList.remove('open'));
+    $('#reminderContinue').addEventListener('click', () => {
+      $('#reminderModal').classList.remove('open');
+      this.begin();
+    });
+    this.initCamDrag();
+    this.initCursorHalo();
+  },
+
+  /* Entry point: optionally interject the sensitive-info reminder. */
+  async start() {
+    if (State.phase === 'recording' || State.phase === 'paused') return;
+    if (State.phase === 'review') this.resetForNewRecording();
+    UIController.clearRecError();
+    if ($('#optReminder').checked) {
+      $('#reminderModal').classList.add('open');
+      return; // begin() is called from the modal's Continue button
+    }
+    this.begin();
+  },
+
+  resetForNewRecording() {
+    if (State.media.url) { URL.revokeObjectURL(State.media.url); }
+    State.media = { displayStream: null, micStream: null, camStream: null, recorder: null, blobs: [], blob: null, url: null, mimeType: '' };
+    State.markers = [];
+    State.transcriptChunks = [];
+    State.elapsed = 0;
+    State.ai.outputs = {};
+    State.phase = 'idle';
+    $('#playbackVideo').style.display = 'none';
+    $('#playbackVideo').removeAttribute('src');
+    $('#previewVideo').style.display = '';
+    $('#results').style.display = 'none';
+    $('#timer').textContent = '00:00';
+    TranscriptController.render();
+    UIController.renderMarkers();
+    AIController.renderOutputs();
+    UIController.updatePhase();
+  },
+
+  /* Acquire streams and start MediaRecorder. */
+  async begin() {
+    const wantMic = $('#optMic').checked;
+    const wantSys = $('#optSysAudio').checked;
+
+    // 1) Screen capture — the browser shows its own screen/window/tab picker.
+    let display;
+    try {
+      display = await navigator.mediaDevices.getDisplayMedia({
+        video: { frameRate: { ideal: 30 } },
+        audio: wantSys, // system/tab audio where the browser supports it
+      });
+    } catch (err) {
+      if (err && (err.name === 'NotAllowedError' || err.name === 'AbortError')) {
+        UIController.showRecError('Screen sharing was cancelled or denied. Click “Start Recording” and choose a screen, window or tab to share.');
+      } else {
+        UIController.showRecError('Could not start screen capture: ' + (err && err.message || err));
+      }
+      return;
+    }
+    State.media.displayStream = display;
+
+    if (wantSys && display.getAudioTracks().length === 0) {
+      UIController.setPermStatus('System audio was not captured. Tip: in Chrome, share a tab and tick “Also share tab audio”, or share the entire screen with audio enabled.', 'warn');
+    } else {
+      UIController.setPermStatus('Screen capture active.', 'ok');
+    }
+
+    // 2) Microphone (optional, recording continues without it on failure).
+    let mic = null;
+    if (wantMic && Support.userMedia) {
+      try {
+        mic = await navigator.mediaDevices.getUserMedia({
+          audio: { echoCancellation: true, noiseSuppression: true },
+        });
+      } catch (err) {
+        const msg = err && err.name === 'NotAllowedError'
+          ? 'Microphone permission denied — recording continues without mic audio.'
+          : err && err.name === 'NotFoundError'
+            ? 'No microphone found — recording continues without mic audio.'
+            : 'Microphone unavailable (' + (err && err.name) + ') — recording continues without it.';
+        UIController.setPermStatus(msg, 'warn');
+        toast(msg, true);
+      }
+    }
+    State.media.micStream = mic;
+
+    // 3) Webcam overlay (optional, preview only).
+    if ($('#optCam').checked) await this.syncWebcam();
+
+    // 4) Mix audio sources into one track via WebAudio.
+    //    MediaRecorder only reliably records ONE audio track, so mic +
+    //    system audio are merged through an AudioContext destination node.
+    const tracks = [...display.getVideoTracks()];
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC && (mic || display.getAudioTracks().length)) {
+        this.audioCtx = new AC();
+        const dest = this.audioCtx.createMediaStreamDestination();
+        if (display.getAudioTracks().length) {
+          this.audioCtx.createMediaStreamSource(new MediaStream(display.getAudioTracks())).connect(dest);
+        }
+        if (mic) {
+          const micSrc = this.audioCtx.createMediaStreamSource(mic);
+          micSrc.connect(dest);
+          // Analyser for the level meter taps the mic only.
+          this.analyser = this.audioCtx.createAnalyser();
+          this.analyser.fftSize = 512;
+          micSrc.connect(this.analyser);
+        }
+        tracks.push(...dest.stream.getAudioTracks());
+      } else if (mic) {
+        tracks.push(...mic.getAudioTracks());
+      } else {
+        tracks.push(...display.getAudioTracks());
+      }
+    } catch (e) {
+      // WebAudio failed — fall back to raw tracks (may record only one source).
+      if (mic) tracks.push(...mic.getAudioTracks());
+      else tracks.push(...display.getAudioTracks());
+    }
+
+    // 5) MediaRecorder.
+    const mimeType = Support.pickMimeType();
+    let recorder;
+    try {
+      recorder = new MediaRecorder(new MediaStream(tracks), mimeType ? { mimeType } : undefined);
+    } catch (err) {
+      UIController.showRecError('MediaRecorder could not start: ' + (err && err.message || err));
+      this.releaseStreams();
+      return;
+    }
+    State.media.recorder = recorder;
+    State.media.mimeType = mimeType || 'video/webm';
+    State.media.blobs = [];
+    recorder.addEventListener('dataavailable', e => { if (e.data && e.data.size) State.media.blobs.push(e.data); });
+    recorder.addEventListener('stop', () => this.onRecorderStopped());
+    recorder.addEventListener('error', e => {
+      UIController.showRecError('Recording error: ' + (e.error && e.error.message || 'unknown'));
+      this.stop();
+    });
+
+    // If the user ends sharing via the browser's own UI, stop gracefully.
+    display.getVideoTracks()[0].addEventListener('ended', () => {
+      if (State.phase === 'recording' || State.phase === 'paused') {
+        toast('Screen sharing ended — recording stopped.');
+        this.stop();
+      }
+    });
+
+    // Live preview of what is being captured.
+    const preview = $('#previewVideo');
+    preview.style.display = '';
+    $('#playbackVideo').style.display = 'none';
+    preview.srcObject = display;
+
+    recorder.start(1000); // gather data every second so nothing is lost on crash
+    State.phase = 'recording';
+    State.elapsed = 0;
+    State.lastResumeAt = Date.now();
+    State.markers = [];
+    State.transcriptChunks = [];
+    TranscriptController.render();
+    TranscriptController.startLive();
+    UIController.renderMarkers();
+    UIController.updatePhase();
+    $('#results').style.display = 'none';
+
+    this.timerInterval = setInterval(() => UIController.updateTimer(), 250);
+    this.startMeter();
+    toast('Recording started');
+  },
+
+  togglePause() {
+    const rec = State.media.recorder;
+    if (!rec) { toast('Nothing is recording.', true); return; }
+    if (State.phase === 'recording') {
+      try { rec.pause(); } catch (e) { /* pause unsupported in some browsers */ }
+      State.elapsed = currentTime();
+      State.phase = 'paused';
+      TranscriptController.stopLive();
+      toast('Paused');
+    } else if (State.phase === 'paused') {
+      try { rec.resume(); } catch (e) {}
+      State.lastResumeAt = Date.now();
+      State.phase = 'recording';
+      TranscriptController.startLive();
+      toast('Resumed');
+    }
+    UIController.updatePhase();
+  },
+
+  stop() {
+    if (State.phase !== 'recording' && State.phase !== 'paused') {
+      toast('Recording has not started yet.', true);
+      return;
+    }
+    State.elapsed = currentTime();
+    State.phase = 'review';
+    TranscriptController.stopLive();
+    clearInterval(this.timerInterval);
+    cancelAnimationFrame(this.meterRAF);
+    $('#meterBar').style.width = '0%';
+    $('#meterState').textContent = 'off';
+    try { State.media.recorder.stop(); } catch (e) { this.onRecorderStopped(); }
+  },
+
+  /* MediaRecorder flushed its last chunk → assemble blob and show results. */
+  onRecorderStopped() {
+    this.releaseStreams();
+    const blob = new Blob(State.media.blobs, { type: State.media.mimeType });
+    State.media.blob = blob;
+    if (State.media.url) URL.revokeObjectURL(State.media.url);
+    State.media.url = blob.size ? URL.createObjectURL(blob) : null;
+
+    State.meta.duration = State.elapsed;
+    State.meta.trimStart = 0;
+    State.meta.trimEnd = State.elapsed;
+
+    // Swap the stage from live preview to playback.
+    $('#previewVideo').srcObject = null;
+    $('#previewVideo').style.display = 'none';
+    const pb = $('#playbackVideo');
+    if (State.media.url) { pb.src = State.media.url; pb.style.display = ''; }
+
+    UIController.updatePhase();
+    UIController.updateTimer();
+    ExportController.showResults();
+    AIController.generateAll(); // auto-generate from whatever transcript exists
+    toast('Recording finished — ' + fmtTime(State.elapsed));
+  },
+
+  releaseStreams() {
+    ['displayStream', 'micStream', 'camStream'].forEach(k => {
+      const s = State.media[k];
+      if (s) s.getTracks().forEach(t => t.stop());
+      State.media[k] = null;
+    });
+    if (this.audioCtx) { this.audioCtx.close().catch(() => {}); this.audioCtx = null; this.analyser = null; }
+    $('#camOverlay').style.display = 'none';
+  },
+
+  /* ----- markers ----- */
+  addMarker() {
+    if (State.phase !== 'recording' && State.phase !== 'paused') return;
+    const t = currentTime();
+    // Use the most recent transcript text as a hint for the marker label.
+    const last = State.transcriptChunks[State.transcriptChunks.length - 1];
+    const label = 'Marker ' + (State.markers.length + 1) + (last ? ' — near “' + last.text.slice(0, 40) + '…”' : '');
+    State.markers.push({ time: t, label });
+    State.markers.sort((a, b) => a.time - b.time);
+    UIController.renderMarkers();
+    toast('Marker added at ' + fmtTime(t));
+  },
+  addMarkerAtPlayhead() {
+    const v = $('#playbackVideo');
+    const t = Math.min(v.currentTime || 0, State.meta.duration);
+    State.markers.push({ time: t, label: 'Marker ' + (State.markers.length + 1) + ' (added after recording)' });
+    State.markers.sort((a, b) => a.time - b.time);
+    UIController.renderMarkers();
+    toast('Marker added at ' + fmtTime(t));
+  },
+
+  /* ----- mic level meter ----- */
+  startMeter() {
+    if (!this.analyser) { $('#meterState').textContent = 'no mic'; return; }
+    $('#meterState').textContent = 'live';
+    const data = new Uint8Array(this.analyser.frequencyBinCount);
+    const loop = () => {
+      if (!this.analyser) return;
+      this.analyser.getByteTimeDomainData(data);
+      // RMS of the waveform → 0..1 level
+      let sum = 0;
+      for (let i = 0; i < data.length; i++) { const v = (data[i] - 128) / 128; sum += v * v; }
+      const rms = Math.sqrt(sum / data.length);
+      $('#meterBar').style.width = Math.min(100, rms * 260) + '%';
+      this.meterRAF = requestAnimationFrame(loop);
+    };
+    loop();
+  },
+
+  /* ----- webcam overlay (preview only) ----- */
+  async syncWebcam() {
+    const want = $('#optCam').checked;
+    const overlay = $('#camOverlay');
+    if (!want) {
+      if (State.media.camStream) { State.media.camStream.getTracks().forEach(t => t.stop()); State.media.camStream = null; }
+      overlay.style.display = 'none';
+      return;
+    }
+    if (!Support.userMedia) { toast('Webcam not supported in this browser.', true); $('#optCam').checked = false; return; }
+    try {
+      const cam = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } });
+      State.media.camStream = cam;
+      $('#camVideo').srcObject = cam;
+      overlay.style.display = 'block';
+    } catch (err) {
+      $('#optCam').checked = false;
+      toast(err && err.name === 'NotAllowedError'
+        ? 'Webcam permission denied.'
+        : 'Webcam unavailable: ' + (err && err.name), true);
+    }
+  },
+
+  /* Drag the webcam overlay around the stage with pointer events. */
+  initCamDrag() {
+    const overlay = $('#camOverlay');
+    const stage = $('#stage');
+    let drag = null;
+    overlay.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      overlay.setPointerCapture(e.pointerId);
+      const r = overlay.getBoundingClientRect();
+      drag = { dx: e.clientX - r.left, dy: e.clientY - r.top };
+      overlay.classList.add('dragging');
+    });
+    overlay.addEventListener('pointermove', (e) => {
+      if (!drag) return;
+      const sr = stage.getBoundingClientRect();
+      const or = overlay.getBoundingClientRect();
+      let x = e.clientX - sr.left - drag.dx;
+      let y = e.clientY - sr.top - drag.dy;
+      x = Math.max(0, Math.min(x, sr.width - or.width));
+      y = Math.max(0, Math.min(y, sr.height - or.height));
+      overlay.style.left = x + 'px'; overlay.style.top = y + 'px';
+      overlay.style.right = 'auto'; overlay.style.bottom = 'auto';
+    });
+    const end = () => { drag = null; overlay.classList.remove('dragging'); };
+    overlay.addEventListener('pointerup', end);
+    overlay.addEventListener('pointercancel', end);
+  },
+
+  /* Simulated cursor highlight: a halo that follows the pointer over the stage. */
+  initCursorHalo() {
+    const stage = $('#stage'), halo = $('#cursorHalo');
+    stage.addEventListener('pointermove', (e) => {
+      if (!$('#optCursor').checked) return;
+      const r = stage.getBoundingClientRect();
+      halo.style.left = (e.clientX - r.left) + 'px';
+      halo.style.top = (e.clientY - r.top) + 'px';
+      halo.style.display = 'block';
+    });
+    stage.addEventListener('pointerleave', () => { halo.style.display = 'none'; });
+  },
+  syncCursorHalo() {
+    if (!$('#optCursor').checked) $('#cursorHalo').style.display = 'none';
+  },
+};
+
+/* ============================================================
+   BLUR BOXES — draggable/resizable privacy rectangles.
+   Saved as metadata only (fractions of stage size); baked-in
+   video blurring is a v2 feature.
+   ============================================================ */
+const BlurBoxes = {
+  add() {
+    const stage = $('#stage');
+    const box = document.createElement('div');
+    box.className = 'blur-box';
+    const region = { x: 0.35, y: 0.35, w: 0.3, h: 0.2 };
+    State.blurRegions.push(region);
+    box.style.left = region.x * 100 + '%';
+    box.style.top = region.y * 100 + '%';
+    box.style.width = region.w * 100 + '%';
+    box.style.height = region.h * 100 + '%';
+
+    const del = document.createElement('button');
+    del.className = 'bb-del'; del.textContent = '✕';
+    del.setAttribute('aria-label', 'Remove blur box');
+    del.addEventListener('pointerdown', e => e.stopPropagation());
+    del.addEventListener('click', () => {
+      const i = State.blurRegions.indexOf(region);
+      if (i >= 0) State.blurRegions.splice(i, 1);
+      box.remove();
+      this.updateCount();
+    });
+
+    const grip = document.createElement('div');
+    grip.className = 'bb-resize';
+    grip.title = 'Drag to resize';
+
+    box.append(del, grip);
+    stage.appendChild(box);
+    this.makeInteractive(box, grip, region);
+    this.updateCount();
+    toast('Blur box added — drag to position, corner to resize. Saved as metadata (not rendered into the export yet).');
+  },
+
+  makeInteractive(box, grip, region) {
+    const stage = $('#stage');
+    let mode = null, start = null;
+
+    const onDown = (e, m) => {
+      e.preventDefault(); e.stopPropagation();
+      mode = m;
+      box.setPointerCapture(e.pointerId);
+      const sr = stage.getBoundingClientRect();
+      const br = box.getBoundingClientRect();
+      start = {
+        px: e.clientX, py: e.clientY, sr,
+        x: br.left - sr.left, y: br.top - sr.top, w: br.width, h: br.height,
+      };
+    };
+    box.addEventListener('pointerdown', e => onDown(e, 'move'));
+    grip.addEventListener('pointerdown', e => onDown(e, 'resize'));
+
+    box.addEventListener('pointermove', (e) => {
+      if (!mode) return;
+      const dx = e.clientX - start.px, dy = e.clientY - start.py;
+      const { sr } = start;
+      if (mode === 'move') {
+        const x = Math.max(0, Math.min(start.x + dx, sr.width - start.w));
+        const y = Math.max(0, Math.min(start.y + dy, sr.height - start.h));
+        box.style.left = x + 'px'; box.style.top = y + 'px';
+        region.x = x / sr.width; region.y = y / sr.height;
+      } else {
+        const w = Math.max(40, Math.min(start.w + dx, sr.width - start.x));
+        const h = Math.max(30, Math.min(start.h + dy, sr.height - start.y));
+        box.style.width = w + 'px'; box.style.height = h + 'px';
+        region.w = w / sr.width; region.h = h / sr.height;
+      }
+    });
+    const end = () => { mode = null; };
+    box.addEventListener('pointerup', end);
+    box.addEventListener('pointercancel', end);
+  },
+
+  updateCount() {
+    const n = State.blurRegions.length;
+    $('#blurCount').textContent = n ? n + ' blur region' + (n > 1 ? 's' : '') + ' (metadata)' : '';
+  },
+};
+
+/* ============================================================
+   TRANSCRIPT CONTROLLER
+   Web Speech API live transcription with timestamped chunks,
+   inline editing, and a manual textarea fallback.
+   ============================================================ */
+const TranscriptController = {
+  recognition: null,
+  running: false,        // whether we WANT recognition active
+  restartTimer: null,
+
+  init() {
+    $('#btnToggleManual').addEventListener('click', () => {
+      const w = $('#manualWrap');
+      w.style.display = w.style.display === 'none' ? 'block' : 'none';
+      if (w.style.display === 'block') {
+        $('#manualTranscript').value = State.transcriptChunks
+          .map(c => '[' + fmtTime(c.t) + '] ' + c.text).join('\n');
+      }
+    });
+    $('#btnApplyManual').addEventListener('click', () => this.applyManual());
+    $('#btnClearTranscript').addEventListener('click', () => {
+      State.transcriptChunks = [];
+      this.render();
+      toast('Transcript cleared');
+    });
+  },
+
+  /* ----- live recognition ----- */
+  startLive() {
+    if (!Support.speech) return;
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (this.recognition) this.stopLive();
+    const rec = new SR();
+    this.recognition = rec;
+    this.running = true;
+    rec.continuous = true;
+    rec.interimResults = true;
+    rec.lang = navigator.language || 'en-US';
+
+    rec.onresult = (e) => {
+      let interim = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const res = e.results[i];
+        const text = res[0].transcript.trim();
+        if (!text) continue;
+        if (res.isFinal) {
+          State.transcriptChunks.push({ t: currentTime(), text });
+          this.render();
+        } else {
+          interim += text + ' ';
+        }
+      }
+      $('#interimLine').textContent = interim ? '… ' + interim : '';
+    };
+    // Chrome ends recognition after silence — restart while recording.
+    rec.onend = () => {
+      $('#interimLine').textContent = '';
+      if (this.running && State.phase === 'recording') {
+        this.restartTimer = setTimeout(() => { try { rec.start(); } catch (e) {} }, 250);
+      }
+    };
+    rec.onerror = (e) => {
+      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+        this.running = false;
+        $('#speechUnavailable').style.display = 'block';
+        $('#speechUnavailable').textContent = 'Speech recognition was blocked (microphone permission). Use the manual transcript box below.';
+        $('#manualWrap').style.display = 'block';
+      }
+      // 'no-speech' and 'aborted' are routine; onend handles restart.
+    };
+    try { rec.start(); } catch (e) { /* already started */ }
+  },
+
+  stopLive() {
+    this.running = false;
+    clearTimeout(this.restartTimer);
+    if (this.recognition) {
+      try { this.recognition.stop(); } catch (e) {}
+      this.recognition = null;
+    }
+    $('#interimLine').textContent = '';
+  },
+
+  /* ----- manual fallback: lines (optionally "[MM:SS] text") become chunks ----- */
+  applyManual() {
+    const lines = $('#manualTranscript').value.split('\n').map(l => l.trim()).filter(Boolean);
+    const dur = State.meta.duration || Math.max(60, lines.length * 8);
+    State.transcriptChunks = lines.map((line, i) => {
+      const m = line.match(/^\[(\d{1,2}):(\d{2})\]\s*(.*)$/);
+      if (m) return { t: parseInt(m[1], 10) * 60 + parseInt(m[2], 10), text: m[3] };
+      return { t: Math.round(i * (dur / Math.max(1, lines.length))), text: line };
+    }).filter(c => c.text);
+    this.render();
+    toast('Transcript applied (' + State.transcriptChunks.length + ' chunks)');
+  },
+
+  /* ----- render + inline editing ----- */
+  render() {
+    const list = $('#transcriptList');
+    list.innerHTML = '';
+    State.transcriptChunks.forEach((chunk) => {
+      const row = document.createElement('div');
+      row.className = 'tr-chunk';
+      const t = document.createElement('span');
+      t.className = 't'; t.textContent = fmtTime(chunk.t);
+      t.title = 'Jump playback here';
+      t.addEventListener('click', () => {
+        const v = $('#playbackVideo');
+        if (v.style.display !== 'none' && v.src) { v.currentTime = chunk.t; }
+      });
+      const txt = document.createElement('span');
+      txt.className = 'txt';
+      txt.contentEditable = 'true';
+      txt.spellcheck = false;
+      txt.textContent = chunk.text;
+      txt.setAttribute('role', 'textbox');
+      txt.setAttribute('aria-label', 'Transcript at ' + fmtTime(chunk.t));
+      txt.addEventListener('blur', () => { chunk.text = txt.textContent.trim(); });
+      txt.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); txt.blur(); } });
+      row.append(t, txt);
+      list.appendChild(row);
+    });
+    list.scrollTop = list.scrollHeight;
+    $('#transcriptHint').style.display = State.transcriptChunks.length ? 'none' : '';
+  },
+};
+
+/* ============================================================
+   AI CONTROLLER — adapter layer
+   Local deterministic heuristics (always available), with
+   optional Chrome built-in AI and OpenAI-compatible endpoints.
+   ============================================================ */
+const AIController = {
+  init() {
+    $('#btnGenerate').addEventListener('click', () => this.generateAll(true));
+    $$('[data-copy]').forEach(btn => btn.addEventListener('click', () => {
+      const key = btn.dataset.copy;
+      copyText(State.ai.outputs[key], key.charAt(0).toUpperCase() + key.slice(1));
+    }));
+    this.updateEngineLabel();
+    $('#optExternalAI').addEventListener('change', () => this.updateEngineLabel());
+    $('#aiKey').addEventListener('input', () => this.updateEngineLabel());
+  },
+
+  updateEngineLabel() {
+    $('#aiEngineLabel').textContent = 'engine: ' + this.engineName();
+  },
+  engineName() {
+    if ($('#optExternalAI').checked && $('#aiKey').value.trim()) return 'external API';
+    if (Support.chromeAIReady) return 'Chrome built-in AI';
+    return 'local heuristics';
+  },
+
+  /* ---------- shared text utilities ---------- */
+  STOPWORDS: new Set(('a an and are as at be but by for from has have i if in into is it its of on or so ' +
+    'that the their then there these they this to was we were what when which will with you your ' +
+    'um uh like okay ok just really actually basically going gonna want lets let now here also can').split(' ')),
+
+  sentences(text) {
+    return (text.match(/[^.!?\n]+[.!?]*/g) || []).map(s => s.trim()).filter(s => s.length > 2);
+  },
+  keywords(text, n = 8) {
+    const freq = {};
+    (text.toLowerCase().match(/[a-zäöüß][a-zäöüß'-]{2,}/gi) || []).forEach(w => {
+      if (!this.STOPWORDS.has(w)) freq[w] = (freq[w] || 0) + 1;
+    });
+    return Object.entries(freq).sort((a, b) => b[1] - a[1]).slice(0, n).map(e => e[0]);
+  },
+  ACTION_VERBS: ['click', 'open', 'select', 'go', 'type', 'press', 'choose', 'navigate', 'enter', 'save',
+    'drag', 'scroll', 'create', 'delete', 'copy', 'paste', 'install', 'run', 'start', 'stop', 'add',
+    'remove', 'set', 'enable', 'disable', 'upload', 'download', 'search', 'find', 'check', 'confirm',
+    'switch', 'close', 'edit', 'update', 'configure', 'log', 'sign', 'visit', 'refresh', 'submit', 'pick'],
+
+  /* ============ local heuristic implementations ============ */
+
+  summarizeTranscript(transcript) {
+    const sents = this.sentences(transcript);
+    if (!sents.length) return '';
+    if (sents.length <= 3) return sents.join(' ');
+    const kws = this.keywords(transcript, 12);
+    // Score each sentence by keyword hits, normalized by length; keep original order.
+    const scored = sents.map((s, i) => {
+      const words = s.toLowerCase();
+      let score = kws.reduce((acc, k, ki) => acc + (words.includes(k) ? (kws.length - ki) : 0), 0);
+      score = score / Math.sqrt(s.split(/\s+/).length);
+      if (i === 0) score *= 1.3; // opening sentence usually frames the topic
+      return { s, i, score };
+    });
+    const top = scored.sort((a, b) => b.score - a.score).slice(0, Math.min(4, Math.ceil(sents.length / 4)))
+      .sort((a, b) => a.i - b.i).map(x => x.s);
+    return top.join(' ');
+  },
+
+  extractSteps(transcript) {
+    const chunks = State.transcriptChunks.length
+      ? State.transcriptChunks.map(c => c.text)
+      : this.sentences(transcript);
+    const steps = [];
+    chunks.forEach(chunk => {
+      this.sentences(chunk).forEach(sent => {
+        const lower = sent.toLowerCase();
+        const verb = this.ACTION_VERBS.find(v =>
+          new RegExp('\\b' + v + '(s|ed|ing)?\\b').test(lower));
+        if (verb) {
+          // Rewrite around the action verb to sound imperative.
+          const idx = lower.search(new RegExp('\\b' + verb + '(s|ed|ing)?\\b'));
+          let step = sent.slice(idx).replace(/[.!?]+$/, '');
+          step = step.charAt(0).toUpperCase() + step.slice(1);
+          if (step.length > 6 && !steps.some(s => s.toLowerCase() === step.toLowerCase())) steps.push(step);
+        }
+      });
+    });
+    if (!steps.length && chunks.length) {
+      // Fallback: sequence the transcript into numbered passages.
+      return chunks.slice(0, 8).map(c => c.replace(/[.!?]+$/, '')).filter(Boolean);
+    }
+    return steps.slice(0, 15);
+  },
+
+  generateTitle(transcript) {
+    const kws = this.keywords(transcript, 3);
+    if (!kws.length) return 'Screen Recording Walkthrough';
+    const cap = w => w.charAt(0).toUpperCase() + w.slice(1);
+    return 'How to ' + cap(kws[0]) + (kws[1] ? ' — ' + cap(kws[1]) + (kws[2] ? ' & ' + cap(kws[2]) : '') : '') + ' (Walkthrough)';
+  },
+
+  generateChapters(transcript, duration, markers) {
+    const dur = Math.max(duration || 0, 1);
+    const chunks = State.transcriptChunks;
+    const points = [{ time: 0 }];
+    markers.forEach(m => points.push({ time: m.time }));
+    if (markers.length === 0 && dur > 60) {
+      // No markers → split into up to 4 even segments.
+      const n = Math.min(4, Math.ceil(dur / 60));
+      for (let i = 1; i < n; i++) points.push({ time: (dur / n) * i });
+    }
+    const uniq = [...new Set(points.map(p => Math.round(p.time)))].sort((a, b) => a - b);
+    return uniq.map((t, i) => {
+      const next = uniq[i + 1] !== undefined ? uniq[i + 1] : dur;
+      const inRange = chunks.filter(c => c.t >= t && c.t < next);
+      const text = inRange.map(c => c.text).join(' ');
+      const kws = this.keywords(text, 2);
+      const title = i === 0 ? 'Introduction'
+        : kws.length ? kws.map(k => k.charAt(0).toUpperCase() + k.slice(1)).join(' & ')
+        : 'Chapter ' + (i + 1);
+      return { start: t, end: Math.round(next), title, timestamp: fmtTime(t) };
+    });
+  },
+
+  generateTutorial(transcript, markers) {
+    const title = State.meta.title !== 'Untitled recording'
+      ? State.meta.title : (State.ai.outputs.title || this.generateTitle(transcript));
+    const summary = State.ai.outputs.summary || this.summarizeTranscript(transcript);
+    const steps = this.extractSteps(transcript);
+    const chapters = this.generateChapters(transcript, this.effectiveDuration(), markers);
+    const kws = this.keywords(transcript, 5);
+    let md = '# ' + title + '\n\n';
+    md += '> Auto-generated from a ScreenScribe AI screen recording (' + fmtTime(this.effectiveDuration()) + ').\n\n';
+    if (summary) md += '## Overview\n\n' + summary + '\n\n';
+    if (kws.length) md += '## Prerequisites\n\nFamiliarity with: ' + kws.join(', ') + '.\n\n';
+    if (steps.length) {
+      md += '## Step-by-step guide\n\n';
+      steps.forEach((s, i) => { md += (i + 1) + '. ' + s + '\n'; });
+      md += '\n';
+    }
+    if (chapters.length > 1) {
+      md += '## Chapters\n\n';
+      chapters.forEach(c => { md += '- **' + c.timestamp + '** — ' + c.title + '\n'; });
+      md += '\n';
+    }
+    if (markers.length) {
+      md += '## Key moments\n\n';
+      markers.forEach(m => { md += '- ' + fmtTime(m.time) + ' — ' + m.label + '\n'; });
+      md += '\n';
+    }
+    md += '## Wrap-up\n\nThat covers the full workflow shown in the recording. Re-watch individual chapters above for details.\n';
+    return md;
+  },
+
+  generateSocialPost(transcript) {
+    const title = State.ai.outputs.title || this.generateTitle(transcript);
+    const summary = State.ai.outputs.summary || this.summarizeTranscript(transcript);
+    const kws = this.keywords(transcript, 3);
+    const tags = kws.map(k => '#' + k.replace(/[^a-z0-9äöüß]/gi, '')).join(' ');
+    return '🎬 New walkthrough: ' + title + '\n\n' +
+      (summary ? summary.split(' ').slice(0, 45).join(' ') + '…\n\n' : '') +
+      '✅ Recorded and documented in one pass with ScreenScribe AI — no editing suite needed.\n\n' +
+      (tags ? tags + ' ' : '') + '#screenrecording #tutorial';
+  },
+
+  generateBugReport(transcript) {
+    const steps = this.extractSteps(transcript);
+    const dur = fmtTime(this.effectiveDuration());
+    let md = '## Bug report (from screen recording)\n\n';
+    md += '**Recording:** ' + State.meta.title + ' (' + dur + ')\n';
+    md += '**Date:** ' + new Date().toISOString().slice(0, 10) + '\n';
+    md += '**Environment:** ' + navigator.userAgent + '\n\n';
+    md += '### Steps to reproduce\n\n';
+    (steps.length ? steps : ['(describe the steps shown in the recording)']).slice(0, 10)
+      .forEach((s, i) => { md += (i + 1) + '. ' + s + '\n'; });
+    md += '\n### Expected behavior\n\n_(fill in)_\n\n### Actual behavior\n\n_(fill in)_\n';
+    if (State.markers.length) {
+      md += '\n### Marked moments in the recording\n\n';
+      State.markers.forEach(m => { md += '- ' + fmtTime(m.time) + ' — ' + m.label + '\n'; });
+    }
+    return md;
+  },
+
+  effectiveDuration() {
+    const { trimStart, trimEnd, duration } = State.meta;
+    return (trimEnd > trimStart) ? trimEnd - trimStart : duration;
+  },
+
+  /* ============ engine adapters ============ */
+
+  /** Try external OpenAI-compatible API. Returns string or throws. */
+  async callExternal(taskPrompt, text) {
+    const endpoint = $('#aiEndpoint').value.trim() || 'https://api.openai.com/v1/chat/completions';
+    const key = $('#aiKey').value.trim();
+    const model = $('#aiModel').value.trim() || 'gpt-4o-mini';
+    const resp = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+      body: JSON.stringify({
+        model,
+        messages: [
+          { role: 'system', content: 'You turn screen-recording transcripts into concise documentation. Reply with the requested text only.' },
+          { role: 'user', content: taskPrompt + '\n\nTranscript:\n' + text },
+        ],
+        temperature: 0.4,
+      }),
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    const out = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+    if (!out) throw new Error('Empty response');
+    return out.trim();
+  },
+
+  /** Try Chrome built-in AI (Prompt API). Returns string or throws.
+      The API surface has changed between Chrome versions, so we probe
+      both the new global LanguageModel and the older window.ai shape. */
+  async callChromeAI(taskPrompt, text) {
+    let session = null;
+    if (window.LanguageModel && LanguageModel.create) {
+      session = await LanguageModel.create();
+    } else if (window.ai && window.ai.languageModel && window.ai.languageModel.create) {
+      session = await window.ai.languageModel.create();
+    }
+    if (!session) throw new Error('Prompt API unavailable');
+    const out = String(await session.prompt(taskPrompt + '\n\nTranscript:\n' + text.slice(0, 6000))).trim();
+    if (session.destroy) session.destroy();
+    // Model-less Chromium builds echo the prompt back — treat that as failure.
+    if (!out || out.includes('echoing back the input') || out.includes(taskPrompt.slice(0, 40))) {
+      throw new Error('on-device model not usable');
+    }
+    return out;
+  },
+
+  /** Run one task through the best available engine, falling back to local. */
+  async runTask(key, taskPrompt, localFn) {
+    const text = transcriptText();
+    const wantExternal = $('#optExternalAI').checked && $('#aiKey').value.trim();
+    if (wantExternal) {
+      try { return await this.callExternal(taskPrompt, text); }
+      catch (e) { toast('External AI failed for ' + key + ' (' + e.message + ') — using local fallback.', true); }
+    } else if (Support.chromeAIReady) {
+      try { return await this.callChromeAI(taskPrompt, text); }
+      catch (e) { /* built-in model may not be downloaded — silent local fallback */ }
+    }
+    return localFn();
+  },
+
+  /* ============ orchestration ============ */
+  async generateAll(manual = false) {
+    const text = transcriptText();
+    if (!text) {
+      if (manual) toast('No transcript yet. Record with mic + transcription, or paste one in the Transcript tab.', true);
+      this.renderOutputs();
+      return;
+    }
+    $('#btnGenerate').disabled = true;
+    $('#btnGenerate').textContent = '⏳ Generating…';
+    const markers = State.markers;
+    const out = State.ai.outputs;
+    try {
+      out.title    = await this.runTask('title',   'Write one short, catchy tutorial title for this recording.', () => this.generateTitle(text));
+      out.summary  = await this.runTask('summary', 'Summarize this transcript in 3-4 sentences.', () => this.summarizeTranscript(text));
+      const localSteps = () => { const s = this.extractSteps(text); return s.map((x, i) => (i + 1) + '. ' + x).join('\n'); };
+      out.steps    = await this.runTask('steps',   'Extract a numbered step-by-step guide (max 12 steps) from this transcript.', localSteps);
+      const chaptersArr = this.generateChapters(text, this.effectiveDuration(), markers);
+      out.chaptersJson = chaptersArr;
+      out.chapters = chaptersArr.map(c => c.timestamp + '  ' + c.title).join('\n');
+      out.tutorial = await this.runTask('tutorial', 'Turn this transcript into a Markdown tutorial with title, overview, prerequisites, numbered steps and a wrap-up.', () => this.generateTutorial(text, markers));
+      out.social   = await this.runTask('social',  'Write a short LinkedIn/X post (with 2-4 hashtags) announcing a tutorial based on this transcript.', () => this.generateSocialPost(text));
+      out.bug      = await this.runTask('bug',     'Write a Markdown bug report (steps to reproduce, expected, actual) from this transcript.', () => this.generateBugReport(text));
+      if (State.meta.title === 'Untitled recording' && out.title) {
+        State.meta.title = out.title.replace(/^["']|["']$/g, '');
+        $('#videoTitle').value = State.meta.title;
+      }
+      this.renderOutputs();
+      UIController.showTab('ai');
+      if (manual) toast('Outputs generated with ' + this.engineName());
+    } finally {
+      $('#btnGenerate').disabled = false;
+      $('#btnGenerate').textContent = '✨ Generate all';
+    }
+  },
+
+  renderOutputs() {
+    const o = State.ai.outputs;
+    $('#out-title').textContent = o.title || '';
+    $('#out-summary').textContent = o.summary || '';
+    $('#out-steps').textContent = o.steps || '';
+    $('#out-chapters').textContent = o.chapters || '';
+    $('#out-tutorial').textContent = o.tutorial || '';
+    $('#out-social').textContent = o.social || '';
+    $('#out-bug').textContent = o.bug || '';
+  },
+};
+
+/* ============================================================
+   EXPORT CONTROLLER — downloads, clipboard, trim metadata
+   ============================================================ */
+const ExportController = {
+  init() {
+    $('#btnDlVideo').addEventListener('click', () => {
+      if (!State.media.blob || !State.media.blob.size) { toast('No video recorded yet.', true); return; }
+      const ext = State.media.mimeType.includes('mp4') ? 'mp4' : 'webm';
+      download(this.safeName() + '.' + ext, State.media.blob);
+    });
+    $('#btnDlTranscript').addEventListener('click', () => {
+      if (!State.transcriptChunks.length) { toast('No transcript available.', true); return; }
+      const txt = State.transcriptChunks.map(c => '[' + fmtTime(c.t) + '] ' + c.text).join('\n');
+      download(this.safeName() + '-transcript.txt', txt, 'text/plain');
+    });
+    $('#btnDlTutorial').addEventListener('click', () => {
+      const md = State.ai.outputs.tutorial;
+      if (!md) { toast('Generate outputs first (AI Outputs tab).', true); return; }
+      download(this.safeName() + '-tutorial.md', md, 'text/markdown');
+    });
+    $('#btnDlChapters').addEventListener('click', () => {
+      const json = {
+        title: State.meta.title,
+        duration: State.meta.duration,
+        trim: { start: State.meta.trimStart, end: State.meta.trimEnd },
+        chapters: State.ai.outputs.chaptersJson || [],
+        markers: State.markers,
+        blurRegions: State.blurRegions, // privacy metadata, not baked into the video
+      };
+      download(this.safeName() + '-chapters.json', JSON.stringify(json, null, 2), 'application/json');
+    });
+    $('#btnCopySummary').addEventListener('click', () => copyText(State.ai.outputs.summary, 'Summary'));
+    $('#btnCopySteps').addEventListener('click', () => copyText(State.ai.outputs.steps, 'Steps'));
+    $('#btnCopySocial').addEventListener('click', () => copyText(State.ai.outputs.social, 'Social post'));
+    $('#btnCopyBug').addEventListener('click', () => copyText(State.ai.outputs.bug, 'Bug report'));
+
+    $('#videoTitle').addEventListener('input', e => { State.meta.title = e.target.value || 'Untitled recording'; });
+
+    // Trim sliders — metadata-only in the MVP (video is not re-encoded).
+    $('#trimStart').addEventListener('input', () => this.onTrim());
+    $('#trimEnd').addEventListener('input', () => this.onTrim());
+  },
+
+  safeName() {
+    return (State.meta.title || 'recording').toLowerCase()
+      .replace(/[^a-z0-9äöüß]+/gi, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'recording';
+  },
+
+  showResults() {
+    $('#results').style.display = 'block';
+    $('#videoTitle').value = State.meta.title;
+    const dur = State.meta.duration;
+    ['#trimStart', '#trimEnd'].forEach(sel => { $(sel).max = dur; });
+    $('#trimStart').value = 0;
+    $('#trimEnd').value = dur;
+    $('#trimStartLabel').textContent = fmtTime(0);
+    $('#trimEndLabel').textContent = fmtTime(dur);
+  },
+
+  onTrim() {
+    let s = parseFloat($('#trimStart').value);
+    let e = parseFloat($('#trimEnd').value);
+    if (e <= s) { e = Math.min(s + 1, State.meta.duration); $('#trimEnd').value = e; }
+    State.meta.trimStart = s;
+    State.meta.trimEnd = e;
+    $('#trimStartLabel').textContent = fmtTime(s);
+    $('#trimEndLabel').textContent = fmtTime(e);
+    // Trim affects chapters + tutorial metadata; regenerate chapters live.
+    if (transcriptText()) {
+      const arr = AIController.generateChapters(transcriptText(), e - s, State.markers.filter(m => m.time >= s && m.time <= e));
+      State.ai.outputs.chaptersJson = arr;
+      State.ai.outputs.chapters = arr.map(c => c.timestamp + '  ' + c.title).join('\n');
+      AIController.renderOutputs();
+    }
+  },
+};
+
+/* ============================================================
+   DEMO DATA — explore the app without recording anything
+   ============================================================ */
+const DemoData = {
+  load() {
+    if (State.phase === 'recording' || State.phase === 'paused') {
+      toast('Stop the current recording before loading demo data.', true);
+      return;
+    }
+    State.phase = 'review';
+    State.elapsed = 187;
+    State.meta = { title: 'Untitled recording', duration: 187, trimStart: 0, trimEnd: 187 };
+    State.markers = [
+      { time: 32, label: 'Marker 1 — repository settings opened' },
+      { time: 95, label: 'Marker 2 — Pages configuration' },
+      { time: 150, label: 'Marker 3 — first successful deploy' },
+    ];
+    State.transcriptChunks = [
+      { t: 2,   text: "Hi everyone, today I'll show you how to publish a static website for free using GitHub Pages." },
+      { t: 12,  text: 'First, open your repository on GitHub and make sure your index file is on the main branch.' },
+      { t: 28,  text: 'Click the settings tab in the top navigation of the repository.' },
+      { t: 41,  text: 'Scroll down the left sidebar and select the Pages section.' },
+      { t: 58,  text: 'Under source, choose deploy from a branch and select the main branch with the root folder.' },
+      { t: 76,  text: 'Press save and GitHub will start building your site in the background.' },
+      { t: 95,  text: 'While it builds, check the actions tab to watch the deploy workflow run.' },
+      { t: 118, text: 'After about a minute, refresh the Pages settings and you will see your public URL at the top.' },
+      { t: 140, text: 'Open the URL to confirm the site loads, then test it on mobile as well.' },
+      { t: 158, text: 'If you want a custom domain, add a CNAME record with your DNS provider and enter the domain here.' },
+      { t: 176, text: 'And that is it — your site is live, free, and updates automatically on every push to main.' },
+    ];
+    State.media.blob = null; State.media.url = null;
+    $('#previewVideo').style.display = 'none';
+    $('#playbackVideo').style.display = 'none';
+    $('#timer').textContent = fmtTime(187);
+    TranscriptController.render();
+    UIController.renderMarkers();
+    UIController.updatePhase();
+    // Re-show the stage message after updatePhase (which hides it in review phase).
+    $('#stageEmpty').style.display = 'flex';
+    $('#stageEmpty').querySelector('div:last-child').innerHTML =
+      '<strong>Demo metadata loaded.</strong><br><span style="font-size:13px">Transcript, markers and AI outputs are fake — there is no demo video. Record something real to test playback and export.</span>';
+    ExportController.showResults();
+    AIController.generateAll();
+    toast('Demo recording metadata loaded');
+  },
+};
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+  UIController.init();
+  RecorderController.init();
+  TranscriptController.init();
+  AIController.init();
+  ExportController.init();
+  $('#btnDemo').addEventListener('click', () => DemoData.load());
+
+  // Warn before closing the tab while a recording is in progress.
+  window.addEventListener('beforeunload', (e) => {
+    if (State.phase === 'recording' || State.phase === 'paused') {
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  });
+});
+</script>
+</body>
+</html>

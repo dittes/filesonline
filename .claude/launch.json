@@ -12,6 +12,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["serve", "-l", "3738", "maxball"],
       "port": 3738
+    },
+    {
+      "name": "screenscribe",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "-l", "3739", "screenscribe"],
+      "port": 3739
     }
   ]
 }
