@@ -146,36 +146,38 @@ export function renderFileTable(containerEl) {
             <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" width="14" height="14">
               <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
-            Add Files
+            <span class="btn-label">Add Files</span>
           </button>
           <button class="btn btn-sm btn-ghost toolbar-add-folder" title="Add folder">
             <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" width="14" height="14">
               <path d="M2 4a1 1 0 011-1h4l1 1h5a1 1 0 011 1v7a1 1 0 01-1 1H3a1 1 0 01-1-1V4z" fill="currentColor" opacity=".4"/>
               <path d="M8 8v4M6 10h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
-            Add Folder
+            <span class="btn-label">Add Folder</span>
           </button>
           <button class="btn btn-sm btn-ghost toolbar-download-zip" title="Download selected as ZIP" disabled>
             <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" width="14" height="14">
               <path d="M8 2v8M5 7l3 3 3-3M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
-            Download ZIP
+            <span class="btn-label">Download ZIP</span>
           </button>
           <button class="btn btn-sm btn-ghost toolbar-get-metadata" title="Get metadata for selected" disabled>
             <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" width="14" height="14">
               <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
               <path d="M8 7v5M8 5v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
-            Metadata
+            <span class="btn-label">Metadata</span>
           </button>
           <button class="btn btn-sm btn-danger toolbar-clear-files" title="Clear all files">
             <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" width="14" height="14">
               <path d="M3 5h10l-1 8H4L3 5zM6 5V3h4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
-            Clear
+            <span class="btn-label">Clear</span>
           </button>
         </div>
       </div>
+
+      <nav class="file-breadcrumb" aria-label="Folder path" hidden></nav>
 
       <div class="file-table-container">
         <table class="file-table" role="grid" aria-label="Loaded files">
@@ -216,8 +218,8 @@ export function renderFileTable(containerEl) {
           <h3>No files loaded</h3>
           <p>Drop files here or use the buttons below to get started.</p>
           <div class="empty-actions">
-            <button class="btn btn-primary empty-open-files">Open Files</button>
-            <button class="btn btn-secondary empty-open-folder">Open Folder</button>
+            <button class="btn btn-primary empty-open-folder">Open Folder</button>
+            <button class="btn btn-secondary empty-open-files">Open Files</button>
           </div>
         </div>
       </div>
@@ -435,6 +437,49 @@ function _refreshFileTable(containerEl) {
 
   // Update sort indicators
   _updateSortIndicators(containerEl);
+
+  // Update breadcrumb
+  _renderBreadcrumb(containerEl);
+}
+
+/**
+ * Render the folder breadcrumb below the toolbar when a path filter is active.
+ * @param {HTMLElement} containerEl
+ */
+function _renderBreadcrumb(containerEl) {
+  const bar = $('.file-breadcrumb', containerEl);
+  if (!bar) return;
+
+  const path = (state.filters.path || '').replace(/\/$/, '');
+  if (!path || state.files.size === 0) {
+    bar.hidden = true;
+    bar.innerHTML = '';
+    return;
+  }
+
+  const segments = path.split('/').filter(Boolean);
+  const crumbs = [
+    `<button class="crumb" data-path="">
+      <svg viewBox="0 0 16 16" fill="none" width="12" height="12" aria-hidden="true"><path d="M2 7l6-5 6 5v6a1 1 0 01-1 1H3a1 1 0 01-1-1V7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      All Files
+    </button>`,
+  ];
+  let prefix = '';
+  segments.forEach((seg, i) => {
+    prefix += seg + '/';
+    const isLast = i === segments.length - 1;
+    crumbs.push(`<span class="crumb-sep" aria-hidden="true">/</span>`);
+    crumbs.push(isLast
+      ? `<span class="crumb crumb-current" aria-current="location">${escapeHtml(seg)}</span>`
+      : `<button class="crumb" data-path="${escapeHtml(prefix)}">${escapeHtml(seg)}</button>`);
+  });
+
+  bar.innerHTML = crumbs.join('');
+  bar.hidden = false;
+
+  bar.querySelectorAll('button.crumb').forEach(btn => {
+    btn.addEventListener('click', () => setFilter('path', btn.dataset.path || ''));
+  });
 }
 
 /**
@@ -463,7 +508,7 @@ function _renderGrid(gridEl, files) {
           aria-label="Select ${escapeHtml(entry.name)}"
           data-id="${escapeHtml(entry.id)}"
         />
-        <div class="file-card-thumb"${isImage ? ` data-thumb-id="${escapeHtml(entry.id)}"` : ''}>${getFileTypeIcon(entry.ext)}</div>
+        <div class="file-card-thumb icon-${escapeHtml(entry.category)}"${isImage ? ` data-thumb-id="${escapeHtml(entry.id)}"` : ''}>${getFileTypeIcon(entry.ext)}</div>
         <div class="file-card-body">
           <div class="file-card-name">${escapeHtml(entry.name)}</div>
           <div class="file-card-meta">${escapeHtml(formatBytes(entry.size))}</div>
@@ -551,7 +596,7 @@ function _buildFileRow(entry, index) {
         />
       </td>
       <td class="col-name">
-        <span class="file-icon" aria-hidden="true">${icon}</span>
+        <span class="file-icon icon-${escapeHtml(entry.category)}" aria-hidden="true">${icon}</span>
         <span class="file-name" title="${escapeHtml(entry.name)}">${escapeHtml(displayName)}</span>
       </td>
       <td class="col-ext">${escapeHtml(entry.ext || '—')}</td>
@@ -654,6 +699,16 @@ function _showContextMenu(x, y, id, entry) {
       action: () => downloadBlob(entry.file, entry.name),
     },
     {
+      label: 'Copy Name',
+      icon: `<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" width="14" height="14"><rect x="5" y="5" width="8" height="9" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M3 11V3a1 1 0 011-1h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+      action: () => _copyText(entry.name, 'Name'),
+    },
+    {
+      label: 'Copy Path',
+      icon: `<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" width="14" height="14"><path d="M2 4a1 1 0 011-1h4l1 1h5a1 1 0 011 1v7a1 1 0 01-1 1H3a1 1 0 01-1-1V4z" stroke="currentColor" stroke-width="1.5"/></svg>`,
+      action: () => _copyText(entry.relativePath || entry.name, 'Path'),
+    },
+    {
       label: 'Get Metadata',
       icon: `<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" width="14" height="14"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 7v5M8 5v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
       action: () => { setSelectedIds([id]); setActiveModule('metadata'); },
@@ -726,6 +781,20 @@ function _showContextMenu(x, y, id, entry) {
     document.removeEventListener('click', onOutsideClick);
     document.removeEventListener('keydown', onEscape);
   };
+}
+
+/** Copy text to the clipboard with a toast. */
+async function _copyText(text, label) {
+  try {
+    await navigator.clipboard.writeText(text);
+    if (_uiModule && typeof _uiModule.showToast === 'function') {
+      _uiModule.showToast(`${label} copied to clipboard.`, 'success');
+    }
+  } catch {
+    if (_uiModule && typeof _uiModule.showToast === 'function') {
+      _uiModule.showToast('Clipboard access was blocked.', 'error');
+    }
+  }
 }
 
 /** Remove any open context menu. */
@@ -939,6 +1008,60 @@ function _initKeyboardShortcuts() {
     }
 
     if (inInput) return;
+
+    // "/" focuses the file search box
+    if (e.key === '/' && state.workspaceOpen && !ctrl) {
+      const search = document.querySelector('.file-search');
+      if (search) {
+        e.preventDefault();
+        search.focus();
+        search.select();
+      }
+      return;
+    }
+
+    // Arrow / Enter / Space navigation in the Browse module
+    if (state.workspaceOpen && state.activeModule === 'browser' && state.files.size > 0 && !ctrl) {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        const files = getFilteredFiles();
+        if (!files.length) return;
+        let idx = _lastClickedIndex;
+        if (state.selectedIds.size === 1) {
+          const selId = [...state.selectedIds][0];
+          const found = files.findIndex(f => f.id === selId);
+          if (found >= 0) idx = found;
+        }
+        const next = e.key === 'ArrowDown'
+          ? Math.min(idx + 1, files.length - 1)
+          : Math.max(idx <= 0 ? 0 : idx - 1, 0);
+        const target = files[next];
+        if (!target) return;
+        _lastClickedIndex = next;
+        setSelectedIds([target.id]);
+        openPreview(target.id);
+        // Keep the focused row in view
+        requestAnimationFrame(() => {
+          const el = document.querySelector(`.file-row[data-id="${target.id}"], .file-card[data-id="${target.id}"]`);
+          if (el) el.scrollIntoView({ block: 'nearest' });
+        });
+        return;
+      }
+      if (e.key === ' ' && _lastClickedIndex >= 0) {
+        const files = getFilteredFiles();
+        const target = files[_lastClickedIndex];
+        if (target) {
+          e.preventDefault();
+          toggleSelected(target.id);
+        }
+        return;
+      }
+      if (e.key === 'Enter' && state.selectedIds.size === 1) {
+        e.preventDefault();
+        openPreview([...state.selectedIds][0]);
+        return;
+      }
+    }
 
     // Ctrl+A: select all
     if (ctrl && e.key === 'a') {

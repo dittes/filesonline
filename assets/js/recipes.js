@@ -1,7 +1,7 @@
 // Managed saved operation presets stored in IndexedDB
 
 import { generateId, formatDate, escapeHtml } from './utils.js';
-import { state, on, emit } from './state.js';
+import { state, on, emit, setActiveModule } from './state.js';
 import { $, $$, showToast, showConfirm } from './ui.js';
 
 // ─── Storage helpers ──────────────────────────────────────────────────────────
@@ -167,6 +167,14 @@ export async function duplicateRecipe(id) {
  */
 export function applyRecipe(recipe) {
   emit('recipe:apply', recipe);
+  // Take the user to the module the recipe configures
+  const moduleByType = {
+    'rename': 'rename',
+    'archive': 'archive',
+    'metadata-export': 'metadata',
+  };
+  const target = moduleByType[recipe.type];
+  if (target) setActiveModule(target);
 }
 
 // ─── Module UI ────────────────────────────────────────────────────────────────
@@ -416,7 +424,7 @@ export function initRecipesModule(containerEl) {
       });
       renderUserRecipes();
       closeModal();
-      showToast(`Recipe "${escapeHtml(name)}" saved.`, 'success');
+      showToast(`Recipe "${name}" saved.`, 'success');
     } catch (err) {
       formError.textContent = `Save failed: ${err.message}`;
       formError.hidden = false;

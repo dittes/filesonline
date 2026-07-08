@@ -524,6 +524,21 @@ export function initRenameModule(containerEl) {
     undoBtn.disabled = true;
   });
 
+  // ── Recipes integration ───────────────────────────────────────────────────
+  // Load rule sets when a rename recipe is applied from the Recipes module.
+  on('recipe:apply', recipe => {
+    if (!recipe || recipe.type !== 'rename') return;
+    const config = recipe.config || {};
+    if (!Array.isArray(config.rules) || config.rules.length === 0) return;
+    rules = config.rules.map(r => ({ ...r, id: generateId() }));
+    if (typeof config.preserveExt === 'boolean') {
+      preserveExt = config.preserveExt;
+      extCheck.checked = preserveExt;
+    }
+    renderRules();
+    schedulePreview();
+  });
+
   // Initial render
   refreshPreview();
 }

@@ -20,6 +20,7 @@ import { getExtension, getMimeCategory, generateId } from './utils.js';
  * @typedef {Object} Filters
  * @property {string} search
  * @property {string} category
+ * @property {string} path     folder path prefix ('' = all files)
  * @property {string} sort     'name' | 'size' | 'modified' | 'type' | 'ext'
  * @property {string} order    'asc' | 'desc'
  */
@@ -103,6 +104,7 @@ export const state = {
   filters: {
     search: '',
     category: '',
+    path: '',
     sort: 'name',
     order: 'asc',
   },
@@ -296,10 +298,15 @@ export function setFilter(key, value) {
  * @returns {FileEntry[]}
  */
 export function getFilteredFiles() {
-  const { search, category, sort, order } = state.filters;
+  const { search, category, path, sort, order } = state.filters;
   const searchLower = search.trim().toLowerCase();
 
   let entries = Array.from(state.files.values());
+
+  if (path) {
+    const prefix = path.endsWith('/') ? path : path + '/';
+    entries = entries.filter(f => (f.relativePath || '').startsWith(prefix));
+  }
 
   if (searchLower) {
     entries = entries.filter(f =>

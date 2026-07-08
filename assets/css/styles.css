@@ -4757,3 +4757,593 @@ a.feature-card-link {
   padding: 0 4px;
   font-size: 10px;
 }
+
+/* ==========================================================================
+   FILE EXPLORER REDESIGN
+   Styles for the actual Browse-module markup (toolbar, table, breadcrumb,
+   folder tree, preview header, empty states). Later rules override the
+   legacy definitions above.
+   ========================================================================== */
+
+/* ── Small form controls ─────────────────────────────────────────────── */
+
+.input-sm,
+.select-sm {
+  height: 28px;
+  font-size: 13px;
+}
+
+.select-sm {
+  padding-right: 26px;
+}
+
+.file-search {
+  width: 210px;
+  flex: none;
+}
+
+.file-type-filter {
+  width: 132px;
+  flex: none;
+}
+
+/* ── Browse layout ───────────────────────────────────────────────────── */
+
+.file-table-wrap {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  background: var(--surface);
+}
+
+.file-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.file-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.file-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.file-toolbar-right .btn svg {
+  flex-shrink: 0;
+}
+
+/* ── Breadcrumb ──────────────────────────────────────────────────────── */
+
+.file-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 5px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-hover);
+  font-size: 12px;
+  overflow-x: auto;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.file-breadcrumb[hidden] {
+  display: none;
+}
+
+.crumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: none;
+  background: none;
+  color: var(--text-2);
+  font-size: 12px;
+  font-family: var(--font);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+}
+
+button.crumb {
+  cursor: pointer;
+}
+
+button.crumb:hover {
+  background: var(--surface-active);
+  color: var(--text);
+}
+
+.crumb-current {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.crumb-sep {
+  color: var(--text-3);
+}
+
+/* ── Table container + status bar ────────────────────────────────────── */
+
+.file-table-container {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.file-table-container > .file-table {
+  flex: none;
+}
+
+.file-status-bar {
+  padding: 5px 14px;
+  font-size: 12px;
+  color: var(--text-2);
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+}
+
+/* ── Table density + column treatment ────────────────────────────────── */
+
+.file-table th,
+.file-table td {
+  height: 32px;
+  padding: 0 12px;
+}
+
+.file-table td {
+  font-size: 13px;
+}
+
+.file-table th.col-check,
+.file-table td.col-check {
+  width: 34px;
+  padding: 0 0 0 12px;
+}
+
+.file-table th.col-ext  { width: 64px; }
+.file-table th.col-size { width: 92px; text-align: right; }
+.file-table th.col-modified { width: 150px; }
+.file-table th.col-path { width: 22%; }
+
+.file-table td.col-ext,
+.file-table td.col-modified,
+.file-table td.col-path {
+  color: var(--text-2);
+  font-size: 12px;
+}
+
+.file-table td.col-size {
+  color: var(--text-2);
+  font-size: 12px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── File type icon (inline, 16px, colored by category) ──────────────── */
+
+.file-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  vertical-align: -3px;
+  margin-right: 8px;
+  color: var(--text-3);
+  flex-shrink: 0;
+}
+
+.file-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.col-name .file-name {
+  vertical-align: middle;
+}
+
+.file-icon.icon-image,       .file-card-thumb.icon-image       { color: #8b5cf6; }
+.file-icon.icon-video,       .file-card-thumb.icon-video       { color: #ef4444; }
+.file-icon.icon-audio,       .file-card-thumb.icon-audio       { color: #f97316; }
+.file-icon.icon-pdf,         .file-card-thumb.icon-pdf         { color: #dc2626; }
+.file-icon.icon-document,    .file-card-thumb.icon-document    { color: #2563eb; }
+.file-icon.icon-spreadsheet, .file-card-thumb.icon-spreadsheet { color: #16a34a; }
+.file-icon.icon-code,        .file-card-thumb.icon-code        { color: #0891b2; }
+.file-icon.icon-archive,     .file-card-thumb.icon-archive     { color: #d97706; }
+.file-icon.icon-text,        .file-card-thumb.icon-text        { color: #64748b; }
+.file-icon.icon-binary,      .file-card-thumb.icon-binary      { color: var(--text-3); }
+
+/* ── Empty state (browse) ────────────────────────────────────────────── */
+
+.file-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 64px 24px;
+  text-align: center;
+  flex: 1;
+  min-height: 320px;
+}
+
+.file-empty-state .empty-icon svg {
+  width: 56px;
+  height: 56px;
+  color: var(--border-strong);
+  margin-bottom: 10px;
+}
+
+.file-empty-state h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.file-empty-state p {
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.empty-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+/* ── Folder tree (left pane) ─────────────────────────────────────────── */
+
+.tree {
+  padding: 10px 8px;
+  overflow-y: auto;
+}
+
+.tree-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.tree-section-header {
+  margin-top: 0;
+  padding: 2px 8px 6px;
+}
+
+.tree-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.tree-node {
+  list-style: none;
+}
+
+.tree-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 8px 0 calc(4px + var(--indent, 0px));
+  overflow: hidden;
+}
+
+.tree-item__toggle {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-3);
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.tree-item__toggle[data-action="toggle"]:hover {
+  background: var(--surface-active);
+  color: var(--text);
+}
+
+.tree-item__toggle svg {
+  width: 10px;
+  height: 10px;
+}
+
+.tree-item__toggle-placeholder {
+  width: 10px;
+  height: 10px;
+  display: block;
+}
+
+.tree-item__icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f59e0b;
+}
+
+.tree-item--all .tree-item__icon {
+  color: var(--text-3);
+}
+
+.tree-item.active .tree-item__icon {
+  color: inherit;
+}
+
+.tree-item__icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.tree-item__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+.tree-item__count {
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--text-3);
+  background: var(--surface-active);
+  border-radius: 8px;
+  padding: 0 6px;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.tree-item.active .tree-item__count {
+  background: var(--accent-light-hover);
+  color: var(--accent);
+}
+
+.tree-children {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: none;
+  overflow: hidden;
+  transition: height 160ms ease;
+}
+
+.tree-children--open {
+  display: block;
+}
+
+.tree-footer {
+  margin-top: auto;
+  padding: 10px 4px 2px;
+}
+
+.tree-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 6px 8px;
+  font-size: 13px;
+  font-family: var(--font);
+  color: var(--text-2);
+  background: none;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: color var(--transition), border-color var(--transition), background-color var(--transition);
+}
+
+.tree-add-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+.tree-add-btn svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.tree-empty {
+  padding: 16px 8px;
+  font-size: 12px;
+  color: var(--text-3);
+  text-align: center;
+}
+
+/* ── Preview panel refinements ───────────────────────────────────────── */
+
+.preview-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: 100%;
+  min-height: 240px;
+  padding: 48px 16px;
+  color: var(--text-3);
+  font-size: 13px;
+  text-align: center;
+}
+
+.preview-empty svg {
+  color: var(--border-strong);
+}
+
+.preview-header {
+  height: auto;
+  min-height: 48px;
+  padding: 8px 12px;
+}
+
+.preview-header-icon {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-3);
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.preview-header-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.preview-header-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.preview-header-info .preview-filename {
+  flex: none;
+}
+
+.preview-filesize {
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.preview-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* ── FAQ: native <details> support ───────────────────────────────────── */
+
+.faq-item[open] .faq-answer {
+  display: block;
+}
+
+summary.faq-question {
+  list-style: none;
+}
+
+summary.faq-question::-webkit-details-marker {
+  display: none;
+}
+
+summary.faq-question::after {
+  content: "+";
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--text-3);
+  flex-shrink: 0;
+  transition: transform var(--transition);
+  line-height: 1;
+}
+
+.faq-item[open] summary.faq-question::after {
+  transform: rotate(45deg);
+}
+
+/* ── Recipes card actions ────────────────────────────────────────────── */
+
+.recipe-card-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+/* Toolbar responsiveness: icon-only action buttons when the pane is tight */
+.file-toolbar {
+  container-type: inline-size;
+  container-name: filetoolbar;
+}
+
+@container filetoolbar (max-width: 1020px) {
+  .file-toolbar-right .btn .btn-label {
+    display: none;
+  }
+  .file-toolbar-right .btn {
+    padding: 0 7px;
+  }
+}
+
+.file-empty-state[hidden] {
+  display: none;
+}
+
+/* ── Code / text preview with line numbers ───────────────────────────── */
+
+.code-preview {
+  display: flex;
+  align-items: flex-start;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.7;
+  min-height: 100%;
+  background: var(--surface);
+}
+
+.code-gutter {
+  flex-shrink: 0;
+  padding: 12px 8px 12px 12px;
+  text-align: right;
+  color: var(--text-3);
+  background: var(--surface-hover);
+  border-right: 1px solid var(--border);
+  -webkit-user-select: none;
+  user-select: none;
+  white-space: pre;
+}
+
+.code-gutter .ln {
+  display: block;
+}
+
+.code-content {
+  flex: 1;
+  margin: 0;
+  padding: 12px;
+  overflow-x: auto;
+  color: var(--text);
+  white-space: pre;
+}
+
+.code-content code {
+  font-family: inherit;
+}
+
+.code-content .lc {
+  display: block;
+  min-height: 1.7em;
+}

@@ -33,7 +33,16 @@ export function initFolderTree(containerEl) {
 
   // Re-render whenever files change
   on('files:added',   () => _render(containerEl));
-  on('files:cleared', () => _render(containerEl));
+  on('files:removed', () => _render(containerEl));
+  on('files:cleared', () => { _activePath = ''; _render(containerEl); });
+
+  // Keep the active highlight in sync when the path filter changes elsewhere
+  // (e.g. breadcrumb clicks in the file table toolbar)
+  on('filters:change', ({ filters }) => {
+    if (filters && filters.path !== undefined && filters.path !== _activePath) {
+      _setActivePath(filters.path, containerEl);
+    }
+  });
 
   // Event delegation — all clicks inside the container
   containerEl.addEventListener('click', (e) => _handleClick(e, containerEl));
@@ -67,8 +76,11 @@ export function buildTreeData(files) {
       continue;
     }
 
-    // Split the path into segments, ignoring empty strings
+    // Split the path into segments, ignoring empty strings.
+    // The last segment is the filename itself — only the folders above it
+    // become tree nodes (unless the path explicitly ends with "/").
     const segments = rel.replace(/\/$/, '').split('/').filter(Boolean);
+    if (!rel.endsWith('/')) segments.pop();
     let node = root;
     let builtPath = '';
 
@@ -121,17 +133,20 @@ function _buildPanelHTML(root, totalCount) {
       <div class="tree-section-header">Sources</div>
 
       <ul class="tree-list" role="tree">
-        <li class="tree-item tree-item--all${_activePath === '' ? ' active' : ''}"
-            data-path=""
-            data-type="all"
-            role="treeitem"
-            tabindex="0"
-            aria-selected="${_activePath === ''}">
-          <span class="tree-item__icon">
-            ${_iconFiles()}
-          </span>
-          <span class="tree-item__label">All Files</span>
-          <span class="tree-item__count">${totalCount}</span>
+        <li class="tree-node" role="none">
+          <div class="tree-item tree-item--all${_activePath === '' ? ' active' : ''}"
+              data-path=""
+              data-type="all"
+              role="treeitem"
+              tabindex="0"
+              aria-selected="${_activePath === ''}">
+            <span class="tree-item__toggle"><span class="tree-item__toggle-placeholder"></span></span>
+            <span class="tree-item__icon">
+              ${_iconFiles()}
+            </span>
+            <span class="tree-item__label">All Files</span>
+            <span class="tree-item__count">${totalCount}</span>
+          </div>
         </li>
 
         ${childrenHTML}
@@ -170,26 +185,27 @@ function _buildChildrenHTML(children, depth) {
       : '';
 
     html += `
-      <li class="tree-item${isActive ? ' active' : ''}${hasChildren ? ' tree-item--folder' : ''}"
-          data-path="${escapeHtml(node.path)}"
-          data-type="folder"
-          data-expanded="${isExpanded}"
-          role="treeitem"
-          aria-expanded="${isExpanded}"
-          aria-selected="${isActive}"
-          tabindex="0"
-          style="--indent: ${indent}px">
+      <li class="tree-node" data-expanded="${isExpanded}" role="none">
+        <div class="tree-item${isActive ? ' active' : ''}${hasChildren ? ' tree-item--folder' : ''}"
+            data-path="${escapeHtml(node.path)}"
+            data-type="folder"
+            role="treeitem"
+            aria-expanded="${isExpanded}"
+            aria-selected="${isActive}"
+            tabindex="0"
+            style="--indent: ${indent}px">
 
-        <span class="tree-item__toggle" data-action="toggle" aria-label="Toggle folder">
-          ${hasChildren ? _iconChevron(isExpanded) : '<span class="tree-item__toggle-placeholder"></span>'}
-        </span>
+          <span class="tree-item__toggle"${hasChildren ? ' data-action="toggle" aria-label="Toggle folder"' : ''}>
+            ${hasChildren ? _iconChevron(isExpanded) : '<span class="tree-item__toggle-placeholder"></span>'}
+          </span>
 
-        <span class="tree-item__icon">
-          ${_iconFolder(isExpanded)}
-        </span>
+          <span class="tree-item__icon">
+            ${_iconFolder(isExpanded)}
+          </span>
 
-        <span class="tree-item__label" title="${escapeHtml(node.name)}">${escapeHtml(node.name)}</span>
-        <span class="tree-item__count">${node.count}</span>
+          <span class="tree-item__label" title="${escapeHtml(node.name)}">${escapeHtml(node.name)}</span>
+          <span class="tree-item__count">${node.count}</span>
+        </div>
 
         ${hasChildren ? `
           <ul class="tree-children${isExpanded ? ' tree-children--open' : ''}" role="group">
@@ -217,8 +233,8 @@ function _handleClick(e, containerEl) {
   const toggleBtn = e.target.closest('[data-action="toggle"]');
   if (toggleBtn) {
     e.stopPropagation();
-    const item = toggleBtn.closest('.tree-item');
-    if (item) _toggleExpand(item, containerEl);
+    const node = toggleBtn.closest('.tree-node');
+    if (node) _toggleExpand(node, containerEl);
     return;
   }
 
@@ -242,17 +258,15 @@ function _handleClick(e, containerEl) {
  * @param {HTMLElement} item
  * @param {HTMLElement} containerEl
  */
-function _toggleExpand(item, containerEl) {
-  const isExpanded = item.dataset.expanded === 'true';
+function _toggleExpand(node, containerEl) {
+  const isExpanded = node.dataset.expanded === 'true';
   const newExpanded = !isExpanded;
 
-  item.dataset.expanded = String(newExpanded);
-  item.setAttribute('aria-expanded', String(newExpanded));
+  node.dataset.expanded = String(newExpanded);
+  const row = node.querySelector(':scope > .tree-item');
+  if (row) row.setAttribute('aria-expanded', String(newExpanded));
 
-  const chevron  = item.querySelector('.tree-chevron');
-  if (chevron) chevron.classList.toggle('tree-chevron--open', newExpanded);
-
-  const children = item.querySelector('.tree-children');
+  const children = node.querySelector(':scope > .tree-children');
   if (children) {
     if (newExpanded) {
       // Measure natural height then animate to it
@@ -280,7 +294,7 @@ function _toggleExpand(item, containerEl) {
   }
 
   // Update chevron icon inside the toggle button
-  const toggleBtn = item.querySelector('[data-action="toggle"]');
+  const toggleBtn = node.querySelector('[data-action="toggle"]');
   if (toggleBtn) {
     toggleBtn.innerHTML = _iconChevron(newExpanded);
   }

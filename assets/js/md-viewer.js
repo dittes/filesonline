@@ -18,7 +18,8 @@ const CDN = {
   hljs: 'https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/highlight.min.js',
   hljsCssLight: 'https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/styles/github.min.css',
   hljsCssDark: 'https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/styles/github-dark.min.css',
-  html2pdf: 'https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js',
+  html2canvas: 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js',
+  jspdf: 'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js',
 };
 
 const _loaded = new Map(); // src -> Promise
@@ -402,35 +403,79 @@ async function exportPdf() {
   const html = await getRenderedHtml();
   if (!html) { showToast('Nothing to export yet.', 'info'); return; }
 
+  let clip = null;
   try {
-    await loadScript(CDN.html2pdf);
+    await Promise.all([loadScript(CDN.html2canvas), loadScript(CDN.jspdf)]);
 
-    // Render in a light-themed offscreen wrapper so the PDF is always
-    // black-on-white regardless of the app theme (tokens resolve locally).
+    // Render in a light-themed wrapper so the PDF is always black-on-white
+    // regardless of the app theme (tokens resolve locally on the wrapper).
+    // The wrapper stays in normal document flow inside a zero-height clipping
+    // parent — html2canvas renders absolutely-positioned or off-screen
+    // elements as blank.
+    clip = document.createElement('div');
+    clip.style.cssText = 'height:0;overflow:hidden;';
     const wrap = document.createElement('div');
     wrap.className = 'md-preview';
     wrap.style.cssText = [
-      'position:fixed', 'left:-10000px', 'top:0', 'width:730px',
-      'background:#fff', 'color:#1c1c1a', 'padding:24px',
+      'width:730px', 'background:#fff', 'color:#1c1c1a', 'padding:24px',
       '--bg:#F9F9F8', '--surface:#FFFFFF', '--surface-hover:#F4F4F3',
       '--surface-active:#EEEEED', '--border:#E4E4E2', '--border-strong:#CCCCCA',
       '--text:#1C1C1A', '--text-2:#5A5956', '--text-3:#9A9896', '--accent:#1B4FD8',
     ].join(';');
     wrap.innerHTML = html;
-    document.body.appendChild(wrap);
+    clip.appendChild(wrap);
+    document.body.appendChild(clip);
+    await new Promise(r => requestAnimationFrame(r));
 
-    await window.html2pdf().set({
-      margin: [12, 12, 14, 12],
-      filename: `${baseName()}.pdf`,
-      html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
-    }).from(wrap).save();
+    const canvas = await window.html2canvas(wrap, {
+      scale: 2,
+      backgroundColor: '#ffffff',
+      useCORS: true,
+      logging: false,
+    });
+    clip.remove();
+    clip = null;
+    if (!canvas.width || !canvas.height) throw new Error('Rendering produced an empty canvas');
 
-    wrap.remove();
+    // Slice the tall canvas into A4 pages
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+    const margin = 10;
+    const pageWmm = 210 - margin * 2;
+    const pageHmm = 297 - margin * 2;
+    const pxPerMm = canvas.width / pageWmm;
+    const pageHpx = Math.floor(pageHmm * pxPerMm);
+
+    const slice = document.createElement('canvas');
+    slice.width = canvas.width;
+    const sctx = slice.getContext('2d');
+
+    let y = 0;
+    let first = true;
+    while (y < canvas.height) {
+      const h = Math.min(pageHpx, canvas.height - y);
+      slice.height = h;
+      sctx.fillStyle = '#ffffff';
+      sctx.fillRect(0, 0, slice.width, h);
+      sctx.drawImage(canvas, 0, y, canvas.width, h, 0, 0, canvas.width, h);
+      if (!first) pdf.addPage();
+      pdf.addImage(slice.toDataURL('image/jpeg', 0.92), 'JPEG', margin, margin, pageWmm, h / pxPerMm);
+      first = false;
+      y += h;
+    }
+
+    const blob = pdf.output('blob');
+    // A structurally empty PDF is ~1 KB — treat that as failure
+    if (!blob || blob.size < 2000) {
+      throw new Error(`PDF generation produced an empty document (${blob ? blob.size : 0} bytes)`);
+    }
+    window.__mdvLastPdfSize = blob.size; // debug/testing hook
+
+    downloadBlob(blob, `${baseName()}.pdf`);
     showToast('PDF exported.', 'success');
   } catch (err) {
-    console.warn('md-viewer: html2pdf failed, using print fallback', err);
+    if (clip) clip.remove();
+    console.warn('md-viewer: PDF generation failed, using print fallback', err);
     printFallback(html);
   }
 }
