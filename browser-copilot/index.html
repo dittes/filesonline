@@ -629,6 +629,10 @@ function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
+/* Guard against browser-AI calls that hang while a model downloads. */
+function withTimeout(promise, ms) {
+  return Promise.race([promise, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]);
+}
 function fmtSize(bytes) {
   if (bytes < 1024) return bytes + ' B';
   if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
@@ -947,13 +951,13 @@ class AIAdapter {
       try {
         let s = null;
         if (window.Summarizer && Summarizer.create) {
-          if (Summarizer.availability && (await Summarizer.availability()) !== 'available') throw new Error('na');
-          s = await Summarizer.create({ type: 'key-points', length: 'medium' });
+          if (Summarizer.availability && (await withTimeout(Summarizer.availability(), 2000)) !== 'available') throw new Error('na');
+          s = await withTimeout(Summarizer.create({ type: 'key-points', length: 'medium' }), 4000);
         } else if (window.ai && window.ai.summarizer) {
           s = await window.ai.summarizer.create();
         }
         if (s) {
-          const out = String(await s.summarize(text.slice(0, 20000))).trim();
+          const out = String(await withTimeout(s.summarize(text.slice(0, 20000)), 15000)).trim();
           if (s.destroy) s.destroy();
           if (out) return { text: out, mode: 'browser-ai' };
         }
@@ -967,13 +971,13 @@ class AIAdapter {
       try {
         let r = null;
         if (window.Rewriter && Rewriter.create) {
-          if (Rewriter.availability && (await Rewriter.availability()) !== 'available') throw new Error('na');
-          r = await Rewriter.create();
+          if (Rewriter.availability && (await withTimeout(Rewriter.availability(), 2000)) !== 'available') throw new Error('na');
+          r = await withTimeout(Rewriter.create(), 4000);
         } else if (window.ai && window.ai.rewriter) {
           r = await window.ai.rewriter.create();
         }
         if (r) {
-          const out = String(await r.rewrite(text.slice(0, 20000), { context: instruction })).trim();
+          const out = String(await withTimeout(r.rewrite(text.slice(0, 20000), { context: instruction }), 15000)).trim();
           if (r.destroy) r.destroy();
           if (out) return { text: out, mode: 'browser-ai' };
         }
@@ -992,12 +996,17 @@ class AIAdapter {
         let tr = null;
         const source = await this.detectLanguage(text) || (target === 'de' ? 'en' : 'de');
         if (window.Translator && Translator.create) {
-          tr = await Translator.create({ sourceLanguage: source, targetLanguage: target });
+          // create() can hang while a language pack downloads — gate + timeout.
+          if (Translator.availability &&
+              (await withTimeout(Translator.availability({ sourceLanguage: source, targetLanguage: target }), 2000)) !== 'available') {
+            throw new Error('not ready');
+          }
+          tr = await withTimeout(Translator.create({ sourceLanguage: source, targetLanguage: target }), 4000);
         } else if (window.translation && window.translation.createTranslator) {
-          tr = await window.translation.createTranslator({ sourceLanguage: source, targetLanguage: target });
+          tr = await withTimeout(window.translation.createTranslator({ sourceLanguage: source, targetLanguage: target }), 4000);
         }
         if (tr) {
-          const out = String(await tr.translate(text.slice(0, 20000))).trim();
+          const out = String(await withTimeout(tr.translate(text.slice(0, 20000)), 15000)).trim();
           if (tr.destroy) tr.destroy();
           if (out) return { text: out, mode: 'browser-ai' };
         }
@@ -1009,7 +1018,7 @@ class AIAdapter {
   async detectLanguage(text) {
     try {
       if (window.LanguageDetector && LanguageDetector.create) {
-        const d = await LanguageDetector.create();
+        const d = await withTimeout(LanguageDetector.create(), 3000);
         const res = await d.detect(text.slice(0, 2000));
         if (d.destroy) d.destroy();
         return res && res[0] && res[0].detectedLanguage;

@@ -1,0 +1,2491 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Startpage — a private, local-first browser command center for modern web work. Command bar, workspaces, todos, scratchpad, focus timer. No backend, no tracking.">
+<meta name="theme-color" content="#0d1117">
+<title>Startpage — local-first command center</title>
+<style>
+/* ============================================================
+   Startpage — calm, minimal design system
+   Dark by default. CSS variables. No external anything.
+   ============================================================ */
+:root {
+  --bg: #f5f6f9;
+  --bg-grad: radial-gradient(1100px 500px at 50% -80px, #e8ecf8 0%, transparent 60%);
+  --panel: #ffffff;
+  --inset: #eef0f5;
+  --hover: #e8ebf2;
+  --border: #e2e6ee;
+  --border-strong: #c9d0dd;
+  --text: #1b2130;
+  --dim: #5c6474;
+  --faint: #9098a8;
+  --accent: #5b74f0;
+  --accent-soft: #e8ecfe;
+  --danger: #d84b50;
+  --danger-soft: #fbeaea;
+  --warn: #a87f0a;
+  --warn-soft: #faf3da;
+  --ok: #2f9e63;
+  --ok-soft: #e3f4ea;
+  --shadow: 0 1px 2px rgba(15,20,40,.06), 0 8px 30px rgba(15,20,40,.07);
+  --r: 14px;
+  --r-sm: 9px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+[data-theme="dark"] {
+  --bg: #0d1117;
+  --bg-grad: radial-gradient(1100px 500px at 50% -80px, #16203a 0%, transparent 60%);
+  --panel: #141a24;
+  --inset: #0e131c;
+  --hover: #1c2432;
+  --border: #222b3b;
+  --border-strong: #33405a;
+  --text: #e6eaf3;
+  --dim: #9aa4b8;
+  --faint: #626d84;
+  --accent: #7289f2;
+  --accent-soft: #1e2848;
+  --danger: #f0666b;
+  --danger-soft: #3a2126;
+  --warn: #ddb64a;
+  --warn-soft: #34301c;
+  --ok: #4ec488;
+  --ok-soft: #14301f;
+  --shadow: 0 1px 2px rgba(0,0,0,.5), 0 12px 40px rgba(0,0,0,.35);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body {
+  font-family: var(--font); font-size: 14px; line-height: 1.5;
+  background: var(--bg); background-image: var(--bg-grad);
+  background-repeat: no-repeat;
+  color: var(--text);
+  min-height: 100vh; display: flex; flex-direction: column;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* ---------- controls ---------- */
+button {
+  font-family: inherit; font-size: 13px;
+  border: 1px solid var(--border); background: var(--panel); color: var(--text);
+  padding: 6px 12px; border-radius: var(--r-sm); cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px; justify-content: center;
+  transition: background .12s, border-color .12s;
+}
+button:hover:not(:disabled) { background: var(--hover); }
+button:disabled { opacity: .45; cursor: not-allowed; }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+.btn-primary:hover:not(:disabled) { filter: brightness(1.08); background: var(--accent); }
+.btn-ghost { background: transparent; border-color: transparent; color: var(--dim); }
+.btn-ghost:hover:not(:disabled) { background: var(--hover); color: var(--text); }
+.btn-sm { padding: 3px 9px; font-size: 12px; border-radius: 7px; }
+input[type="text"], input[type="password"], input[type="number"], select, textarea {
+  font-family: inherit; font-size: 13.5px; color: var(--text);
+  background: var(--inset); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 7px 10px;
+}
+input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: -1px; }
+kbd {
+  font-family: var(--mono); font-size: 10.5px;
+  background: var(--inset); border: 1px solid var(--border-strong);
+  border-bottom-width: 2px; border-radius: 5px; padding: 0 5px; color: var(--dim);
+}
+.badge {
+  font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+  padding: 2px 8px; border-radius: 999px; white-space: nowrap; border: none;
+}
+.badge.ok { background: var(--ok-soft); color: var(--ok); }
+.badge.warn { background: var(--warn-soft); color: var(--warn); }
+.badge.info { background: var(--accent-soft); color: var(--accent); }
+.badge.danger { background: var(--danger-soft); color: var(--danger); }
+
+/* ---------- header ---------- */
+header {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 22px; flex: none;
+}
+.logo { font-weight: 700; font-size: 14px; letter-spacing: .02em; color: var(--dim); }
+.logo b { color: var(--text); }
+header .right { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+#privacyBadge { cursor: pointer; }
+
+/* ---------- command zone ---------- */
+#commandZone {
+  max-width: 720px; width: 100%; margin: 26px auto 8px; padding: 0 20px;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  position: relative;
+}
+#clock { font-size: 52px; font-weight: 200; letter-spacing: .01em; line-height: 1; font-variant-numeric: tabular-nums; }
+#dateline { color: var(--dim); font-size: 13.5px; }
+#greeting { color: var(--faint); font-size: 13px; margin-bottom: 10px; }
+#cmdWrap { width: 100%; position: relative; }
+#cmd {
+  width: 100%; font-size: 16px; padding: 14px 46px 14px 18px;
+  border-radius: 14px; border: 1px solid var(--border-strong);
+  background: var(--panel); box-shadow: var(--shadow);
+}
+#cmdKbd { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+#suggestions {
+  position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 60;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 12px; box-shadow: var(--shadow);
+  list-style: none; margin: 0; padding: 5px; display: none;
+  max-height: 320px; overflow-y: auto;
+}
+#suggestions li {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 11px; border-radius: 8px; cursor: pointer; font-size: 13.5px;
+}
+#suggestions li .ico { width: 20px; text-align: center; flex: none; }
+#suggestions li .lbl { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#suggestions li .kind { font-size: 10.5px; color: var(--faint); text-transform: uppercase; letter-spacing: .05em; }
+#suggestions li.sel, #suggestions li:hover { background: var(--hover); }
+#cmdHintLine { font-size: 11.5px; color: var(--faint); margin-top: 4px; }
+
+/* result card */
+#resultCard {
+  width: 100%; margin-top: 12px; display: none;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--r); box-shadow: var(--shadow); overflow: hidden;
+  text-align: left;
+}
+#resultHead { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+#resultTitle { font-weight: 650; font-size: 13.5px; flex: 1; }
+#resultSrc { font-size: 11px; color: var(--faint); }
+#resultBody { padding: 12px 16px; font-size: 13.5px; max-height: 300px; overflow-y: auto; white-space: normal; }
+#resultActions { display: flex; gap: 6px; padding: 9px 14px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+
+/* ---------- columns ---------- */
+#columns {
+  flex: 1; display: grid; gap: 18px;
+  grid-template-columns: 280px minmax(0, 1fr) 340px;
+  max-width: 1280px; width: 100%; margin: 18px auto 30px; padding: 0 22px;
+  align-items: start;
+}
+@media (max-width: 1080px) { #columns { grid-template-columns: 260px minmax(0,1fr); } #captureCol { grid-column: 1 / -1; } }
+@media (max-width: 760px) { #columns { grid-template-columns: 1fr; } #captureCol { grid-column: 1; } }
+
+.card {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--r); box-shadow: var(--shadow);
+}
+.card > .card-head {
+  display: flex; align-items: center; gap: 8px; padding: 12px 15px 0;
+}
+.card h2 {
+  margin: 0; font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .09em; color: var(--faint); flex: 1;
+}
+.card-body { padding: 10px 15px 14px; }
+.hint { font-size: 11.5px; color: var(--faint); }
+.empty { font-size: 12.5px; color: var(--faint); font-style: italic; padding: 6px 0; }
+
+/* workspaces */
+.ws { border-top: 1px solid var(--border); padding: 10px 15px; }
+.ws:first-of-type { border-top: none; }
+.ws-head { display: flex; align-items: center; gap: 8px; }
+.ws-name { font-weight: 650; font-size: 13px; flex: 1; display: flex; gap: 7px; align-items: center; min-width: 0; }
+.ws-name .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ws-num { font-size: 10px; color: var(--faint); font-family: var(--mono); }
+.ws-head .mini, .link-row .mini {
+  border: none; background: none; color: var(--faint); padding: 1px 4px;
+  font-size: 12px; cursor: pointer; border-radius: 5px; opacity: 0;
+}
+.ws:hover .mini, .link-row:hover .mini { opacity: 1; }
+.ws-head .mini:hover, .link-row .mini:hover { background: var(--hover); color: var(--text); }
+.ws-links { margin-top: 5px; display: flex; flex-direction: column; gap: 1px; }
+.link-row { display: flex; align-items: center; gap: 7px; border-radius: 7px; padding: 3px 6px; }
+.link-row:hover { background: var(--hover); }
+.link-row a { color: var(--dim); text-decoration: none; font-size: 13px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.link-row a:hover { color: var(--accent); }
+.link-row img.fav { width: 14px; height: 14px; border-radius: 3px; flex: none; }
+.link-row .sc { font-family: var(--mono); font-size: 10px; color: var(--faint); }
+.ws-accent { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+
+/* today column */
+#todayCol { display: flex; flex-direction: column; gap: 16px; }
+.prio-list, .todo-list { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.todo {
+  display: flex; align-items: center; gap: 9px; padding: 5px 7px;
+  border-radius: 8px; font-size: 13.5px;
+}
+.todo:hover { background: var(--hover); }
+.todo input[type="checkbox"] { accent-color: var(--accent); width: 15px; height: 15px; flex: none; cursor: pointer; }
+.todo .txt { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.todo.done .txt { text-decoration: line-through; color: var(--faint); }
+.todo .due { font-size: 10px; padding: 1px 7px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); flex: none; }
+.todo .due.today { background: var(--danger-soft); color: var(--danger); }
+.todo .mini { border: none; background: none; color: var(--faint); padding: 1px 4px; font-size: 12px; cursor: pointer; border-radius: 5px; opacity: 0; }
+.todo:hover .mini { opacity: 1; }
+.todo .mini:hover { color: var(--text); background: var(--hover); }
+.todo .star { opacity: .35; }
+.todo .star.on { opacity: 1; color: var(--warn); }
+#todoInputRow { display: flex; gap: 7px; margin-top: 9px; }
+#todoInput { flex: 1; }
+.note-row { display: flex; align-items: center; gap: 8px; padding: 5px 7px; border-radius: 8px; font-size: 13px; cursor: pointer; }
+.note-row:hover { background: var(--hover); }
+.note-row .t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.note-row .d { font-size: 11px; color: var(--faint); flex: none; }
+.note-row .mini { border: none; background: none; color: var(--faint); padding: 1px 4px; cursor: pointer; border-radius: 5px; opacity: 0; font-size: 12px; }
+.note-row:hover .mini { opacity: 1; }
+
+/* focus card */
+#focusCard .card-body { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+#focusStateLine { font-size: 13px; color: var(--dim); flex: 1; min-width: 140px; }
+
+/* capture column */
+#captureCol { display: flex; flex-direction: column; gap: 16px; }
+#scratch {
+  width: 100%; min-height: 170px; resize: vertical; border: 1px solid var(--border);
+  background: var(--inset); font-size: 13.5px; line-height: 1.55; font-family: inherit;
+}
+.btn-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+#scratchCounts { font-size: 11px; color: var(--faint); margin-top: 6px; }
+.tools-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+
+/* ---------- focus overlay ---------- */
+#focusOverlay {
+  position: fixed; inset: 0; z-index: 150; display: none;
+  background: var(--bg); background-image: var(--bg-grad);
+  flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+  text-align: center; padding: 30px;
+}
+#focusOverlay.open { display: flex; }
+#focusCountdown { font-size: 96px; font-weight: 200; font-variant-numeric: tabular-nums; line-height: 1; }
+#focusTask {
+  font-size: 16px; text-align: center; background: transparent;
+  border: none; border-bottom: 1px solid var(--border-strong);
+  border-radius: 0; color: var(--text); padding: 6px 10px; width: min(420px, 80vw);
+}
+#focusTask:focus-visible { outline: none; border-bottom-color: var(--accent); }
+#focusHint { color: var(--faint); font-size: 12.5px; }
+
+/* ---------- modals ---------- */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(5,8,15,.55);
+  display: none; place-items: center; z-index: 120; padding: 18px;
+}
+.modal-backdrop.open { display: grid; }
+.modal {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--r); box-shadow: var(--shadow);
+  width: 100%; max-width: 540px; max-height: 86vh;
+  display: flex; flex-direction: column;
+}
+.modal.wide { max-width: 700px; }
+.modal-head { display: flex; align-items: center; gap: 8px; padding: 13px 18px; border-bottom: 1px solid var(--border); }
+.modal-head h3 { margin: 0; font-size: 15px; flex: 1; }
+.modal-body { padding: 15px 18px; overflow-y: auto; font-size: 13.5px; }
+.modal-foot { padding: 11px 18px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; }
+.set-group { margin-bottom: 18px; }
+.set-group h4 { margin: 0 0 8px; font-size: 13px; }
+.set-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 5px 0; }
+.set-row .lbl { font-size: 13px; }
+.set-row .sub { display: block; font-size: 11.5px; color: var(--faint); max-width: 330px; }
+.set-col { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
+.set-col label { font-size: 11.5px; color: var(--faint); }
+.diag-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.diag-table td { padding: 5px 6px; border-bottom: 1px solid var(--border); }
+.diag-table td:last-child { text-align: right; }
+
+/* file modal viewer */
+#fileContent {
+  width: 100%; min-height: 200px; max-height: 42vh; resize: vertical;
+  font-family: var(--mono); font-size: 12.5px;
+}
+#filePreview { max-height: 42vh; overflow: auto; border: 1px solid var(--border); border-radius: var(--r-sm); padding: 12px 14px; display: none; }
+#filePreview iframe { width: 100%; height: 320px; border: none; background: #fff; border-radius: 6px; }
+.csv-table { border-collapse: collapse; font-size: 12px; font-family: var(--mono); }
+.csv-table th, .csv-table td { border: 1px solid var(--border); padding: 3px 8px; white-space: nowrap; }
+.csv-table th { background: var(--inset); position: sticky; top: 0; }
+
+/* markdown render (result card, previews, notes) */
+.md-render { font-size: 13.5px; }
+.md-render h1, .md-render h2, .md-render h3 { line-height: 1.3; margin: .9em 0 .4em; }
+.md-render h1 { font-size: 1.4em; } .md-render h2 { font-size: 1.2em; } .md-render h3 { font-size: 1.05em; }
+.md-render h1:first-child, .md-render h2:first-child, .md-render h3:first-child { margin-top: 0; }
+.md-render code { font-family: var(--mono); font-size: .88em; background: var(--inset); padding: 1px 5px; border-radius: 5px; }
+.md-render pre { background: var(--inset); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; overflow-x: auto; }
+.md-render pre code { background: none; padding: 0; }
+.md-render blockquote { margin: .7em 0; padding: 3px 12px; border-left: 3px solid var(--accent); color: var(--dim); }
+.md-render table { border-collapse: collapse; margin: .7em 0; font-size: .93em; }
+.md-render th, .md-render td { border: 1px solid var(--border); padding: 4px 9px; text-align: left; }
+.md-render a { color: var(--accent); }
+.md-render li { margin: .12em 0; }
+.md-render hr { border: none; border-top: 1px solid var(--border); margin: 1em 0; }
+
+/* switch */
+.switch { position: relative; display: inline-block; width: 34px; height: 20px; flex: none; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider-ui { position: absolute; inset: 0; cursor: pointer; background: var(--border-strong); border-radius: 999px; transition: background .12s; }
+.slider-ui::before { content: ""; position: absolute; height: 14px; width: 14px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: transform .12s; box-shadow: 0 1px 3px rgba(0,0,0,.3); }
+.switch input:checked + .slider-ui { background: var(--accent); }
+.switch input:checked + .slider-ui::before { transform: translateX(14px); }
+.switch input:focus-visible + .slider-ui { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* toasts */
+#toasts { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 8px; z-index: 300; align-items: center; pointer-events: none; }
+.toast { background: var(--text); color: var(--panel); padding: 8px 16px; border-radius: 999px; font-size: 13px; box-shadow: var(--shadow); max-width: 90vw; animation: toast-in .18s ease-out; }
+.toast.error { background: var(--danger); color: #fff; }
+@keyframes toast-in { from { opacity: 0; transform: translateY(8px); } }
+
+footer { text-align: center; padding: 10px; font-size: 11.5px; color: var(--faint); }
+footer a { color: var(--faint); }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="logo"><b>Startpage</b> · local-first command center</span>
+  <div class="right">
+    <button id="privacyBadge" class="badge ok" title="Privacy status — click for details">Local only</button>
+    <button id="btnDemo" class="btn-ghost btn-sm" title="Load demo workspaces, todos and notes">Load Demo Setup</button>
+    <button id="btnDiag" class="btn-ghost btn-sm" title="Browser diagnostics" aria-label="Browser diagnostics">🩺</button>
+    <button id="btnSettings" class="btn-ghost btn-sm" title="Settings" aria-label="Settings">⚙️</button>
+    <button id="btnTheme" class="btn-ghost btn-sm" title="Toggle light / dark" aria-label="Toggle theme">◐</button>
+  </div>
+</header>
+
+<!-- ============ COMMAND ZONE ============ -->
+<section id="commandZone" aria-label="Command bar">
+  <div id="clock" aria-hidden="true">--:--</div>
+  <div id="dateline"></div>
+  <div id="greeting"></div>
+  <div id="cmdWrap">
+    <label class="sr-only" for="cmd">Command bar</label>
+    <input id="cmd" type="text" placeholder="Search, open, note, todo, timer, summarize…"
+           autocomplete="off" spellcheck="false" aria-expanded="false" role="combobox" aria-controls="suggestions">
+    <span id="cmdKbd"><kbd>/</kbd></span>
+    <ul id="suggestions" role="listbox" aria-label="Suggestions"></ul>
+  </div>
+  <div id="cmdHintLine">/ or Ctrl+K to command · <span id="engineHint"></span></div>
+
+  <div id="resultCard" role="region" aria-label="Result">
+    <div id="resultHead">
+      <span id="resultTitle"></span>
+      <span id="resultSrc"></span>
+      <span id="resultMode" class="badge warn"></span>
+      <button class="btn-ghost btn-sm" id="resultClose" aria-label="Close result">✕</button>
+    </div>
+    <div id="resultBody" class="md-render"></div>
+    <div id="resultActions">
+      <button id="resCopy" class="btn-sm">📋 Copy</button>
+      <button id="resSaveNote" class="btn-sm">📝 Save as note</button>
+      <button id="resAddTodos" class="btn-sm" style="display:none">☑ Add as todos</button>
+      <button id="resDownload" class="btn-sm">⬇ .md</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COLUMNS ============ -->
+<main id="columns">
+  <!-- Workspaces -->
+  <section class="card" id="wsCol" aria-label="Workspaces">
+    <div class="card-head">
+      <h2>Workspaces</h2>
+      <button id="btnAddLink" class="btn-ghost btn-sm" title="Add link">＋ Link</button>
+    </div>
+    <div id="wsList"></div>
+    <div class="card-body" style="padding-top:6px">
+      <span class="hint">Alt+1…6 opens a workspace’s links</span>
+    </div>
+  </section>
+
+  <!-- Today -->
+  <div id="todayCol">
+    <section class="card" aria-label="Today">
+      <div class="card-head">
+        <h2>Today</h2>
+        <button id="btnArchiveDone" class="btn-ghost btn-sm" title="Archive completed todos">Archive done</button>
+        <button id="btnClearDay" class="btn-ghost btn-sm" title="Archive done todos and clear the focus task">Clear day</button>
+      </div>
+      <div class="card-body">
+        <div class="hint" style="margin-bottom:2px">Top priorities <span style="opacity:.6">(★ a todo to pin it)</span></div>
+        <ul id="prioList" class="prio-list"></ul>
+        <div class="hint" style="margin:10px 0 2px">Todos</div>
+        <ul id="todoList" class="todo-list"></ul>
+        <div id="todoInputRow">
+          <label class="sr-only" for="todoInput">Add todo</label>
+          <input id="todoInput" type="text" placeholder='Add todo… (append “today”, “tomorrow”, “soon”)'>
+          <button id="btnAddTodo" class="btn-primary btn-sm" aria-label="Add todo">Add</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="focusCard" aria-label="Focus">
+      <div class="card-head"><h2>Focus</h2></div>
+      <div class="card-body">
+        <span id="focusStateLine">No session running.</span>
+        <label class="sr-only" for="focusMin">Minutes</label>
+        <input id="focusMin" type="number" min="1" max="180" value="25" style="width:64px" aria-label="Focus minutes">
+        <button id="btnFocus" class="btn-primary btn-sm">▶ Start focus</button>
+      </div>
+    </section>
+
+    <section class="card" aria-label="Recent notes">
+      <div class="card-head"><h2>Recent notes</h2></div>
+      <div class="card-body" id="noteList"></div>
+    </section>
+  </div>
+
+  <!-- Capture & Tools -->
+  <div id="captureCol">
+    <section class="card" aria-label="Capture">
+      <div class="card-head">
+        <h2>Capture</h2>
+        <span id="aiModeNote" class="hint"></span>
+      </div>
+      <div class="card-body">
+        <label class="sr-only" for="scratch">Scratchpad</label>
+        <textarea id="scratch" placeholder="Paste, dictate, or write anything. Process it locally."></textarea>
+        <div id="scratchCounts" aria-live="polite"></div>
+        <div class="btn-row">
+          <button id="scPaste" class="btn-sm" title="Paste clipboard into scratchpad">📥 Paste</button>
+          <button id="scCopy" class="btn-sm" title="Copy scratchpad">📋 Copy</button>
+          <button id="scVoice" class="btn-sm" title="Voice note (speech to text)">🎙 Voice</button>
+          <button id="scSaveNote" class="btn-sm" title="Save scratchpad as note">📝 Note</button>
+          <button id="scDownload" class="btn-sm" title="Download as .md">⬇ .md</button>
+        </div>
+        <div class="btn-row">
+          <button id="scSummarize" class="btn-sm">Summarize</button>
+          <button id="scRewrite" class="btn-sm">Rewrite</button>
+          <button id="scTodos" class="btn-sm">Extract todos</button>
+          <button id="scClean" class="btn-sm" title="Clean whitespace and formatting">Clean</button>
+          <button id="scBullets" class="btn-sm" title="Convert lines to Markdown bullets">Bullets</button>
+          <button id="scTranslate" class="btn-sm">Translate</button>
+          <select id="trTarget" aria-label="Translation target" style="padding:3px 6px;font-size:12px">
+            <option value="de">→ DE</option><option value="en">→ EN</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" aria-label="Tools">
+      <div class="card-head"><h2>Tools</h2></div>
+      <div class="card-body tools-grid">
+        <button id="tlOpenFile" class="btn-sm">📂 Open file</button>
+        <button id="tlQuickDoc" class="btn-sm" title="Create a quick markdown doc from the scratchpad">📄 Quick .md doc</button>
+        <button id="tlClipSummarize" class="btn-sm" title="Summarize clipboard contents">📎 Clip summarize</button>
+        <button id="tlClipTodos" class="btn-sm" title="Extract todos from clipboard">📎 Clip todos</button>
+        <button id="tlExport" class="btn-sm">⬇ Export data</button>
+        <button id="tlImport" class="btn-sm">⬆ Import data</button>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  Everything stays in this browser. No accounts, no uploads, no tracking.
+  · <a href="https://4hourventure.com/imprint" target="_blank" rel="noopener">Imprint</a>
+</footer>
+
+<!-- ============ FOCUS OVERLAY ============ -->
+<div id="focusOverlay" role="dialog" aria-modal="true" aria-label="Focus session">
+  <div id="focusCountdown">25:00</div>
+  <label class="sr-only" for="focusTask">Current task</label>
+  <input id="focusTask" type="text" placeholder="What are you focusing on?">
+  <div class="btn-row" style="justify-content:center">
+    <button id="focusPause">⏸ Pause</button>
+    <button id="focusEnd" class="btn-ghost">End session</button>
+  </div>
+  <div id="focusHint">Esc to end · notifications fire when done (if enabled in Settings)</div>
+</div>
+
+<!-- ============ SETTINGS MODAL ============ -->
+<div class="modal-backdrop" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+  <div class="modal wide">
+    <div class="modal-head"><h3 id="settingsTitle">Settings</h3><button class="btn-ghost" data-close aria-label="Close">✕</button></div>
+    <div class="modal-body">
+      <div class="set-group">
+        <h4>Search engines</h4>
+        <p class="hint" style="margin:0 0 6px">One per line: <code>prefix = url with %s</code>. The default engine handles plain queries.</p>
+        <textarea id="setEngines" rows="6" style="width:100%;font-family:var(--mono);font-size:12px" spellcheck="false"></textarea>
+        <div class="set-row">
+          <span class="lbl">Default engine prefix</span>
+          <input type="text" id="setDefaultEngine" style="width:70px" spellcheck="false">
+        </div>
+      </div>
+      <div class="set-group">
+        <h4>Appearance & behavior</h4>
+        <div class="set-row">
+          <span class="lbl">Show favicons on links
+            <span class="sub">Loads each site’s /favicon.ico directly from its domain — a network request per link. Off by default.</span></span>
+          <span class="switch"><input type="checkbox" id="setFavicons"><span class="slider-ui"></span></span>
+        </div>
+        <div class="set-row">
+          <span class="lbl">Focus timer notifications
+            <span class="sub">Asks for browser notification permission only when you enable this.</span></span>
+          <button id="btnEnableNotif" class="btn-sm">Enable notifications</button>
+        </div>
+      </div>
+      <div class="set-group">
+        <h4>External AI (optional, off by default)</h4>
+        <div class="set-row">
+          <span class="lbl">Allow external AI requests
+            <span class="sub">Sends processed text to the endpoint below. You will be warned before the first request each session.</span></span>
+          <span class="switch"><input type="checkbox" id="setExternal"><span class="slider-ui"></span></span>
+        </div>
+        <div class="set-col">
+          <label for="setEndpoint">OpenAI-compatible endpoint</label>
+          <input type="text" id="setEndpoint" placeholder="https://api.openai.com/v1/chat/completions" spellcheck="false" autocomplete="off">
+          <label for="setApiKey">API key (memory only unless stored below)</label>
+          <input type="password" id="setApiKey" placeholder="sk-…" autocomplete="off">
+          <label for="setModel">Model</label>
+          <input type="text" id="setModel" placeholder="gpt-4o-mini" spellcheck="false">
+          <div class="set-row">
+            <span class="lbl">Store API key in this browser
+              <span class="sub">⚠️ Plain text in localStorage — readable by anyone with access to this browser profile.</span></span>
+            <span class="switch"><input type="checkbox" id="setStoreKey"><span class="slider-ui"></span></span>
+          </div>
+        </div>
+      </div>
+      <div class="set-group">
+        <h4>Data</h4>
+        <div class="btn-row" style="margin:0">
+          <button id="setExport">⬇ Export all data (.json)</button>
+          <button id="setImport">⬆ Import data</button>
+          <button id="setNotesMd">⬇ Notes as .md</button>
+          <button id="setReset" style="color:var(--danger)">🗑 Reset all local data</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ DIAGNOSTICS MODAL ============ -->
+<div class="modal-backdrop" id="diagModal" role="dialog" aria-modal="true" aria-labelledby="diagTitle">
+  <div class="modal">
+    <div class="modal-head"><h3 id="diagTitle">Browser diagnostics</h3><button class="btn-ghost" data-close aria-label="Close">✕</button></div>
+    <div class="modal-body"><table class="diag-table" id="diagTable"></table></div>
+  </div>
+</div>
+
+<!-- ============ PRIVACY MODAL ============ -->
+<div class="modal-backdrop" id="privacyModal" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+  <div class="modal">
+    <div class="modal-head"><h3 id="privacyTitle">🔒 Privacy</h3><button class="btn-ghost" data-close aria-label="Close">✕</button></div>
+    <div class="modal-body">
+      <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px">
+        <li>All data (notes, todos, workspaces, settings) stays in this browser’s localStorage. Nothing is uploaded.</li>
+        <li>No automatic network requests. Favicons are optional and off by default.</li>
+        <li>The clipboard is read only when you click a paste/clip button.</li>
+        <li>Files are opened only after you pick them, and never leave your machine.</li>
+        <li>Browser AI (Chrome built-in models) runs on-device; availability depends on your browser and hardware.</li>
+        <li>External AI is opt-in only, off by default, and warns before sending anything.</li>
+      </ul>
+      <p class="hint" style="margin-top:12px">Current AI mode: <span id="privacyAiMode"></span></p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ LINK MODAL ============ -->
+<div class="modal-backdrop" id="linkModal" role="dialog" aria-modal="true" aria-labelledby="linkModalTitle">
+  <div class="modal">
+    <div class="modal-head"><h3 id="linkModalTitle">Add link</h3><button class="btn-ghost" data-close aria-label="Close">✕</button></div>
+    <div class="modal-body">
+      <div class="set-col">
+        <label for="linkWs">Workspace</label>
+        <select id="linkWs"></select>
+        <label for="linkTitle">Title</label>
+        <input type="text" id="linkTitle" placeholder="Gmail">
+        <label for="linkUrl">URL</label>
+        <input type="text" id="linkUrl" placeholder="https://mail.google.com" spellcheck="false">
+        <label for="linkShortcut">Shortcut (optional, for the command bar)</label>
+        <input type="text" id="linkShortcut" placeholder="gm" spellcheck="false">
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button data-close>Cancel</button>
+      <button id="btnSaveLink" class="btn-primary">Save link</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ NOTE MODAL ============ -->
+<div class="modal-backdrop" id="noteModal" role="dialog" aria-modal="true" aria-labelledby="noteModalTitle">
+  <div class="modal wide">
+    <div class="modal-head">
+      <h3 id="noteModalTitle" style="display:flex;gap:8px;align-items:center;flex:1">
+        <input type="text" id="noteTitle" style="flex:1;font-weight:650" aria-label="Note title">
+      </h3>
+      <button class="btn-ghost" data-close aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <label class="sr-only" for="noteContent">Note content</label>
+      <textarea id="noteContent" rows="12" style="width:100%;font-size:13.5px" spellcheck="true"></textarea>
+    </div>
+    <div class="modal-foot">
+      <button id="btnNoteDelete" class="btn-ghost" style="color:var(--danger);margin-right:auto">Delete</button>
+      <button id="btnNoteMd" title="Download this note as Markdown">⬇ .md</button>
+      <button id="btnNoteSave" class="btn-primary">Save note</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ FILE MODAL ============ -->
+<div class="modal-backdrop" id="fileModal" role="dialog" aria-modal="true" aria-labelledby="fileModalTitle">
+  <div class="modal wide">
+    <div class="modal-head">
+      <h3 id="fileModalTitle">File</h3>
+      <span id="fileMeta" class="hint"></span>
+      <button class="btn-ghost" data-close aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <textarea id="fileContent" spellcheck="false" aria-label="File content"></textarea>
+      <div id="filePreview"></div>
+      <div class="btn-row">
+        <button id="fileToggleView" class="btn-sm">👁 Preview</button>
+        <button id="fileSummarize" class="btn-sm">Summarize</button>
+        <button id="fileTodos" class="btn-sm">Extract todos</button>
+        <button id="fileCount" class="btn-sm">Word count</button>
+        <button id="filePretty" class="btn-sm" style="display:none">{ } Pretty JSON</button>
+        <button id="fileSave" class="btn-sm">💾 Save</button>
+        <button id="fileDownload" class="btn-sm">⬇ Download</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ EXTERNAL AI WARNING ============ -->
+<div class="modal-backdrop" id="extWarnModal" role="dialog" aria-modal="true" aria-labelledby="extWarnTitle">
+  <div class="modal">
+    <div class="modal-head"><h3 id="extWarnTitle">⚠️ Send text to external AI?</h3></div>
+    <div class="modal-body">
+      <p>This sends the text you're processing to:</p>
+      <p><code id="extWarnEndpoint" style="font-family:var(--mono);font-size:12px"></code></p>
+      <p>The provider receives and processes it under its own terms. Continue only with content you're comfortable sharing.</p>
+    </div>
+    <div class="modal-foot">
+      <button id="extWarnCancel">Cancel</button>
+      <button id="extWarnOk" class="btn-primary">Send</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="fileInput" accept=".txt,.md,.markdown,.json,.csv,.html,.htm,.js,.css,.log" style="display:none" aria-hidden="true">
+<input type="file" id="importInput" accept=".json" style="display:none" aria-hidden="true">
+<div id="toasts" aria-live="polite"></div>
+
+<script>
+'use strict';
+/* ============================================================
+   Startpage — architecture
+     Support / DiagnosticsController — capability detection
+     StorageController — localStorage JSON wrapper
+     AppState          — single source of truth
+     AIAdapter         — browser AI / external (opt-in) / heuristics
+     CommandController — parser + suggestions + execution
+     WorkspaceController, TodoController, NoteController,
+     ScratchpadController, FileController, FocusController,
+     ClipboardController, VoiceController, ExportController,
+     UIController, App (boot)
+   ============================================================ */
+
+const $  = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function uid() { return 'id-' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36); }
+function fmtSize(b) { return b < 1024 ? b + ' B' : b < 1048576 ? (b / 1024).toFixed(1) + ' KB' : (b / 1048576).toFixed(1) + ' MB'; }
+function toast(msg, isError = false) {
+  const el = document.createElement('div');
+  el.className = 'toast' + (isError ? ' error' : '');
+  el.textContent = msg;
+  $('#toasts').appendChild(el);
+  setTimeout(() => el.remove(), 3600);
+}
+function download(filename, content, mime) {
+  const blob = content instanceof Blob ? content : new Blob([content], { type: mime || 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+/* Guard against browser-AI calls that hang while a model downloads. */
+function withTimeout(promise, ms) {
+  return Promise.race([promise, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]);
+}
+async function copyText(text, label) {
+  if (!text) { toast('Nothing to copy.', true); return; }
+  try { await navigator.clipboard.writeText(text); toast((label || 'Text') + ' copied'); }
+  catch (e) { window.prompt('Clipboard unavailable — copy manually:', text); }
+}
+
+/* ============================================================
+   SUPPORT
+   ============================================================ */
+const Support = {
+  localStorage: (() => { try { localStorage.setItem('_t', '1'); localStorage.removeItem('_t'); return true; } catch (e) { return false; } })(),
+  idb: 'indexedDB' in window,
+  clipboardRead: !!(navigator.clipboard && navigator.clipboard.readText),
+  clipboardWrite: !!(navigator.clipboard && navigator.clipboard.writeText),
+  fileApi: typeof FileReader !== 'undefined',
+  fsAccess: 'showOpenFilePicker' in window,
+  speechRec: !!(window.SpeechRecognition || window.webkitSpeechRecognition),
+  speechSynth: 'speechSynthesis' in window,
+  notifications: 'Notification' in window,
+  wakeLock: !!(navigator.wakeLock && navigator.wakeLock.request),
+  worker: typeof Worker !== 'undefined',
+  serviceWorker: 'serviceWorker' in navigator,
+  webgpu: !!navigator.gpu,
+  promptApi: !!(window.LanguageModel || (window.ai && window.ai.languageModel)),
+  summarizerApi: !!(window.Summarizer || (window.ai && window.ai.summarizer)),
+  translatorApi: !!(window.Translator || (window.translation && window.translation.createTranslator)),
+  langDetectApi: !!(window.LanguageDetector || (window.translation && window.translation.createDetector)),
+  promptReady: false,
+  swBlobWorks: null, // resolved at boot: Chrome rejects blob: service workers
+
+  /* Some Chromium builds expose the Prompt API without a usable model
+     (they echo the prompt back) — probe real availability. */
+  async probe() {
+    try {
+      if (window.LanguageModel && LanguageModel.availability) {
+        this.promptReady = (await LanguageModel.availability()) === 'available';
+      } else if (window.ai && window.ai.languageModel && window.ai.languageModel.capabilities) {
+        this.promptReady = (await window.ai.languageModel.capabilities()).available === 'readily';
+      } else {
+        this.promptReady = this.promptApi;
+      }
+    } catch (e) { this.promptReady = false; }
+    return this.promptReady;
+  },
+};
+
+/* ============================================================
+   STORAGE — localStorage JSON wrapper (simple + inspectable)
+   ============================================================ */
+const StorageController = {
+  get(key, fallback = null) {
+    if (!Support.localStorage) return fallback;
+    try {
+      const raw = localStorage.getItem('sp-' + key);
+      return raw === null ? fallback : JSON.parse(raw);
+    } catch (e) { return fallback; }
+  },
+  set(key, value) {
+    if (!Support.localStorage) return;
+    try { localStorage.setItem('sp-' + key, JSON.stringify(value)); }
+    catch (e) { toast('Local storage is full — data not saved.', true); }
+  },
+  reset() {
+    Object.keys(localStorage).filter(k => k.startsWith('sp-')).forEach(k => localStorage.removeItem(k));
+  },
+};
+
+/* ============================================================
+   APP STATE
+   ============================================================ */
+const DEFAULT_ENGINES = {
+  g:  'https://www.google.com/search?q=%s',
+  d:  'https://duckduckgo.com/?q=%s',
+  yt: 'https://www.youtube.com/results?search_query=%s',
+  gh: 'https://github.com/search?q=%s',
+  hn: 'https://hn.algolia.com/?q=%s',
+  x:  'https://x.com/search?q=%s',
+  li: 'https://www.linkedin.com/search/results/all/?keywords=%s',
+  r:  'https://www.reddit.com/search/?q=%s',
+  md: 'https://www.google.com/search?q=markdown+%s',
+};
+
+const AppState = {
+  workspaces: [],
+  todos: [],
+  notes: [],
+  scratch: '',
+  cmdHistory: [],
+  recentFiles: [],
+  settings: {
+    engines: { ...DEFAULT_ENGINES },
+    defaultEngine: 'g',
+    favicons: false,
+    focusMinutes: 25,
+    external: { enabled: false, endpoint: '', model: 'gpt-4o-mini', storeKey: false },
+  },
+  session: { apiKey: '', externalConfirmed: false, lastResult: null, currentFile: null },
+
+  save() {
+    StorageController.set('workspaces', this.workspaces);
+    StorageController.set('todos', this.todos);
+    StorageController.set('notes', this.notes);
+    StorageController.set('scratch', this.scratch);
+    StorageController.set('history', this.cmdHistory.slice(0, 25));
+    StorageController.set('recentFiles', this.recentFiles.slice(0, 8));
+    StorageController.set('settings', this.settings);
+  },
+  load() {
+    this.workspaces = StorageController.get('workspaces', []);
+    this.todos = StorageController.get('todos', []);
+    this.notes = StorageController.get('notes', []);
+    this.scratch = StorageController.get('scratch', '');
+    this.cmdHistory = StorageController.get('history', []);
+    this.recentFiles = StorageController.get('recentFiles', []);
+    const s = StorageController.get('settings');
+    if (s) this.settings = { ...this.settings, ...s, engines: { ...this.settings.engines, ...(s.engines || {}) }, external: { ...this.settings.external, ...(s.external || {}) } };
+    if (this.settings.external.storeKey) this.session.apiKey = localStorage.getItem('sp-api-key') || '';
+    if (!this.workspaces.length) this.workspaces = defaultWorkspaces();
+  },
+};
+
+function defaultWorkspaces() {
+  const L = (title, url, shortcut) => ({ id: uid(), title, url, shortcut: shortcut || '' });
+  return [
+    { id: uid(), name: 'Work', emoji: '💼', accent: '#5b74f0', desc: '', links: [
+      L('Gmail', 'https://mail.google.com', 'gm'), L('Calendar', 'https://calendar.google.com', 'cal'),
+      L('Drive', 'https://drive.google.com', 'dr'), L('Slack', 'https://slack.com', 'sl')] },
+    { id: uid(), name: 'Writing', emoji: '✍️', accent: '#9d5cf5', desc: '', links: [
+      L('Notion', 'https://www.notion.so', 'no'), L('Google Docs', 'https://docs.google.com', 'docs')] },
+    { id: uid(), name: 'Research', emoji: '🔎', accent: '#2f9e63', desc: '', links: [
+      L('Perplexity', 'https://www.perplexity.ai', 'pp'), L('Claude', 'https://claude.ai', 'cl'),
+      L('ChatGPT', 'https://chatgpt.com', 'gpt'), L('Hacker News', 'https://news.ycombinator.com', 'hn')] },
+    { id: uid(), name: 'Dev', emoji: '🛠️', accent: '#dd7f21', desc: '', links: [
+      L('GitHub', 'https://github.com', 'gh'), L('Linear', 'https://linear.app', 'ln')] },
+    { id: uid(), name: 'Finance', emoji: '📊', accent: '#c9483f', desc: '', links: [
+      L('Google Sheets', 'https://sheets.google.com', 'sh')] },
+    { id: uid(), name: 'Personal', emoji: '🌱', accent: '#3aa3c9', desc: '', links: [
+      L('YouTube', 'https://www.youtube.com', 'yt'), L('X', 'https://x.com', 'x'),
+      L('LinkedIn', 'https://www.linkedin.com', 'li')] },
+  ];
+}
+
+/* ============================================================
+   MARKDOWN RENDERER (safe: input fully escaped, only own tags out)
+   ============================================================ */
+const Markdown = {
+  toHtml(md) {
+    const codeBlocks = [];
+    let src = String(md).replace(/```([\w-]*)\r?\n([\s\S]*?)```/g, (m, lang, code) => {
+      codeBlocks.push('<pre><code>' + escapeHtml(code) + '</code></pre>');
+      return 'B' + (codeBlocks.length - 1) + '';
+    });
+    src = escapeHtml(src);
+    const inline = (s) => s
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+      .replace(/(^|\W)\*([^*\n]+)\*(?=\W|$)/g, '$1<em>$2</em>')
+      .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+|mailto:[^)\s]+)\)/g,
+        '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    const lines = src.split(/\r?\n/);
+    const out = [];
+    let list = null, para = [], table = [];
+    const flushPara = () => { if (para.length) { out.push('<p>' + inline(para.join(' ')) + '</p>'); para = []; } };
+    const flushList = () => { if (list) { out.push('</' + list + '>'); list = null; } };
+    const flushTable = () => {
+      if (table.length >= 2 && /^\s*\|?[\s:|-]+\|?\s*$/.test(table[1])) {
+        const row = r => r.replace(/^\||\|$/g, '').split('|').map(c => inline(c.trim()));
+        let html = '<table><thead><tr>' + row(table[0]).map(c => '<th>' + c + '</th>').join('') + '</tr></thead><tbody>';
+        table.slice(2).forEach(r => { html += '<tr>' + row(r).map(c => '<td>' + c + '</td>').join('') + '</tr>'; });
+        out.push(html + '</tbody></table>');
+      } else { table.forEach(t => para.push(t)); flushPara(); }
+      table = [];
+    };
+    for (const line of lines) {
+      const b = line.match(/^B(\d+)\s*$/);
+      if (b) { flushPara(); flushList(); if (table.length) flushTable(); out.push(codeBlocks[+b[1]]); continue; }
+      if (/^\s*\|.*\|?\s*$/.test(line) && line.includes('|')) { flushPara(); flushList(); table.push(line); continue; }
+      if (table.length) flushTable();
+      const h = line.match(/^(#{1,6})\s+(.*)$/);
+      if (h) { flushPara(); flushList(); out.push('<h' + h[1].length + '>' + inline(h[2]) + '</h' + h[1].length + '>'); continue; }
+      if (/^\s*(---+|\*\*\*+)\s*$/.test(line)) { flushPara(); flushList(); out.push('<hr>'); continue; }
+      if (/^&gt;\s?/.test(line.trim())) { flushPara(); flushList(); out.push('<blockquote>' + inline(line.trim().replace(/^&gt;\s?/, '')) + '</blockquote>'); continue; }
+      const task = line.match(/^\s*[-*]\s+\[( |x|X)\]\s+(.*)$/);
+      const ul = line.match(/^\s*[-*+]\s+(.*)$/);
+      const ol = line.match(/^\s*\d+[.)]\s+(.*)$/);
+      if (task) { flushPara(); if (list !== 'ul') { flushList(); out.push('<ul>'); list = 'ul'; }
+        out.push('<li><input type="checkbox" disabled' + (task[1].trim() ? ' checked' : '') + '> ' + inline(task[2]) + '</li>'); continue; }
+      if (ul) { flushPara(); if (list !== 'ul') { flushList(); out.push('<ul>'); list = 'ul'; } out.push('<li>' + inline(ul[1]) + '</li>'); continue; }
+      if (ol) { flushPara(); if (list !== 'ol') { flushList(); out.push('<ol>'); list = 'ol'; } out.push('<li>' + inline(ol[1]) + '</li>'); continue; }
+      if (!line.trim()) { flushPara(); flushList(); continue; }
+      para.push(line.trim());
+    }
+    if (table.length) flushTable();
+    flushPara(); flushList();
+    return out.join('\n');
+  },
+};
+
+/* ============================================================
+   SAFE CALCULATOR — shunting-yard, no eval, unary minus support
+   ============================================================ */
+function safeCalc(expr) {
+  if (!/^[\d\s+\-*/%^().]+$/.test(expr)) return null;
+  const tokens = expr.match(/(\d+\.?\d*)|[+\-*/%^()]/g);
+  if (!tokens) return null;
+  const prec = { '+': 1, '-': 1, '*': 2, '/': 2, '%': 2, '^': 3 };
+  const rightAssoc = { '^': true };
+  const output = [], ops = [];
+  let prev = null; // previous token, for unary minus detection
+  for (const t of tokens) {
+    if (/^\d/.test(t)) { output.push(parseFloat(t)); }
+    else if (t === '(') { ops.push(t); }
+    else if (t === ')') {
+      while (ops.length && ops[ops.length - 1] !== '(') output.push(ops.pop());
+      if (!ops.length) return null;
+      ops.pop();
+    } else {
+      let op = t;
+      if (op === '-' && (prev === null || (typeof prev === 'string' && prev !== ')'))) {
+        output.push(0); // unary minus: rewrite "-x" as "0 - x"
+      }
+      while (ops.length) {
+        const top = ops[ops.length - 1];
+        if (top === '(') break;
+        if (prec[top] > prec[op] || (prec[top] === prec[op] && !rightAssoc[op])) output.push(ops.pop());
+        else break;
+      }
+      ops.push(op);
+    }
+    prev = /^\d/.test(t) ? 0 : t;
+  }
+  while (ops.length) { const op = ops.pop(); if (op === '(') return null; output.push(op); }
+  const stack = [];
+  for (const t of output) {
+    if (typeof t === 'number') { stack.push(t); continue; }
+    const b = stack.pop(), a = stack.pop();
+    if (a === undefined || b === undefined) return null;
+    switch (t) {
+      case '+': stack.push(a + b); break;
+      case '-': stack.push(a - b); break;
+      case '*': stack.push(a * b); break;
+      case '/': stack.push(b === 0 ? NaN : a / b); break;
+      case '%': stack.push(a % b); break;
+      case '^': stack.push(Math.pow(a, b)); break;
+    }
+  }
+  if (stack.length !== 1 || !isFinite(stack[0])) return null;
+  return Math.round(stack[0] * 1e10) / 1e10;
+}
+
+/* ============================================================
+   AI ADAPTER — browser AI → heuristics; external strictly opt-in
+   ============================================================ */
+class AIAdapter {
+  constructor() {
+    this.stops = new Set(('a an and are as at be but by for from has have i if in into is it its of on or so that the their ' +
+      'then there these they this to was we were what when which will with you your not can our just about over under very ' +
+      'um uh like okay ok also may might would could should shall do does did been being had must need needs want wants ' +
+      'get gets got make makes made new more most some any all each every because while still really').split(' '));
+    this.ACTION_RX = /\b(todo|to-do|need(s)? to|must|should|follow(-| )up|deadline|due|send|call|create|review|fix|decide|schedule|prepare|finish|update|write|email|remember to|don'?t forget)\b/i;
+  }
+
+  mode() {
+    if (AppState.settings.external.enabled && AppState.session.apiKey) return 'external';
+    if (Support.promptReady) return 'browser-ai';
+    return 'heuristic';
+  }
+  modeLabel(m) { return { external: 'External AI', 'browser-ai': 'Browser AI', heuristic: 'Local heuristic' }[m] || m; }
+
+  /* ---------- text utilities ---------- */
+  plain(text) {
+    return String(text)
+      .replace(/```[\s\S]*?```/g, ' ')
+      .replace(/^#{1,6}\s.*$/gm, '')
+      .replace(/^\s*\|.*\|\s*$/gm, ' ')
+      .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+      .replace(/[*_`>#|]+/g, ' ');
+  }
+  sentences(text) {
+    return (this.plain(text).replace(/\s+/g, ' ').match(/[^.!?]+[.!?]*/g) || [])
+      .map(s => s.trim()).filter(s => s.length > 8);
+  }
+  keywords(text, n = 8) {
+    const freq = {};
+    (String(text).toLowerCase().match(/[a-zà-öø-ÿäöüß][a-zà-öø-ÿäöüß'-]{2,}/gi) || [])
+      .forEach(w => { if (!this.stops.has(w)) freq[w] = (freq[w] || 0) + 1; });
+    return Object.entries(freq).sort((a, b) => b[1] - a[1]).slice(0, n).map(e => e[0]);
+  }
+  cap(w) { return w.charAt(0).toUpperCase() + w.slice(1); }
+
+  /* ---------- public API ---------- */
+  async generate(prompt, options = {}) {
+    const context = options.context || '';
+    if (this.mode() === 'external') {
+      const ok = await UIController.confirmExternal();
+      if (ok) {
+        try { return { text: await this.callExternal(prompt, context), mode: 'external' }; }
+        catch (e) { toast('External AI failed (' + e.message + ') — using local mode.', true); }
+      }
+    }
+    if (Support.promptReady) {
+      try { return { text: await this.callPromptApi(prompt, context), mode: 'browser-ai' }; }
+      catch (e) { /* fall through */ }
+    }
+    return { text: this.heuristic(options.task || 'generate', prompt, context, options), mode: 'heuristic' };
+  }
+
+  async summarize(text, options = {}) {
+    if (this.mode() !== 'external' && Support.summarizerApi) {
+      try {
+        let s = null;
+        if (window.Summarizer && Summarizer.create) {
+          if (Summarizer.availability && (await withTimeout(Summarizer.availability(), 2000)) !== 'available') throw new Error('na');
+          s = await withTimeout(Summarizer.create({ type: 'key-points', length: 'medium' }), 4000);
+        } else if (window.ai && window.ai.summarizer) s = await withTimeout(window.ai.summarizer.create(), 4000);
+        if (s) {
+          const out = String(await withTimeout(s.summarize(text.slice(0, 20000)), 15000)).trim();
+          if (s.destroy) s.destroy();
+          if (out) return { text: out, mode: 'browser-ai' };
+        }
+      } catch (e) { /* fall through */ }
+    }
+    return this.generate('Summarize the following text concisely.', { ...options, task: 'summarize', context: text });
+  }
+
+  async rewrite(text, instruction = '') {
+    return this.generate(instruction || 'Rewrite this more concisely and clearly.', { task: 'rewrite', context: text, instruction });
+  }
+  async extractTodos(text) { return this.generate('Extract action items as a checklist.', { task: 'todos', context: text }); }
+
+  async translate(text, targetLanguage) {
+    const target = /de|german|deutsch/i.test(targetLanguage) ? 'de' : 'en';
+    if (this.mode() !== 'external' && Support.translatorApi) {
+      try {
+        let tr = null;
+        const source = target === 'de' ? 'en' : 'de';
+        if (window.Translator && Translator.create) {
+          // Only proceed if the language pack is actually ready — create()
+          // can otherwise hang while a model downloads in the background.
+          if (Translator.availability &&
+              (await withTimeout(Translator.availability({ sourceLanguage: source, targetLanguage: target }), 2000)) !== 'available') {
+            throw new Error('not ready');
+          }
+          tr = await withTimeout(Translator.create({ sourceLanguage: source, targetLanguage: target }), 4000);
+        } else if (window.translation) {
+          tr = await withTimeout(window.translation.createTranslator({ sourceLanguage: source, targetLanguage: target }), 4000);
+        }
+        if (tr) {
+          const out = String(await withTimeout(tr.translate(text.slice(0, 20000)), 15000)).trim();
+          if (tr.destroy) tr.destroy();
+          if (out) return { text: out, mode: 'browser-ai' };
+        }
+      } catch (e) { /* fall through */ }
+    }
+    if (this.mode() === 'external') return this.generate('Translate this to ' + (target === 'de' ? 'German' : 'English') + '.', { task: 'generate', context: text });
+    return { text: 'Translation requires browser AI support or external AI, which is disabled.\n\nEnable Chrome’s Translator API or configure external AI in Settings.', mode: 'heuristic' };
+  }
+
+  async title(text) { return this.generate('Suggest 3 concise titles.', { task: 'title', context: text }); }
+
+  /* ---------- Mode A: Chrome Prompt API ---------- */
+  async callPromptApi(prompt, context) {
+    let session = null;
+    if (window.LanguageModel && LanguageModel.create) session = await withTimeout(LanguageModel.create(), 4000);
+    else if (window.ai && window.ai.languageModel) session = await withTimeout(window.ai.languageModel.create(), 4000);
+    if (!session) throw new Error('unavailable');
+    const out = String(await withTimeout(session.prompt(prompt + (context ? '\n\n---\n' + context.slice(0, 12000) : '')), 30000)).trim();
+    if (session.destroy) session.destroy();
+    if (!out || out.includes('echoing back the input') || out.includes(prompt.slice(0, 40))) throw new Error('model not usable');
+    return out;
+  }
+
+  /* ---------- Mode C: external, opt-in only ---------- */
+  async callExternal(prompt, context) {
+    const endpoint = AppState.settings.external.endpoint.trim() || 'https://api.openai.com/v1/chat/completions';
+    const resp = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + AppState.session.apiKey },
+      body: JSON.stringify({
+        model: AppState.settings.external.model || 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: 'You are a concise text-processing assistant. Reply with the requested text only, in Markdown.' },
+          { role: 'user', content: prompt + (context ? '\n\n---\n' + context.slice(0, 24000) : '') },
+        ],
+        temperature: 0.4,
+      }),
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    const out = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+    if (!out) throw new Error('empty response');
+    return out.trim();
+  }
+
+  /* ---------- Mode B: deterministic heuristics ---------- */
+  heuristicSummarize(text) {
+    const sents = this.sentences(text);
+    if (sents.length <= 3) return sents.join(' ') || String(text).slice(0, 300);
+    const kws = this.keywords(text, 14);
+    const scored = sents.map((s, i) => {
+      const lower = s.toLowerCase();
+      let score = kws.reduce((a, k, ki) => a + (lower.includes(k) ? kws.length - ki : 0), 0);
+      score /= Math.sqrt(s.split(/\s+/).length);
+      if (/\d/.test(s)) score *= 1.25;
+      if (/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|q[1-4]|\d{4}|monday|friday|deadline)\b/i.test(lower)) score *= 1.15;
+      if (this.ACTION_RX.test(s)) score *= 1.2;
+      if ((s.match(/\b[A-Z][a-z]+/g) || []).length > 1) score *= 1.1; // capitalized entities
+      if (i === 0) score *= 1.2;
+      return { s, i, score };
+    });
+    const n = Math.max(3, Math.min(5, Math.ceil(sents.length / 5)));
+    return scored.sort((a, b) => b.score - a.score).slice(0, n)
+      .sort((a, b) => a.i - b.i).map(x => '- ' + x.s).join('\n');
+  }
+
+  heuristicTodos(text) {
+    const lines = String(text).split(/\n/).flatMap(l => {
+      const s = this.sentences(l);
+      return s.length ? s : [l.trim()];
+    });
+    const seen = new Set(), todos = [];
+    lines.forEach(l => {
+      const clean = l.replace(/^[-*•\d.)\s\[\]xX]+/, '').trim();
+      if (!clean || clean.length < 6) return;
+      if ((this.ACTION_RX.test(l) || /^[-*•]\s*\[ \]/.test(l.trim())) && !seen.has(clean.toLowerCase())) {
+        seen.add(clean.toLowerCase());
+        todos.push('- [ ] ' + clean.replace(/[.!?]+$/, ''));
+      }
+    });
+    return todos.length ? todos.join('\n')
+      : '_No obvious action items found. Look for “must / should / need to / follow up / deadline” phrasing._';
+  }
+
+  heuristicRewrite(text, instruction = '') {
+    let out = String(text).replace(/[ \t]+/g, ' ').replace(/ ?\n ?/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+    // remove obvious filler words
+    out = out.replace(/\b(basically|actually|literally|really|very|just|kind of|sort of|you know|i mean|in my opinion)\b\s*/gi, '');
+    out = out.replace(/\b(in order to)\b/gi, 'to').replace(/\b(due to the fact that)\b/gi, 'because')
+             .replace(/\b(at this point in time)\b/gi, 'now').replace(/\b(utilize)\b/gi, 'use');
+    out = out.split(/\n/).map(line => {
+      let l = line.trim();
+      if (!l) return '';
+      l = l.charAt(0).toUpperCase() + l.slice(1);
+      l = l.replace(/([.!?]\s+)([a-z])/g, (m, p, c) => p + c.toUpperCase());
+      return l;
+    }).join('\n');
+    if (/short|concise/i.test(instruction)) {
+      const sents = this.sentences(out);
+      out = sents.slice(0, Math.max(2, Math.ceil(sents.length / 2))).join(' ');
+    }
+    return out.replace(/ {2,}/g, ' ');
+  }
+
+  heuristicTitle(text) {
+    const kws = this.keywords(text, 4).map(k => this.cap(k));
+    if (!kws.length) return '1. Untitled note';
+    return ['1. ' + kws.slice(0, 3).join(' · '),
+            '2. ' + kws[0] + (kws[1] ? ': ' + kws[1] : ''),
+            '3. Notes on ' + kws.slice(0, 2).join(' and ')].join('\n');
+  }
+
+  heuristic(task, prompt, context, options = {}) {
+    const text = context || prompt;
+    switch (task) {
+      case 'summarize': return this.heuristicSummarize(text);
+      case 'todos': return this.heuristicTodos(text);
+      case 'rewrite': return this.heuristicRewrite(text, options.instruction || prompt);
+      case 'title': return this.heuristicTitle(text);
+      default: {
+        const q = this.keywords(prompt, 6);
+        const rel = this.sentences(text)
+          .map(s => ({ s, n: q.reduce((a, k) => a + (s.toLowerCase().includes(k) ? 1 : 0), 0) }))
+          .filter(x => x.n > 0).sort((a, b) => b.n - a.n).slice(0, 4).map(x => '- ' + x.s);
+        return rel.length ? rel.join('\n') : this.heuristicSummarize(text);
+      }
+    }
+  }
+}
+const Adapter = new AIAdapter();
+
+/* ============================================================
+   RESULT CARD — one shared output surface for all text actions
+   ============================================================ */
+const ResultCard = {
+  show(title, text, source, mode, task) {
+    AppState.session.lastResult = { title, text, source, mode, task };
+    $('#resultTitle').textContent = title;
+    $('#resultSrc').textContent = source ? 'from ' + source : '';
+    const badge = $('#resultMode');
+    badge.textContent = Adapter.modeLabel(mode);
+    badge.className = 'badge ' + (mode === 'heuristic' ? 'warn' : mode === 'external' ? 'danger' : 'ok');
+    badge.title = mode === 'heuristic' ? 'Deterministic local text processing — not a real AI model.' : '';
+    $('#resultBody').innerHTML = Markdown.toHtml(text);
+    $('#resAddTodos').style.display = task === 'todos' && !text.startsWith('_') ? '' : 'none';
+    $('#resultCard').style.display = 'block';
+    $('#resultCard').scrollIntoView({ block: 'nearest' });
+  },
+  hide() { $('#resultCard').style.display = 'none'; },
+  init() {
+    $('#resultClose').addEventListener('click', () => this.hide());
+    $('#resCopy').addEventListener('click', () => copyText(AppState.session.lastResult && AppState.session.lastResult.text, 'Result'));
+    $('#resSaveNote').addEventListener('click', () => {
+      const r = AppState.session.lastResult;
+      if (!r) return;
+      NoteController.create(r.title, r.text);
+    });
+    $('#resDownload').addEventListener('click', () => {
+      const r = AppState.session.lastResult;
+      if (!r) return;
+      download(r.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40) + '.md', '# ' + r.title + '\n\n' + r.text, 'text/markdown');
+    });
+    $('#resAddTodos').addEventListener('click', () => {
+      const r = AppState.session.lastResult;
+      if (!r) return;
+      const items = r.text.split('\n').filter(l => l.startsWith('- [ ]')).map(l => l.replace('- [ ] ', ''));
+      items.forEach(t => TodoController.add(t, r.source || 'extracted'));
+      toast(items.length + ' todos added');
+    });
+  },
+};
+
+/* Run a text action end-to-end and show the result card. */
+async function runTextAction(kind, text, source) {
+  if (!text || !text.trim()) { toast('Nothing to process — the text is empty.', true); return; }
+  const titles = { summarize: 'Summary', rewrite: 'Rewrite', todos: 'Action items', translate: 'Translation', title: 'Title ideas' };
+  try {
+    let res;
+    if (kind === 'summarize') res = await Adapter.summarize(text);
+    else if (kind === 'rewrite') res = await Adapter.rewrite(text);
+    else if (kind === 'todos') res = await Adapter.extractTodos(text);
+    else if (kind === 'translate') res = await Adapter.translate(text, $('#trTarget') ? $('#trTarget').value : 'de');
+    else if (kind === 'title') res = await Adapter.title(text);
+    else res = await Adapter.generate(kind, { context: text });
+    ResultCard.show(titles[kind] || 'Result', res.text, source, res.mode, kind);
+  } catch (e) {
+    toast('Action failed: ' + (e && e.message || e), true);
+  }
+}
+
+/* ============================================================
+   COMMAND CONTROLLER — parser, suggestions, execution
+   ============================================================ */
+const CommandController = {
+  selIndex: -1,
+
+  init() {
+    const cmd = $('#cmd');
+    cmd.addEventListener('input', () => this.suggest());
+    cmd.addEventListener('keydown', (e) => {
+      const items = $$('#suggestions li');
+      if (e.key === 'ArrowDown' && items.length) { e.preventDefault(); this.selIndex = (this.selIndex + 1) % items.length; this.highlight(items); }
+      else if (e.key === 'ArrowUp' && items.length) { e.preventDefault(); this.selIndex = (this.selIndex - 1 + items.length) % items.length; this.highlight(items); }
+      else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (this.selIndex >= 0 && items[this.selIndex]) items[this.selIndex].click();
+        else this.execute(cmd.value);
+      } else if (e.key === 'Escape') {
+        if ($('#suggestions').style.display === 'block') this.closeSuggest();
+        else { cmd.value = ''; ResultCard.hide(); }
+      }
+    });
+    document.addEventListener('click', (e) => { if (!$('#cmdWrap').contains(e.target)) this.closeSuggest(); });
+    $('#engineHint').textContent = 'default: ' + (AppState.settings.defaultEngine || 'g');
+  },
+
+  /* ---------- parsing ---------- */
+  looksLikeUrl(s) {
+    return /^https?:\/\/\S+$/i.test(s) || /^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(s);
+  },
+  parse(input) {
+    const raw = input.trim();
+    if (!raw) return null;
+    const lower = raw.toLowerCase();
+    const [head, ...restArr] = raw.split(/\s+/);
+    const rest = restArr.join(' ');
+    const engines = AppState.settings.engines;
+
+    if (engines[head.toLowerCase()] && rest) return { type: 'search', engine: head.toLowerCase(), q: rest };
+    if (this.looksLikeUrl(raw)) return { type: 'url', url: /^https?:/i.test(raw) ? raw : 'https://' + raw };
+    if (lower.startsWith('note ') && rest) return { type: 'note', text: rest };
+    if (lower.startsWith('todo ') && rest) return { type: 'todo', text: rest };
+    if (lower.startsWith('timer')) return { type: 'timer', minutes: parseInt(rest, 10) || AppState.settings.focusMinutes };
+    if (lower === 'focus') return { type: 'timer', minutes: AppState.settings.focusMinutes };
+    if (lower.startsWith('calc ')) return { type: 'calc', expr: rest };
+    if (/^[\d\s+\-*/%^().]+$/.test(raw) && /\d/.test(raw) && /[+\-*/%^]/.test(raw)) return { type: 'calc', expr: raw };
+    if (lower.startsWith('open ') && rest) return { type: 'open', q: rest };
+    if (lower.startsWith('summarize ') && rest) return { type: 'ai', kind: 'summarize', text: rest };
+    if (lower.startsWith('rewrite ') && rest) return { type: 'ai', kind: 'rewrite', text: rest };
+    if (lower.startsWith('translate de ')) return { type: 'ai', kind: 'translate', target: 'de', text: raw.slice(13) };
+    if (lower.startsWith('translate en ')) return { type: 'ai', kind: 'translate', target: 'en', text: raw.slice(13) };
+    if (lower.startsWith('clip')) return { type: 'clip', action: (rest || 'paste').toLowerCase() };
+    if (lower === 'file open' || lower === 'file') return { type: 'file' };
+    if (lower === 'settings') return { type: 'settings' };
+    if (lower === 'demo') return { type: 'demo' };
+    if (lower === 'help' || lower === '?') return { type: 'help' };
+    return { type: 'search', engine: AppState.settings.defaultEngine, q: raw };
+  },
+
+  async execute(input) {
+    const p = this.parse(input);
+    if (!p) return;
+    this.closeSuggest();
+    AppState.cmdHistory.unshift(input.trim());
+    AppState.cmdHistory = [...new Set(AppState.cmdHistory)].slice(0, 25);
+    AppState.save();
+    const cmd = $('#cmd');
+
+    switch (p.type) {
+      case 'search': {
+        const url = (AppState.settings.engines[p.engine] || DEFAULT_ENGINES.g).replace('%s', encodeURIComponent(p.q));
+        window.open(url, '_blank', 'noopener');
+        cmd.value = '';
+        break;
+      }
+      case 'url': window.open(p.url, '_blank', 'noopener'); cmd.value = ''; break;
+      case 'note': NoteController.create(null, p.text); cmd.value = ''; break;
+      case 'todo': TodoController.add(p.text, 'command'); cmd.value = ''; toast('Todo added'); break;
+      case 'timer': FocusController.start(p.minutes); cmd.value = ''; break;
+      case 'calc': {
+        const val = safeCalc(p.expr);
+        if (val === null) toast('Could not evaluate that expression.', true);
+        else ResultCard.show('Calculator', '`' + p.expr.trim() + '` = **' + val + '**', 'calc', 'heuristic', 'calc');
+        break;
+      }
+      case 'open': {
+        const hit = this.findLink(p.q);
+        if (hit) { window.open(hit.url, '_blank', 'noopener'); cmd.value = ''; }
+        else toast('No bookmark matching “' + p.q + '”.', true);
+        break;
+      }
+      case 'ai': {
+        if (p.kind === 'translate') {
+          const res = await Adapter.translate(p.text, p.target);
+          ResultCard.show('Translation', res.text, 'command', res.mode, 'translate');
+        } else await runTextAction(p.kind, p.text, 'command');
+        break;
+      }
+      case 'clip': ClipboardController.handle(p.action); break;
+      case 'file': FileController.open(); cmd.value = ''; break;
+      case 'settings': UIController.openSettings(); cmd.value = ''; break;
+      case 'demo': Demo.load(); cmd.value = ''; break;
+      case 'help':
+        ResultCard.show('Commands',
+          '`g/d/yt/gh/hn/x/li/r/md <query>` search · `<url>` open · `note …` · `todo …` · `timer 25` · `focus` · ' +
+          '`calc 12*37` · `open <bookmark>` · `summarize/rewrite <text>` · `translate de/en <text>` · `clip summarize/todos/paste` · ' +
+          '`file open` · `settings` · `demo`', 'help', 'heuristic', 'help');
+        break;
+    }
+  },
+
+  findLink(q) {
+    const needle = q.toLowerCase();
+    let best = null, bestScore = 0;
+    AppState.workspaces.forEach(ws => ws.links.forEach(l => {
+      let score = 0;
+      if (l.shortcut && l.shortcut.toLowerCase() === needle) score = 100;
+      else if (l.title.toLowerCase() === needle) score = 90;
+      else if (l.title.toLowerCase().startsWith(needle)) score = 70;
+      else if (l.title.toLowerCase().includes(needle)) score = 50;
+      else if (l.url.toLowerCase().includes(needle)) score = 30;
+      if (score > bestScore) { bestScore = score; best = l; }
+    }));
+    return best;
+  },
+
+  /* ---------- suggestions ---------- */
+  suggest() {
+    const q = $('#cmd').value.trim();
+    const box = $('#suggestions');
+    this.selIndex = -1;
+    if (!q) { this.closeSuggest(); return; }
+    const items = [];
+    const lower = q.toLowerCase();
+
+    // matching commands
+    const cmds = [
+      ['note ', '📝', 'Save a note'], ['todo ', '☑', 'Add a todo'], ['timer 25', '⏱', 'Start focus timer'],
+      ['calc ', '🧮', 'Calculate'], ['summarize ', '✨', 'Summarize text'], ['rewrite ', '✨', 'Rewrite text'],
+      ['translate de ', '🌐', 'Translate to German'], ['clip summarize', '📎', 'Summarize clipboard'],
+      ['open ', '🔗', 'Open bookmark'], ['file open', '📂', 'Open local file'], ['focus', '🧘', 'Start focus'],
+      ['settings', '⚙️', 'Open settings'], ['help', '❓', 'Show all commands'],
+    ];
+    cmds.filter(([c]) => c.startsWith(lower) && c !== lower).slice(0, 3)
+      .forEach(([c, ico, desc]) => items.push({ ico, label: c, kind: desc, fill: c }));
+
+    // matching links — "open gm" should match like "gm" does
+    const linkQ = lower.startsWith('open ') ? lower.slice(5) : lower;
+    AppState.workspaces.forEach(ws => ws.links.forEach(l => {
+      if (l.title.toLowerCase().includes(linkQ) || (l.shortcut && l.shortcut.startsWith(linkQ))) {
+        items.push({ ico: '🔗', label: l.title + (l.shortcut ? '  ·  ' + l.shortcut : ''), kind: ws.name, run: () => { window.open(l.url, '_blank', 'noopener'); $('#cmd').value = ''; this.closeSuggest(); } });
+      }
+    }));
+
+    // matching notes
+    AppState.notes.filter(n => (n.title + ' ' + n.content).toLowerCase().includes(lower)).slice(0, 3)
+      .forEach(n => items.push({ ico: '📝', label: n.title, kind: 'note', run: () => { NoteController.openEditor(n.id); this.closeSuggest(); } }));
+
+    // calc live preview
+    if (/^[\d\s+\-*/%^().]+$/.test(q) && /[+\-*/%^]/.test(q)) {
+      const val = safeCalc(q);
+      if (val !== null) items.unshift({ ico: '🧮', label: q + ' = ' + val, kind: 'calc', run: () => { ResultCard.show('Calculator', '`' + q + '` = **' + val + '**', 'calc', 'heuristic', 'calc'); this.closeSuggest(); } });
+    }
+
+    // default: search
+    const eng = AppState.settings.defaultEngine;
+    items.push({ ico: '🔍', label: 'Search “' + q + '”', kind: eng, run: () => this.execute(q) });
+
+    if (!items.length) { this.closeSuggest(); return; }
+    box.innerHTML = '';
+    items.slice(0, 9).forEach((it) => {
+      const li = document.createElement('li');
+      li.setAttribute('role', 'option');
+      li.innerHTML = '<span class="ico">' + it.ico + '</span><span class="lbl">' + escapeHtml(it.label) + '</span><span class="kind">' + escapeHtml(it.kind) + '</span>';
+      li.addEventListener('click', () => {
+        if (it.run) it.run();
+        else if (it.fill) { $('#cmd').value = it.fill; $('#cmd').focus(); this.suggest(); }
+      });
+      box.appendChild(li);
+    });
+    box.style.display = 'block';
+    $('#cmd').setAttribute('aria-expanded', 'true');
+  },
+  highlight(items) {
+    items.forEach((li, i) => li.classList.toggle('sel', i === this.selIndex));
+    if (items[this.selIndex]) items[this.selIndex].scrollIntoView({ block: 'nearest' });
+  },
+  closeSuggest() {
+    $('#suggestions').style.display = 'none';
+    $('#cmd').setAttribute('aria-expanded', 'false');
+    this.selIndex = -1;
+  },
+};
+
+/* ============================================================
+   WORKSPACE CONTROLLER
+   ============================================================ */
+const WorkspaceController = {
+  editingLinkId: null,
+
+  init() {
+    $('#btnAddLink').addEventListener('click', () => this.openLinkModal());
+    $('#btnSaveLink').addEventListener('click', () => this.saveLink());
+    this.render();
+  },
+
+  render() {
+    const host = $('#wsList');
+    host.innerHTML = '';
+    AppState.workspaces.forEach((ws, wi) => {
+      const el = document.createElement('div');
+      el.className = 'ws';
+      const head = document.createElement('div');
+      head.className = 'ws-head';
+      head.innerHTML = `<span class="ws-accent" style="background:${escapeHtml(ws.accent || '#5b74f0')}"></span>
+        <span class="ws-name"><span>${escapeHtml(ws.emoji || '')}</span><span class="n">${escapeHtml(ws.name)}</span><span class="ws-num">⌥${wi + 1}</span></span>`;
+      const openAll = document.createElement('button');
+      openAll.className = 'mini'; openAll.textContent = '⧉'; openAll.title = 'Open all links';
+      openAll.setAttribute('aria-label', 'Open all links in ' + ws.name);
+      openAll.addEventListener('click', () => this.openAll(ws));
+      const rename = document.createElement('button');
+      rename.className = 'mini'; rename.textContent = '✎'; rename.title = 'Rename workspace';
+      rename.setAttribute('aria-label', 'Rename ' + ws.name);
+      rename.addEventListener('click', () => {
+        const name = prompt('Workspace name:', ws.name);
+        if (name && name.trim()) { ws.name = name.trim(); AppState.save(); this.render(); }
+      });
+      head.append(openAll, rename);
+      el.appendChild(head);
+
+      const linksEl = document.createElement('div');
+      linksEl.className = 'ws-links';
+      ws.links.forEach((l, li) => {
+        const row = document.createElement('div');
+        row.className = 'link-row';
+        if (AppState.settings.favicons) {
+          try {
+            const img = document.createElement('img');
+            img.className = 'fav'; img.alt = '';
+            img.src = new URL(l.url).origin + '/favicon.ico';
+            img.addEventListener('error', () => img.remove());
+            row.appendChild(img);
+          } catch (e) {}
+        }
+        const a = document.createElement('a');
+        a.href = l.url; a.target = '_blank'; a.rel = 'noopener';
+        a.textContent = l.title;
+        row.appendChild(a);
+        if (l.shortcut) { const sc = document.createElement('span'); sc.className = 'sc'; sc.textContent = l.shortcut; row.appendChild(sc); }
+        const up = document.createElement('button');
+        up.className = 'mini'; up.textContent = '↑'; up.title = 'Move up';
+        up.setAttribute('aria-label', 'Move ' + l.title + ' up');
+        up.addEventListener('click', () => {
+          if (li === 0) return;
+          [ws.links[li - 1], ws.links[li]] = [ws.links[li], ws.links[li - 1]];
+          AppState.save(); this.render();
+        });
+        const edit = document.createElement('button');
+        edit.className = 'mini'; edit.textContent = '✎'; edit.title = 'Edit link';
+        edit.setAttribute('aria-label', 'Edit ' + l.title);
+        edit.addEventListener('click', () => this.openLinkModal(ws.id, l));
+        const del = document.createElement('button');
+        del.className = 'mini'; del.textContent = '✕'; del.title = 'Delete link';
+        del.setAttribute('aria-label', 'Delete ' + l.title);
+        del.addEventListener('click', () => {
+          if (!confirm('Delete link “' + l.title + '”?')) return;
+          ws.links = ws.links.filter(x => x.id !== l.id);
+          AppState.save(); this.render();
+        });
+        row.append(up, edit, del);
+        linksEl.appendChild(row);
+      });
+      el.appendChild(linksEl);
+      host.appendChild(el);
+    });
+  },
+
+  openAll(ws) {
+    let opened = 0;
+    ws.links.forEach(l => { const w = window.open(l.url, '_blank', 'noopener'); if (w) opened++; });
+    if (opened < ws.links.length) toast('Some tabs were blocked by the popup blocker — allow popups for this page.', true);
+  },
+
+  openByIndex(i) {
+    const ws = AppState.workspaces[i];
+    if (ws) this.openAll(ws);
+  },
+
+  openLinkModal(wsId = null, link = null) {
+    this.editingLinkId = link ? link.id : null;
+    const sel = $('#linkWs');
+    sel.innerHTML = AppState.workspaces.map(w => `<option value="${w.id}">${escapeHtml(w.emoji + ' ' + w.name)}</option>`).join('');
+    if (wsId) sel.value = wsId;
+    $('#linkModalTitle').textContent = link ? 'Edit link' : 'Add link';
+    $('#linkTitle').value = link ? link.title : '';
+    $('#linkUrl').value = link ? link.url : '';
+    $('#linkShortcut').value = link ? (link.shortcut || '') : '';
+    UIController.openModal('#linkModal');
+    $('#linkTitle').focus();
+  },
+
+  saveLink() {
+    const wsId = $('#linkWs').value;
+    const title = $('#linkTitle').value.trim();
+    let url = $('#linkUrl').value.trim();
+    const shortcut = $('#linkShortcut').value.trim();
+    if (!title || !url) { toast('Title and URL are required.', true); return; }
+    if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+    const ws = AppState.workspaces.find(w => w.id === wsId);
+    if (!ws) return;
+    if (this.editingLinkId) {
+      // may have moved workspace: remove from all, re-add
+      AppState.workspaces.forEach(w => { w.links = w.links.filter(l => l.id !== this.editingLinkId); });
+      ws.links.push({ id: this.editingLinkId, title, url, shortcut });
+    } else {
+      ws.links.push({ id: uid(), title, url, shortcut });
+    }
+    AppState.save();
+    this.render();
+    UIController.closeModals();
+    toast('Link saved');
+  },
+};
+
+/* ============================================================
+   TODO CONTROLLER
+   ============================================================ */
+const TodoController = {
+  init() {
+    $('#btnAddTodo').addEventListener('click', () => this.addFromInput());
+    $('#todoInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') this.addFromInput(); });
+    $('#btnArchiveDone').addEventListener('click', () => this.archiveDone());
+    $('#btnClearDay').addEventListener('click', () => {
+      this.archiveDone();
+      $('#focusTask').value = '';
+      toast('Day cleared — done todos archived.');
+    });
+    this.render();
+  },
+
+  parseDue(text) {
+    const m = text.match(/\b(today|tomorrow|soon)\s*$/i);
+    if (!m) return { text, due: null };
+    return { text: text.slice(0, m.index).trim(), due: m[1].toLowerCase() };
+  },
+
+  add(rawText, source = 'manual') {
+    const { text, due } = this.parseDue(rawText.trim());
+    if (!text) return;
+    AppState.todos.unshift({ id: uid(), text, done: false, createdAt: Date.now(), due, source, priority: false, archived: false });
+    AppState.save();
+    this.render();
+  },
+  addFromInput() {
+    const v = $('#todoInput').value.trim();
+    if (!v) return;
+    this.add(v, 'manual');
+    $('#todoInput').value = '';
+  },
+
+  toggle(id) { const t = AppState.todos.find(x => x.id === id); if (t) { t.done = !t.done; AppState.save(); this.render(); } },
+  remove(id) { AppState.todos = AppState.todos.filter(x => x.id !== id); AppState.save(); this.render(); },
+  star(id) { const t = AppState.todos.find(x => x.id === id); if (t) { t.priority = !t.priority; AppState.save(); this.render(); } },
+  move(id, dir) {
+    const list = AppState.todos;
+    const i = list.findIndex(x => x.id === id);
+    const j = i + dir;
+    if (i < 0 || j < 0 || j >= list.length) return;
+    [list[i], list[j]] = [list[j], list[i]];
+    AppState.save(); this.render();
+  },
+  archiveDone() {
+    const n = AppState.todos.filter(t => t.done && !t.archived).length;
+    AppState.todos.forEach(t => { if (t.done) t.archived = true; });
+    AppState.save(); this.render();
+    if (n) toast(n + ' completed todo' + (n > 1 ? 's' : '') + ' archived');
+  },
+
+  buildRow(t, isPrio) {
+    const li = document.createElement('li');
+    li.className = 'todo' + (t.done ? ' done' : '');
+    const cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.checked = t.done;
+    cb.setAttribute('aria-label', 'Mark done: ' + t.text);
+    cb.addEventListener('change', () => this.toggle(t.id));
+    const txt = document.createElement('span');
+    txt.className = 'txt'; txt.textContent = t.text;
+    li.append(cb, txt);
+    if (t.due) { const d = document.createElement('span'); d.className = 'due ' + t.due; d.textContent = t.due; li.appendChild(d); }
+    const star = document.createElement('button');
+    star.className = 'mini star' + (t.priority ? ' on' : '');
+    star.textContent = '★'; star.title = t.priority ? 'Unpin priority' : 'Pin as priority';
+    star.setAttribute('aria-label', star.title + ': ' + t.text);
+    star.style.opacity = t.priority ? 1 : '';
+    star.addEventListener('click', () => this.star(t.id));
+    li.appendChild(star);
+    if (!isPrio) {
+      const up = document.createElement('button');
+      up.className = 'mini'; up.textContent = '↑'; up.title = 'Move up';
+      up.setAttribute('aria-label', 'Move up: ' + t.text);
+      up.addEventListener('click', () => this.move(t.id, -1));
+      li.appendChild(up);
+    }
+    const del = document.createElement('button');
+    del.className = 'mini'; del.textContent = '✕'; del.title = 'Delete';
+    del.setAttribute('aria-label', 'Delete: ' + t.text);
+    del.addEventListener('click', () => this.remove(t.id));
+    li.appendChild(del);
+    return li;
+  },
+
+  render() {
+    const active = AppState.todos.filter(t => !t.archived);
+    const prios = active.filter(t => t.priority && !t.done).slice(0, 3);
+    const prioHost = $('#prioList');
+    prioHost.innerHTML = '';
+    if (!prios.length) prioHost.innerHTML = '<div class="empty">No priorities yet. Add one with “todo …” and ★ it.</div>';
+    prios.forEach(t => prioHost.appendChild(this.buildRow(t, true)));
+
+    const host = $('#todoList');
+    host.innerHTML = '';
+    const rest = active.filter(t => !prios.includes(t));
+    if (!rest.length && !prios.length) host.innerHTML = '<div class="empty">Nothing here. Capture a todo above or type “todo …” in the command bar.</div>';
+    rest.slice(0, 14).forEach(t => host.appendChild(this.buildRow(t, false)));
+  },
+};
+
+/* ============================================================
+   NOTE CONTROLLER
+   ============================================================ */
+const NoteController = {
+  editingId: null,
+
+  init() {
+    $('#btnNoteSave').addEventListener('click', () => this.saveFromModal());
+    $('#btnNoteDelete').addEventListener('click', () => {
+      if (!this.editingId || !confirm('Delete this note?')) return;
+      AppState.notes = AppState.notes.filter(n => n.id !== this.editingId);
+      AppState.save(); this.render();
+      UIController.closeModals();
+      toast('Note deleted');
+    });
+    $('#btnNoteMd').addEventListener('click', () => {
+      const t = $('#noteTitle').value || 'note';
+      download(t.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40) + '.md', '# ' + t + '\n\n' + $('#noteContent').value, 'text/markdown');
+    });
+    this.render();
+  },
+
+  create(title, content) {
+    const t = (title || content.split('\n')[0].replace(/^#+\s*/, '').slice(0, 60) || 'Note').trim();
+    AppState.notes.unshift({ id: uid(), title: t, content, tags: [], createdAt: Date.now(), updatedAt: Date.now() });
+    AppState.save();
+    this.render();
+    toast('Note saved: ' + t);
+  },
+
+  openEditor(id) {
+    const n = AppState.notes.find(x => x.id === id);
+    if (!n) return;
+    this.editingId = id;
+    $('#noteTitle').value = n.title;
+    $('#noteContent').value = n.content;
+    UIController.openModal('#noteModal');
+  },
+
+  saveFromModal() {
+    const n = AppState.notes.find(x => x.id === this.editingId);
+    if (!n) return;
+    n.title = $('#noteTitle').value.trim() || 'Untitled';
+    n.content = $('#noteContent').value;
+    n.updatedAt = Date.now();
+    AppState.save();
+    this.render();
+    UIController.closeModals();
+    toast('Note saved');
+  },
+
+  render() {
+    const host = $('#noteList');
+    host.innerHTML = '';
+    if (!AppState.notes.length) { host.innerHTML = '<div class="empty">No notes yet. Type “note …” in the command bar.</div>'; return; }
+    AppState.notes.slice(0, 6).forEach(n => {
+      const row = document.createElement('div');
+      row.className = 'note-row';
+      row.setAttribute('role', 'button');
+      row.tabIndex = 0;
+      const t = document.createElement('span'); t.className = 't'; t.textContent = '📝 ' + n.title;
+      const d = document.createElement('span'); d.className = 'd';
+      d.textContent = new Date(n.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+      const del = document.createElement('button');
+      del.className = 'mini'; del.textContent = '✕'; del.setAttribute('aria-label', 'Delete note ' + n.title);
+      del.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!confirm('Delete note “' + n.title + '”?')) return;
+        AppState.notes = AppState.notes.filter(x => x.id !== n.id);
+        AppState.save(); this.render();
+      });
+      row.append(t, d, del);
+      const open = () => this.openEditor(n.id);
+      row.addEventListener('click', open);
+      row.addEventListener('keydown', (e) => { if (e.key === 'Enter') open(); });
+      host.appendChild(row);
+    });
+  },
+};
+
+/* ============================================================
+   SCRATCHPAD CONTROLLER
+   ============================================================ */
+const ScratchpadController = {
+  init() {
+    const sc = $('#scratch');
+    sc.value = AppState.scratch;
+    this.updateCounts();
+    let t = null;
+    sc.addEventListener('input', () => {
+      clearTimeout(t);
+      t = setTimeout(() => { AppState.scratch = sc.value; AppState.save(); }, 400);
+      this.updateCounts();
+    });
+    $('#scPaste').addEventListener('click', () => ClipboardController.pasteToScratch());
+    $('#scCopy').addEventListener('click', () => copyText(sc.value, 'Scratchpad'));
+    $('#scSaveNote').addEventListener('click', () => {
+      if (!sc.value.trim()) { toast('Scratchpad is empty.', true); return; }
+      NoteController.create(null, sc.value);
+    });
+    $('#scDownload').addEventListener('click', () => {
+      if (!sc.value.trim()) { toast('Scratchpad is empty.', true); return; }
+      download('scratchpad.md', sc.value, 'text/markdown');
+    });
+    $('#scSummarize').addEventListener('click', () => runTextAction('summarize', sc.value, 'scratchpad'));
+    $('#scRewrite').addEventListener('click', () => runTextAction('rewrite', sc.value, 'scratchpad'));
+    $('#scTodos').addEventListener('click', () => runTextAction('todos', sc.value, 'scratchpad'));
+    $('#scTranslate').addEventListener('click', () => runTextAction('translate', sc.value, 'scratchpad'));
+    $('#scClean').addEventListener('click', () => {
+      sc.value = Adapter.heuristicRewrite(sc.value);
+      AppState.scratch = sc.value; AppState.save(); this.updateCounts();
+      toast('Formatting cleaned');
+    });
+    $('#scBullets').addEventListener('click', () => {
+      sc.value = sc.value.split('\n').map(l => l.trim()).filter(Boolean)
+        .map(l => /^[-*]\s/.test(l) ? l : '- ' + l).join('\n');
+      AppState.scratch = sc.value; AppState.save(); this.updateCounts();
+      toast('Converted to bullets');
+    });
+  },
+  updateCounts() {
+    const v = $('#scratch').value;
+    const words = (v.match(/\S+/g) || []).length;
+    $('#scratchCounts').textContent = words + ' words · ' + v.length + ' chars';
+  },
+};
+
+/* ============================================================
+   CLIPBOARD CONTROLLER — user-initiated only
+   ============================================================ */
+const ClipboardController = {
+  async read() {
+    if (!Support.clipboardRead) {
+      toast('Clipboard reading is not supported here — paste manually with Ctrl/Cmd+V into the scratchpad.', true);
+      return null;
+    }
+    try { return await navigator.clipboard.readText(); }
+    catch (e) {
+      UIController.setPrivacyBadge('clipboard');
+      toast('Clipboard permission denied — paste manually with Ctrl/Cmd+V.', true);
+      return null;
+    }
+  },
+  async pasteToScratch() {
+    const text = await this.read();
+    if (text === null) return;
+    if (!text) { toast('Clipboard is empty.'); return; }
+    const sc = $('#scratch');
+    sc.value = (sc.value ? sc.value + '\n' : '') + text;
+    AppState.scratch = sc.value; AppState.save();
+    ScratchpadController.updateCounts();
+    toast('Pasted ' + text.length + ' chars');
+  },
+  async handle(action) {
+    const text = await this.read();
+    if (!text) { if (text !== null) toast('Clipboard is empty.'); return; }
+    if (action.startsWith('summar')) runTextAction('summarize', text, 'clipboard');
+    else if (action.startsWith('todo')) runTextAction('todos', text, 'clipboard');
+    else if (action.startsWith('rewrit')) runTextAction('rewrite', text, 'clipboard');
+    else { // default: paste
+      const sc = $('#scratch');
+      sc.value = (sc.value ? sc.value + '\n' : '') + text;
+      AppState.scratch = sc.value; AppState.save();
+      ScratchpadController.updateCounts();
+      toast('Clipboard pasted to scratchpad');
+    }
+    $('#cmd').value = '';
+  },
+  init() {
+    $('#tlClipSummarize').addEventListener('click', () => this.handle('summarize'));
+    $('#tlClipTodos').addEventListener('click', () => this.handle('todos'));
+  },
+};
+
+/* ============================================================
+   FILE CONTROLLER — open / inspect / save local files
+   ============================================================ */
+const FileController = {
+  SUPPORTED: ['txt', 'md', 'markdown', 'json', 'csv', 'html', 'htm', 'js', 'css', 'log'],
+  MAX: 8 * 1024 * 1024,
+
+  init() {
+    $('#tlOpenFile').addEventListener('click', () => this.open());
+    $('#fileInput').addEventListener('change', (e) => {
+      if (e.target.files[0]) this.ingest(e.target.files[0], null);
+      e.target.value = '';
+    });
+    $('#tlQuickDoc').addEventListener('click', () => {
+      const content = $('#scratch').value.trim() || '# Quick doc\n\n';
+      download('quick-doc.md', content, 'text/markdown');
+      toast('Markdown doc downloaded');
+    });
+    $('#fileToggleView').addEventListener('click', () => this.toggleView());
+    $('#fileSummarize').addEventListener('click', () => runTextAction('summarize', $('#fileContent').value, this.currentName()));
+    $('#fileTodos').addEventListener('click', () => runTextAction('todos', $('#fileContent').value, this.currentName()));
+    $('#fileCount').addEventListener('click', () => {
+      const v = $('#fileContent').value;
+      toast((v.match(/\S+/g) || []).length + ' words · ' + v.length + ' characters · ' + v.split('\n').length + ' lines');
+    });
+    $('#filePretty').addEventListener('click', () => {
+      try {
+        $('#fileContent').value = JSON.stringify(JSON.parse($('#fileContent').value), null, 2);
+        toast('JSON formatted');
+      } catch (e) { toast('Invalid JSON: ' + e.message, true); }
+    });
+    $('#fileSave').addEventListener('click', () => this.save());
+    $('#fileDownload').addEventListener('click', () => {
+      const f = AppState.session.currentFile;
+      download(f ? f.name : 'file.txt', $('#fileContent').value, 'text/plain;charset=utf-8');
+    });
+  },
+
+  currentName() { const f = AppState.session.currentFile; return f ? f.name : 'file'; },
+
+  async open() {
+    if (Support.fsAccess) {
+      try {
+        const [h] = await window.showOpenFilePicker({
+          types: [{ description: 'Text files', accept: { 'text/*': this.SUPPORTED.map(e => '.' + e) } }],
+        });
+        this.ingest(await h.getFile(), h);
+      } catch (err) {
+        if (err && err.name === 'AbortError') return; // cancelled — fine
+        toast('Could not open file: ' + (err && err.message || err), true);
+      }
+    } else $('#fileInput').click();
+  },
+
+  async ingest(file, handle) {
+    const ext = (file.name.split('.').pop() || '').toLowerCase();
+    if (!this.SUPPORTED.includes(ext)) { toast('.' + ext + ' is not supported. Try: ' + this.SUPPORTED.join(', '), true); return; }
+    if (file.size > this.MAX) { toast('File is ' + fmtSize(file.size) + ' — max is ' + fmtSize(this.MAX) + '.', true); return; }
+    let content;
+    try { content = await file.text(); }
+    catch (e) { toast('Could not read file: ' + (e && e.message), true); return; }
+    AppState.session.currentFile = { name: file.name, ext: ext === 'markdown' ? 'md' : ext === 'htm' ? 'html' : ext, size: file.size, handle };
+    AppState.recentFiles = [{ name: file.name, size: file.size, openedAt: Date.now() },
+      ...AppState.recentFiles.filter(r => r.name !== file.name)];
+    AppState.save();
+    $('#fileModalTitle').textContent = file.name;
+    $('#fileMeta').textContent = '.' + ext + ' · ' + fmtSize(file.size) + (handle ? ' · direct save available' : ' · save = download');
+    $('#fileContent').value = content;
+    $('#filePretty').style.display = ext === 'json' ? '' : 'none';
+    $('#fileToggleView').style.display = ['md', 'markdown', 'html', 'htm', 'csv', 'json'].includes(ext) ? '' : 'none';
+    this.showEditor();
+    UIController.openModal('#fileModal');
+    UIController.setPrivacyBadge('file');
+  },
+
+  showEditor() {
+    $('#fileContent').style.display = '';
+    $('#filePreview').style.display = 'none';
+    $('#fileToggleView').textContent = '👁 Preview';
+  },
+
+  toggleView() {
+    const previewing = $('#filePreview').style.display !== 'none';
+    if (previewing) { this.showEditor(); return; }
+    const f = AppState.session.currentFile;
+    if (!f) return;
+    const host = $('#filePreview');
+    host.innerHTML = '';
+    const content = $('#fileContent').value;
+    if (f.ext === 'md') {
+      const div = document.createElement('div');
+      div.className = 'md-render';
+      div.innerHTML = Markdown.toHtml(content);
+      host.appendChild(div);
+    } else if (f.ext === 'html') {
+      const frame = document.createElement('iframe');
+      frame.setAttribute('sandbox', ''); // no scripts, no same-origin
+      frame.setAttribute('title', 'HTML preview (sandboxed)');
+      frame.srcdoc = content;
+      host.appendChild(frame);
+    } else if (f.ext === 'json') {
+      const pre = document.createElement('pre');
+      pre.style.cssText = 'font-family:var(--mono);font-size:12px;margin:0';
+      try { pre.textContent = JSON.stringify(JSON.parse(content), null, 2); }
+      catch (e) { pre.textContent = '❌ Invalid JSON: ' + e.message; }
+      host.appendChild(pre);
+    } else if (f.ext === 'csv') {
+      host.appendChild(this.csvTable(content));
+    } else {
+      const pre = document.createElement('pre');
+      pre.style.cssText = 'font-family:var(--mono);font-size:12px;white-space:pre-wrap;margin:0';
+      pre.textContent = content;
+      host.appendChild(pre);
+    }
+    $('#fileContent').style.display = 'none';
+    host.style.display = 'block';
+    $('#fileToggleView').textContent = '✏️ Edit';
+  },
+
+  csvTable(text) {
+    const first = text.split('\n')[0] || '';
+    const delim = first.split(';').length > first.split(',').length ? ';' : ',';
+    const rows = [[]]; let cur = '', inQ = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (inQ) { if (c === '"') { if (text[i + 1] === '"') { cur += '"'; i++; } else inQ = false; } else cur += c; }
+      else if (c === '"') inQ = true;
+      else if (c === delim) { rows[rows.length - 1].push(cur); cur = ''; }
+      else if (c === '\n') { rows[rows.length - 1].push(cur); cur = ''; rows.push([]); }
+      else if (c !== '\r') cur += c;
+    }
+    rows[rows.length - 1].push(cur);
+    if (rows.length && rows[rows.length - 1].length === 1 && !rows[rows.length - 1][0]) rows.pop();
+    const wrap = document.createElement('div');
+    wrap.style.overflow = 'auto';
+    const table = document.createElement('table');
+    table.className = 'csv-table';
+    rows.slice(0, 300).forEach((r, i) => {
+      const tr = document.createElement('tr');
+      r.forEach(c => { const td = document.createElement(i === 0 ? 'th' : 'td'); td.textContent = c; tr.appendChild(td); });
+      table.appendChild(tr);
+    });
+    wrap.appendChild(table);
+    return wrap;
+  },
+
+  async save() {
+    const f = AppState.session.currentFile;
+    if (!f) return;
+    if (f.handle && Support.fsAccess) {
+      try {
+        const w = await f.handle.createWritable();
+        await w.write($('#fileContent').value);
+        await w.close();
+        toast('Saved ' + f.name + ' to disk');
+        return;
+      } catch (e) {
+        if (e && e.name === 'AbortError') return;
+        toast('Direct save failed — downloading a copy instead.', true);
+      }
+    }
+    download(f.name, $('#fileContent').value, 'text/plain;charset=utf-8');
+  },
+};
+
+/* ============================================================
+   FOCUS CONTROLLER — timer, overlay, wake lock, notifications
+   ============================================================ */
+const FocusController = {
+  remaining: 0, total: 0, running: false, interval: null, wakeLock: null,
+
+  init() {
+    $('#btnFocus').addEventListener('click', () => this.start(parseInt($('#focusMin').value, 10) || 25));
+    $('#focusPause').addEventListener('click', () => this.togglePause());
+    $('#focusEnd').addEventListener('click', () => this.end(false));
+    $('#btnEnableNotif').addEventListener('click', async () => {
+      if (!Support.notifications) { toast('Notifications are not supported in this browser.', true); return; }
+      const perm = await Notification.requestPermission();
+      toast(perm === 'granted' ? 'Notifications enabled for focus sessions.' : 'Notification permission was not granted.', perm !== 'granted');
+    });
+  },
+
+  async start(minutes) {
+    minutes = Math.max(1, Math.min(180, minutes || 25));
+    AppState.settings.focusMinutes = minutes;
+    AppState.save();
+    this.total = this.remaining = minutes * 60;
+    this.running = true;
+    $('#focusOverlay').classList.add('open');
+    this.tick();
+    clearInterval(this.interval);
+    this.interval = setInterval(() => this.tick(), 1000);
+    $('#focusTask').focus();
+    // Wake Lock: keep the screen on during the session (best effort).
+    if (Support.wakeLock) {
+      try { this.wakeLock = await navigator.wakeLock.request('screen'); }
+      catch (e) { /* not critical */ }
+    }
+  },
+
+  tick() {
+    if (!this.running) return;
+    this.remaining--;
+    if (this.remaining <= 0) { this.complete(); return; }
+    const m = Math.floor(this.remaining / 60), s = this.remaining % 60;
+    $('#focusCountdown').textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    $('#focusStateLine').textContent = 'Focusing — ' + $('#focusCountdown').textContent + ' left' +
+      ($('#focusTask').value ? ' · ' + $('#focusTask').value : '');
+  },
+
+  togglePause() {
+    this.running = !this.running;
+    $('#focusPause').textContent = this.running ? '⏸ Pause' : '▶ Resume';
+  },
+
+  complete() {
+    this.end(true);
+    toast('🎉 Focus session complete!');
+    if (Support.notifications && Notification.permission === 'granted') {
+      try { new Notification('Focus session complete', { body: $('#focusTask').value || 'Nice work. Take a short break.' }); }
+      catch (e) {}
+    }
+  },
+
+  end(done) {
+    clearInterval(this.interval);
+    this.running = false;
+    $('#focusOverlay').classList.remove('open');
+    $('#focusPause').textContent = '⏸ Pause';
+    $('#focusStateLine').textContent = done ? 'Last session completed. 🎉' : 'No session running.';
+    if (this.wakeLock) { this.wakeLock.release().catch(() => {}); this.wakeLock = null; }
+  },
+};
+
+/* ============================================================
+   VOICE CONTROLLER — dictate into the scratchpad
+   ============================================================ */
+const VoiceController = {
+  rec: null, listening: false,
+  init() {
+    const btn = $('#scVoice');
+    if (!Support.speechRec) {
+      btn.disabled = true;
+      btn.title = 'Voice notes need the Web Speech API (Chrome/Edge).';
+      return;
+    }
+    btn.addEventListener('click', () => this.toggle());
+  },
+  toggle() {
+    if (this.listening) { this.stop(); return; }
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const rec = new SR();
+    this.rec = rec;
+    rec.continuous = true; rec.interimResults = false;
+    rec.lang = navigator.language || 'en-US';
+    rec.onresult = (e) => {
+      let final = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) if (e.results[i].isFinal) final += e.results[i][0].transcript + ' ';
+      if (final) {
+        const sc = $('#scratch');
+        sc.value = (sc.value ? sc.value + ' ' : '') + final.trim();
+        AppState.scratch = sc.value; AppState.save();
+        ScratchpadController.updateCounts();
+      }
+    };
+    rec.onerror = (e) => {
+      this.stop();
+      if (e.error === 'not-allowed') toast('Microphone permission denied.', true);
+      else if (e.error !== 'aborted' && e.error !== 'no-speech') toast('Speech recognition error: ' + e.error, true);
+    };
+    rec.onend = () => { this.listening = false; $('#scVoice').textContent = '🎙 Voice'; };
+    try {
+      rec.start();
+      this.listening = true;
+      $('#scVoice').textContent = '⏹ Stop';
+      toast('Listening… speak your note.');
+    } catch (e) { toast('Could not start voice input.', true); }
+  },
+  stop() {
+    if (this.rec) { try { this.rec.stop(); } catch (e) {} }
+    this.listening = false;
+    $('#scVoice').textContent = '🎙 Voice';
+  },
+};
+
+/* ============================================================
+   EXPORT CONTROLLER — backup / restore / notes export
+   ============================================================ */
+const ExportController = {
+  init() {
+    ['#tlExport', '#setExport'].forEach(s => $(s).addEventListener('click', () => this.exportAll()));
+    ['#tlImport', '#setImport'].forEach(s => $(s).addEventListener('click', () => $('#importInput').click()));
+    $('#importInput').addEventListener('change', (e) => {
+      if (e.target.files[0]) this.importAll(e.target.files[0]);
+      e.target.value = '';
+    });
+    $('#setNotesMd').addEventListener('click', () => {
+      if (!AppState.notes.length) { toast('No notes to export.', true); return; }
+      const md = AppState.notes.map(n => '# ' + n.title + '\n\n' + n.content).join('\n\n---\n\n');
+      download('notes.md', md, 'text/markdown');
+    });
+    $('#setReset').addEventListener('click', () => {
+      if (!confirm('Reset ALL local data (workspaces, todos, notes, settings)? This cannot be undone.')) return;
+      StorageController.reset();
+      location.reload();
+    });
+  },
+  exportAll() {
+    const data = {
+      app: 'startpage', version: 1, exportedAt: new Date().toISOString(),
+      workspaces: AppState.workspaces, todos: AppState.todos, notes: AppState.notes,
+      scratch: AppState.scratch, settings: AppState.settings, // API key is never included
+    };
+    download('startpage-backup.json', JSON.stringify(data, null, 2), 'application/json');
+    toast('Backup downloaded — API keys are never included.');
+  },
+  async importAll(file) {
+    let data;
+    try { data = JSON.parse(await file.text()); }
+    catch (e) { toast('Import failed: not valid JSON.', true); return; }
+    if (!data || data.app !== 'startpage') { toast('Import failed: not a Startpage backup.', true); return; }
+    if (Array.isArray(data.workspaces)) AppState.workspaces = data.workspaces;
+    if (Array.isArray(data.todos)) AppState.todos = data.todos;
+    if (Array.isArray(data.notes)) AppState.notes = data.notes;
+    if (typeof data.scratch === 'string') AppState.scratch = data.scratch;
+    if (data.settings) AppState.settings = { ...AppState.settings, ...data.settings, external: { ...AppState.settings.external, ...(data.settings.external || {}) } };
+    AppState.save();
+    WorkspaceController.render(); TodoController.render(); NoteController.render();
+    $('#scratch').value = AppState.scratch;
+    ScratchpadController.updateCounts();
+    UIController.applySettings();
+    toast('Data imported');
+  },
+};
+
+/* ============================================================
+   DIAGNOSTICS
+   ============================================================ */
+const DiagnosticsController = {
+  render() {
+    const swNote = location.protocol.startsWith('http')
+      ? (Support.swBlobWorks === false ? 'partial — blob-URL workers rejected by this browser (single-file app)' : null)
+      : 'unavailable on file:// — serve over http(s) for offline support';
+    const rows = [
+      ['LocalStorage', Support.localStorage], ['IndexedDB', Support.idb],
+      ['Clipboard read', Support.clipboardRead], ['Clipboard write', Support.clipboardWrite],
+      ['File API', Support.fileApi], ['File System Access API', Support.fsAccess],
+      ['Speech recognition', Support.speechRec], ['Speech synthesis', Support.speechSynth],
+      ['Notifications', Support.notifications], ['Wake Lock', Support.wakeLock],
+      ['Web Workers', Support.worker],
+      ['Service Worker', swNote ? 'partial' : Support.serviceWorker, swNote || ''],
+      ['WebGPU', Support.webgpu],
+      ['Chrome Prompt API', Support.promptReady, 'On-device model usable'],
+      ['Chrome Summarizer API', Support.summarizerApi],
+      ['Chrome Translator API', Support.translatorApi],
+      ['Chrome Language Detector', Support.langDetectApi],
+      ['External AI', AppState.settings.external.enabled ? 'enabled' : 'disabled', 'Opt-in only'],
+    ];
+    $('#diagTable').innerHTML = rows.map(([name, st, note]) => {
+      let badge;
+      if (st === 'enabled') badge = '<span class="badge danger">enabled</span>';
+      else if (st === 'disabled') badge = '<span class="badge ok">disabled</span>';
+      else if (st === 'partial') badge = '<span class="badge warn">partial</span>';
+      else badge = st ? '<span class="badge ok">supported</span>' : '<span class="badge warn">unsupported</span>';
+      return `<tr><td title="${escapeHtml(note || '')}">${escapeHtml(name)}</td><td>${badge}</td></tr>`;
+    }).join('');
+  },
+};
+
+/* ============================================================
+   UI CONTROLLER — theme, clock, modals, shortcuts, privacy
+   ============================================================ */
+const UIController = {
+  externalResolver: null,
+
+  init() {
+    /* theme (dark default) */
+    const stored = localStorage.getItem('sp-theme');
+    if (stored) document.documentElement.dataset.theme = stored;
+    $('#btnTheme').addEventListener('click', () => {
+      const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = next;
+      localStorage.setItem('sp-theme', next);
+    });
+
+    /* clock */
+    this.tickClock();
+    setInterval(() => this.tickClock(), 1000);
+
+    /* header buttons */
+    $('#btnDemo').addEventListener('click', () => Demo.load());
+    $('#btnDiag').addEventListener('click', () => { DiagnosticsController.render(); this.openModal('#diagModal'); });
+    $('#btnSettings').addEventListener('click', () => this.openSettings());
+    $('#privacyBadge').addEventListener('click', () => {
+      $('#privacyAiMode').textContent = Adapter.modeLabel(Adapter.mode());
+      this.openModal('#privacyModal');
+    });
+
+    /* modal close */
+    $$('.modal-backdrop').forEach(bd => {
+      bd.addEventListener('click', (e) => { if (e.target === bd) this.closeModals(); });
+      bd.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => this.closeModals()));
+    });
+    $('#extWarnOk').addEventListener('click', () => { this.closeModals(); if (this.externalResolver) this.externalResolver(true); });
+    $('#extWarnCancel').addEventListener('click', () => { this.closeModals(); if (this.externalResolver) this.externalResolver(false); });
+
+    /* settings wiring */
+    $('#setEngines').addEventListener('change', () => {
+      const engines = {};
+      $('#setEngines').value.split('\n').forEach(line => {
+        const m = line.match(/^\s*([\w-]+)\s*=\s*(https?:\/\/\S+)\s*$/);
+        if (m) engines[m[1].toLowerCase()] = m[2];
+      });
+      if (Object.keys(engines).length) {
+        AppState.settings.engines = engines;
+        AppState.save();
+        toast(Object.keys(engines).length + ' search engines saved');
+      } else toast('No valid engine lines found — use “prefix = url with %s”.', true);
+    });
+    $('#setDefaultEngine').addEventListener('change', (e) => {
+      const v = e.target.value.trim().toLowerCase();
+      if (AppState.settings.engines[v]) { AppState.settings.defaultEngine = v; AppState.save(); $('#engineHint').textContent = 'default: ' + v; }
+      else toast('Unknown prefix “' + v + '” — add it to the engine list first.', true);
+    });
+    $('#setFavicons').addEventListener('change', (e) => {
+      AppState.settings.favicons = e.target.checked;
+      AppState.save();
+      WorkspaceController.render();
+      if (e.target.checked) toast('Favicons on — the browser now loads each site’s /favicon.ico.');
+    });
+    $('#setExternal').addEventListener('change', (e) => {
+      AppState.settings.external.enabled = e.target.checked;
+      AppState.session.externalConfirmed = false;
+      AppState.save();
+      this.setPrivacyBadge();
+      this.updateAiModeNote();
+    });
+    $('#setEndpoint').addEventListener('change', (e) => { AppState.settings.external.endpoint = e.target.value.trim(); AppState.save(); });
+    $('#setModel').addEventListener('change', (e) => { AppState.settings.external.model = e.target.value.trim(); AppState.save(); });
+    $('#setApiKey').addEventListener('change', (e) => {
+      AppState.session.apiKey = e.target.value.trim();
+      if (AppState.settings.external.storeKey) localStorage.setItem('sp-api-key', AppState.session.apiKey);
+      this.setPrivacyBadge();
+    });
+    $('#setStoreKey').addEventListener('change', (e) => {
+      AppState.settings.external.storeKey = e.target.checked;
+      AppState.save();
+      if (e.target.checked) {
+        localStorage.setItem('sp-api-key', AppState.session.apiKey);
+        toast('⚠️ API key stored as plain text in this browser profile.', true);
+      } else {
+        localStorage.removeItem('sp-api-key');
+        toast('API key removed from storage (kept in memory for this tab).');
+      }
+    });
+
+    /* global keyboard shortcuts */
+    document.addEventListener('keydown', (e) => {
+      const typing = e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable);
+      const mod = e.metaKey || e.ctrlKey;
+      if (e.key === 'Escape') {
+        if ($('#focusOverlay').classList.contains('open')) FocusController.end(false);
+        else { this.closeModals(); CommandController.closeSuggest(); }
+        return;
+      }
+      if (e.key === '/' && !typing) { e.preventDefault(); $('#cmd').focus(); return; }
+      if (mod && e.key.toLowerCase() === 'k') { e.preventDefault(); $('#cmd').focus(); $('#cmd').select(); return; }
+      if (mod && e.shiftKey && e.key.toLowerCase() === 'f') { e.preventDefault(); FocusController.start(AppState.settings.focusMinutes); return; }
+      if (mod && e.shiftKey && e.key.toLowerCase() === 'n') {
+        e.preventDefault();
+        const sc = $('#scratch').value.trim();
+        if (sc) NoteController.create(null, sc);
+        else { $('#scratch').focus(); toast('Scratchpad focused — write, then Ctrl/Cmd+Shift+N again to save as note.'); }
+        return;
+      }
+      if (mod && e.shiftKey && e.key.toLowerCase() === 't') { e.preventDefault(); $('#todoInput').focus(); return; }
+      if (e.altKey && !typing && /^[1-6]$/.test(e.key)) { e.preventDefault(); WorkspaceController.openByIndex(parseInt(e.key, 10) - 1); }
+    });
+
+    this.applySettings();
+    this.setPrivacyBadge();
+    this.updateAiModeNote();
+  },
+
+  tickClock() {
+    const now = new Date();
+    $('#clock').textContent = now.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+    $('#dateline').textContent = now.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const h = now.getHours();
+    const g = h < 5 ? 'Late night session?' : h < 12 ? 'Good morning.' : h < 18 ? 'Good afternoon.' : 'Good evening.';
+    $('#greeting').textContent = g + ' What should we get done?';
+  },
+
+  openModal(sel) { this.closeModals(); $(sel).classList.add('open'); },
+  closeModals() { $$('.modal-backdrop').forEach(m => m.classList.remove('open')); },
+  openSettings() {
+    this.applySettings();
+    this.openModal('#settingsModal');
+  },
+
+  applySettings() {
+    $('#setEngines').value = Object.entries(AppState.settings.engines).map(([k, v]) => k + ' = ' + v).join('\n');
+    $('#setDefaultEngine').value = AppState.settings.defaultEngine;
+    $('#setFavicons').checked = AppState.settings.favicons;
+    $('#setExternal').checked = AppState.settings.external.enabled;
+    $('#setEndpoint').value = AppState.settings.external.endpoint;
+    $('#setModel').value = AppState.settings.external.model;
+    $('#setStoreKey').checked = AppState.settings.external.storeKey;
+    $('#setApiKey').value = AppState.session.apiKey;
+    $('#engineHint').textContent = 'default: ' + AppState.settings.defaultEngine;
+  },
+
+  confirmExternal() {
+    if (AppState.session.externalConfirmed) return Promise.resolve(true);
+    $('#extWarnEndpoint').textContent = AppState.settings.external.endpoint || 'https://api.openai.com/v1/chat/completions';
+    this.openModal('#extWarnModal');
+    return new Promise((resolve) => {
+      this.externalResolver = (ok) => {
+        if (ok) AppState.session.externalConfirmed = true;
+        this.externalResolver = null;
+        resolve(ok);
+      };
+    });
+  },
+
+  setPrivacyBadge(override) {
+    const b = $('#privacyBadge');
+    if (override === 'clipboard') { b.textContent = 'Clipboard permission needed'; b.className = 'badge warn'; return; }
+    if (override === 'file') { b.textContent = 'File access active'; b.className = 'badge info'; return; }
+    if (AppState.settings.external.enabled && AppState.session.apiKey) { b.textContent = 'External AI enabled'; b.className = 'badge danger'; }
+    else if (AppState.settings.external.enabled) { b.textContent = 'External AI enabled (no key)'; b.className = 'badge warn'; }
+    else if (Support.promptReady) { b.textContent = 'Browser AI available'; b.className = 'badge info'; }
+    else { b.textContent = 'Local only'; b.className = 'badge ok'; }
+  },
+
+  updateAiModeNote() {
+    const m = Adapter.mode();
+    $('#aiModeNote').textContent = m === 'heuristic' ? 'Local heuristic mode' : Adapter.modeLabel(m);
+    $('#aiModeNote').title = m === 'heuristic' ? 'Using local heuristic mode. Browser AI not available. Results are deterministic text processing, not a real AI model.' : '';
+  },
+};
+
+/* ============================================================
+   DEMO SETUP
+   ============================================================ */
+const Demo = {
+  load() {
+    AppState.workspaces = defaultWorkspaces();
+    AppState.todos = [
+      { id: uid(), text: 'Send investor update', done: false, createdAt: Date.now(), due: 'today', source: 'demo', priority: true, archived: false },
+      { id: uid(), text: 'Review Q3 launch plan', done: false, createdAt: Date.now(), due: 'today', source: 'demo', priority: true, archived: false },
+      { id: uid(), text: 'Call Max about the demo', done: false, createdAt: Date.now(), due: 'tomorrow', source: 'demo', priority: true, archived: false },
+      { id: uid(), text: 'Fix onboarding email typo', done: false, createdAt: Date.now(), due: 'soon', source: 'demo', priority: false, archived: false },
+      { id: uid(), text: 'Book flights for the conference', done: true, createdAt: Date.now(), due: null, source: 'demo', priority: false, archived: false },
+    ];
+    AppState.notes = [
+      { id: uid(), title: 'Pilot plant meeting notes', content: '# Pilot plant meeting\n\n- Timeline confirmed for **October**\n- Need to follow up with the engineering firm about permits\n- Budget review scheduled for Friday\n- Decision: we proceed with site B', tags: [], createdAt: Date.now() - 86400000, updatedAt: Date.now() - 86400000 },
+      { id: uid(), title: 'Ideas for the newsletter', content: 'Topics:\n- local-first software\n- browser AI APIs\n- why we moved off spreadsheets', tags: [], createdAt: Date.now() - 172800000, updatedAt: Date.now() - 172800000 },
+    ];
+    AppState.scratch = 'Call with Max went well. We should send the follow-up deck by Friday. ' +
+      'He mentioned the deadline for the grant application is July 20 — need to prepare the budget table. ' +
+      'TODO: review the draft with Anna. There is a risk the lab results are delayed.';
+    AppState.save();
+    WorkspaceController.render();
+    TodoController.render();
+    NoteController.render();
+    $('#scratch').value = AppState.scratch;
+    ScratchpadController.updateCounts();
+    toast('Demo setup loaded — try “Summarize” on the scratchpad, or type “open gmail”.');
+    runTextAction('summarize', AppState.scratch, 'scratchpad');
+  },
+};
+
+/* ============================================================
+   OFFLINE — best-effort service worker via Blob URL.
+   Chrome rejects blob: SW URLs; we try, and report honestly
+   in diagnostics instead of faking offline support.
+   ============================================================ */
+async function tryRegisterServiceWorker() {
+  if (!Support.serviceWorker || !location.protocol.startsWith('http')) { Support.swBlobWorks = false; return; }
+  const SW_SRC = `
+    const CACHE='startpage-v1';
+    self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./'])).then(()=>self.skipWaiting()))});
+    self.addEventListener('fetch',e=>{
+      if(e.request.method!=='GET')return;
+      e.respondWith(fetch(e.request).then(r=>{const c=r.clone();caches.open(CACHE).then(x=>x.put(e.request,c));return r;})
+        .catch(()=>caches.match(e.request)));
+    });`;
+  try {
+    const url = URL.createObjectURL(new Blob([SW_SRC], { type: 'text/javascript' }));
+    await navigator.serviceWorker.register(url);
+    Support.swBlobWorks = true;
+  } catch (e) {
+    Support.swBlobWorks = false; // expected in Chrome — single-file constraint
+  }
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+const App = {
+  init() {
+    AppState.load();
+    UIController.init();
+    CommandController.init();
+    WorkspaceController.init();
+    TodoController.init();
+    NoteController.init();
+    ScratchpadController.init();
+    ClipboardController.init();
+    FileController.init();
+    FocusController.init();
+    VoiceController.init();
+    ExportController.init();
+    ResultCard.init();
+
+    if (!Support.localStorage) {
+      toast('Local storage is unavailable — nothing will persist between visits.', true);
+    }
+
+    Support.probe().then(() => {
+      UIController.setPrivacyBadge();
+      UIController.updateAiModeNote();
+    });
+    tryRegisterServiceWorker();
+  },
+};
+document.addEventListener('DOMContentLoaded', () => App.init());
+</script>
+</body>
+</html>

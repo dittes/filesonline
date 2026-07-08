@@ -24,6 +24,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["serve", "-l", "3740", "browser-copilot"],
       "port": 3740
+    },
+    {
+      "name": "startpage",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "-l", "3741", "startpage"],
+      "port": 3741
     }
   ]
 }
