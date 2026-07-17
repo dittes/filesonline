@@ -1,7 +1,7 @@
 // Files Online — Service Worker
 // Cache-first for app shell, network-first for CDN resources.
 
-const CACHE_VERSION = 'v4';
+const CACHE_VERSION = 'v5';
 const SHELL_CACHE = `files-online-shell-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `files-online-runtime-${CACHE_VERSION}`;
 
@@ -32,6 +32,18 @@ const SHELL_FILES = [
   '/open-md-file/index.html',
   '/assets/css/md-viewer.css',
   '/assets/js/md-viewer.js',
+  '/open-mbox-file/',
+  '/open-mbox-file/index.html',
+  '/assets/css/mbox-viewer.css',
+  '/assets/js/mbox/app.js',
+  '/assets/js/mbox/mbox-parser.js',
+  '/assets/js/mbox/mime-parser.js',
+  '/assets/js/mbox/worker.js',
+  '/assets/js/mbox/search.js',
+  '/assets/js/mbox/threads.js',
+  '/assets/js/mbox/storage.js',
+  '/assets/js/mbox/export.js',
+  '/assets/js/mbox/demo.js',
   '/manifest.webmanifest',
   '/assets/icons/icon.svg',
 ];

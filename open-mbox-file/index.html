@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1B4FD8">
+  <title>Open MBOX File Online – Free MBOX Viewer, Email Archive Search &amp; Export</title>
+  <meta name="description" content="Open, view, search, edit, and export .mbox email archives online. Free MBOX viewer that runs 100% in your browser — your emails are never uploaded. Export to EML, MBOX, CSV, JSON, or ZIP.">
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://files-online.com/open-mbox-file/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://files-online.com/open-mbox-file/">
+  <meta property="og:title" content="Open MBOX File Online – Free MBOX Viewer, Email Archive Search &amp; Export">
+  <meta property="og:description" content="Open, view, search, edit, and export .mbox email archives online. 100% private — your emails stay in your browser.">
+  <meta property="og:site_name" content="Files Online">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Open MBOX File Online – Free MBOX Viewer">
+  <meta name="twitter:description" content="Open, view, search, edit, and export .mbox email archives online. 100% private — your emails stay in your browser.">
+
+  <!-- Theme boot: apply light/dark before first paint to avoid a flash -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('fo-theme');
+        if (t !== 'light' && t !== 'dark') {
+          t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) { /* default to light */ }
+    })();
+  </script>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="/assets/css/styles.css?v=8">
+  <link rel="stylesheet" href="/assets/css/mbox-viewer.css?v=2">
+
+  <!-- Structured Data: WebApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "MBOX Viewer Online",
+    "url": "https://files-online.com/open-mbox-file/",
+    "description": "Open, view, search, edit, and export .mbox email archives online. Free MBOX viewer that runs entirely in your browser — emails are never uploaded.",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Web Browser",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "featureList": [
+      "Open .mbox email archives in the browser (Unix mbox, mboxo, mboxrd)",
+      "Desktop-style three-pane email client layout",
+      "Fast local search with from:, to:, subject:, after:, before:, has:attachment filters",
+      "Conversation thread view",
+      "Sanitized, sandboxed HTML email rendering with remote content blocked",
+      "Attachment preview and download, including ZIP export",
+      "Local editing of messages with undo and revert",
+      "Export to EML, MBOX, CSV, JSON, HTML, and ZIP",
+      "Optional local persistence via IndexedDB — no server, no upload"
+    ],
+    "browserRequirements": "Requires a modern web browser with JavaScript enabled"
+  }
+  </script>
+
+  <!-- Structured Data: FAQPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      { "@type": "Question", "name": "How do I open an MBOX file?", "acceptedAnswer": { "@type": "Answer", "text": "Click \"Choose MBOX File\" or drag your .mbox file onto this page. The archive is parsed locally in your browser and displayed like a desktop email client — no signup, no install, no upload." } },
+      { "@type": "Question", "name": "What is an MBOX file?", "acceptedAnswer": { "@type": "Answer", "text": "MBOX is a standard mailbox format that stores many email messages in one plain-text file. Gmail (Google Takeout), Thunderbird, Apple Mail, and most mail servers export email archives as .mbox files." } },
+      { "@type": "Question", "name": "Can I open a Google Takeout MBOX file?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Gmail exports from Google Takeout are standard MBOX files. Drop the .mbox file on this page to browse, search, and export your Gmail archive — including Gmail labels." } },
+      { "@type": "Question", "name": "Is this MBOX viewer private?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Your email archive stays in your browser and is not uploaded. Parsing, search, and export all happen locally on your device; there is no server that could receive your emails." } },
+      { "@type": "Question", "name": "Can I search inside an MBOX file?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Search across subjects, senders, recipients, bodies, headers, and attachment names, with Gmail-style filters like from:, subject:, after:, before:, has:attachment, is:unread, and exact phrases in quotes." } },
+      { "@type": "Question", "name": "Can I convert MBOX to EML or PDF?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Export individual messages as .eml, plain text, HTML, JSON, or PDF (via the browser print dialog), and export selections or the whole archive as a new .mbox, a ZIP of .eml files, CSV, or JSON." } },
+      { "@type": "Question", "name": "Can I view attachments in an MBOX file?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Attachments are listed with filename, type, and size. Preview images, PDFs, audio, video, and text directly, download individual files, or download all attachments as a ZIP." } },
+      { "@type": "Question", "name": "Can I edit emails in an MBOX file?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, locally. You can edit subject, sender, recipients, date, and body in a working copy. The original file is never modified, and edited messages lose DKIM/S-MIME/PGP signature validity when exported." } },
+      { "@type": "Question", "name": "How large can the MBOX file be?", "acceptedAnswer": { "@type": "Answer", "text": "Parsing runs in a background worker with chunked reading and a virtualized message list, so archives with tens of thousands of messages stay responsive. Very large archives are limited mainly by your device's memory." } },
+      { "@type": "Question", "name": "Does this work with Thunderbird and Apple Mail exports?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Standard Unix mbox plus the common mboxo and mboxrd variants are supported, including files without an .mbox extension." } }
+    ]
+  }
+  </script>
+</head>
+<body class="mbx-page">
+
+  <noscript>
+    <div style="padding:2rem;text-align:center;font-family:system-ui,sans-serif;">
+      <strong>MBOX Viewer Online requires JavaScript.</strong> Please enable JavaScript in your browser to use this tool.
+    </div>
+  </noscript>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/" class="logo">Files Online</a>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="#open">Open MBOX</a>
+        <a href="#search-help">Search</a>
+        <a href="#exports">Export</a>
+        <a href="#privacy">Privacy</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="header-actions">
+        <button class="btn btn-ghost btn-icon theme-toggle" data-action="toggle-theme" aria-label="Toggle dark mode" title="Toggle dark mode">
+          <svg class="icon-moon" viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><path d="M13.5 9.5A5.5 5.5 0 016.5 2.5a5.5 5.5 0 107 7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          <svg class="icon-sun" viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M12.6 3.4l-1.4 1.4M4.8 11.2l-1.4 1.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <button class="btn btn-primary btn-sm" id="mbx-open-btn">Open MBOX</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero: empty state before import -->
+  <section class="hero mbx-hero" id="open">
+    <div class="hero-inner" id="mbx-hero">
+      <div class="hero-badges">
+        <span class="badge badge-neutral">100% Private</span>
+        <span class="badge badge-neutral">No Upload</span>
+        <span class="badge badge-neutral">No Signup</span>
+      </div>
+      <h1 class="hero-title">Open MBOX File Online</h1>
+      <p class="hero-subtitle">Free MBOX viewer for email archives from Gmail (Google Takeout), Thunderbird, and Apple Mail. Open, search, read, edit, and export .mbox files — <strong>your email archive stays in your browser and is not uploaded.</strong></p>
+
+      <div class="mbx-dropzone" id="mbx-dropzone" tabindex="0" role="button" aria-label="Drop your MBOX file here or press Enter to choose a file">
+        <svg viewBox="0 0 48 48" fill="none" width="40" height="40" aria-hidden="true">
+          <path d="M6 12h36v26H6z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M6 14l18 13 18-13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <p class="mbx-dropzone-title">Drop your .mbox file here</p>
+        <div class="mbx-dropzone-actions">
+          <button class="btn btn-primary" id="mbx-choose-btn">Choose MBOX File</button>
+          <button class="btn btn-secondary" id="mbx-demo-btn-2">Load demo archive</button>
+        </div>
+        <p class="mbx-dropzone-note">Supported: <code>.mbox</code>, <code>.mbx</code>, files without extension — Unix mbox, mboxo, mboxrd. Multiple files allowed. Processed locally, never uploaded.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ The app ═══════════════ -->
+  <section class="mbx-app" id="mbx-app" hidden aria-label="MBOX viewer application">
+
+    <!-- Toolbar -->
+    <div class="mbx-toolbar" role="toolbar" aria-label="Archive tools">
+      <div class="mbx-toolbar-group">
+        <button class="btn btn-sm btn-ghost" id="mbx-sidebar-toggle" title="Toggle sidebar" aria-label="Toggle sidebar">☰</button>
+        <button class="btn btn-sm btn-ghost" id="mbx-add-btn" title="Add another archive (Ctrl+O)">+ Add archive</button>
+        <button class="btn btn-sm btn-ghost" id="mbx-demo-btn" title="Load the generated demo archive">Demo</button>
+        <div class="mbx-toolbar-group" style="position:relative;">
+          <button class="btn btn-sm btn-secondary" id="mbx-export-btn" aria-haspopup="true">Export ▾</button>
+          <div class="mbx-menu" id="mbx-export-menu" hidden role="menu">
+            <div class="mbx-menu-label">Current message</div>
+            <button data-export="eml">Save as .eml</button>
+            <button data-export="txt">Save as plain text</button>
+            <button data-export="html-one">Save as sanitized HTML</button>
+            <button data-export="raw">Save raw source</button>
+            <button data-export="json-one">Save as JSON</button>
+            <button data-export="pdf">Print / PDF…</button>
+            <hr>
+            <div class="mbx-menu-label">Selection</div>
+            <button data-export="mbox-sel">New .mbox file</button>
+            <button data-export="zip-sel">ZIP of .eml files</button>
+            <button data-export="csv-sel">CSV metadata</button>
+            <button data-export="json-sel">JSON</button>
+            <button data-export="html-sel">HTML archive</button>
+            <button data-export="att-sel">Attachments as ZIP</button>
+            <hr>
+            <div class="mbx-menu-label">Full archive</div>
+            <button data-export="mbox-all">Full .mbox (incl. edits)</button>
+            <button data-export="zip-all">ZIP of all .eml files</button>
+            <button data-export="csv-all">CSV index</button>
+            <button data-export="json-all">JSON archive</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mbx-search-wrap">
+        <svg class="mbx-search-icon" viewBox="0 0 16 16" fill="none" width="14" height="14" aria-hidden="true"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <input type="search" class="mbx-search" id="mbx-search" placeholder='Search — try from:alice subject:"project update" has:attachment' aria-label="Search messages">
+      </div>
+
+      <div class="mbx-toolbar-group">
+        <button class="btn btn-sm btn-ghost" id="mbx-prev" title="Previous message (k)" aria-label="Previous message">↑</button>
+        <button class="btn btn-sm btn-ghost" id="mbx-next" title="Next message (j)" aria-label="Next message">↓</button>
+        <button class="btn btn-sm btn-ghost" id="mbx-settings-btn" title="Settings and local storage" aria-label="Settings">⚙</button>
+      </div>
+
+      <div class="mbx-toolbar-spacer"></div>
+
+      <div class="mbx-archive-info" aria-live="polite">
+        <span class="mbx-archive-name" id="mbx-archive-name"></span>
+        <span class="mbx-archive-stats" id="mbx-archive-stats"></span>
+      </div>
+      <span class="mbx-parse-status" id="mbx-parse-status" hidden></span>
+    </div>
+
+    <!-- Active search filter chips -->
+    <div class="mbx-chips" id="mbx-search-chips" hidden aria-label="Active search filters"></div>
+
+    <!-- Three-pane layout -->
+    <div class="mbx-layout">
+
+      <!-- Sidebar -->
+      <aside class="mbx-sidebar" id="mbx-sidebar" aria-label="Folders and filters">
+        <div class="mbx-nav-group">
+          <div class="mbx-nav-group-title">Filters</div>
+          <div id="mbx-sidebar-filters"></div>
+        </div>
+        <div class="mbx-nav-group">
+          <div class="mbx-nav-group-title">Dates</div>
+          <div id="mbx-sidebar-dates"></div>
+        </div>
+        <div class="mbx-nav-group">
+          <div class="mbx-nav-group-title">Top senders</div>
+          <div id="mbx-sidebar-senders"></div>
+        </div>
+        <div class="mbx-nav-group" hidden>
+          <div class="mbx-nav-group-title">Labels</div>
+          <div id="mbx-sidebar-labels"></div>
+        </div>
+        <div class="mbx-nav-group" hidden>
+          <div class="mbx-nav-group-title">Saved archives</div>
+          <div id="mbx-sidebar-archives"></div>
+        </div>
+      </aside>
+
+      <!-- Message list -->
+      <div class="mbx-listpane">
+        <div class="mbx-list-header">
+          <span class="mbx-list-count" id="mbx-list-count" aria-live="polite">0 messages</span>
+          <label>Sort
+            <select id="mbx-sort" aria-label="Sort messages">
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="sender">Sender</option>
+              <option value="subject">Subject</option>
+              <option value="attachments">Attachments</option>
+            </select>
+          </label>
+          <button class="btn btn-sm btn-ghost" id="mbx-threadview-btn" title="Toggle conversation thread view">Threads</button>
+          <button class="btn btn-sm btn-ghost" id="mbx-density-btn" title="Density: comfortable">☰≡</button>
+          <button class="btn btn-sm btn-ghost" id="mbx-select-all" title="Select all filtered messages">Select all</button>
+        </div>
+        <div class="mbx-list" id="mbx-list" role="listbox" aria-label="Message list" tabindex="0">
+          <div class="mbx-list-inner" id="mbx-list-inner"></div>
+        </div>
+        <div class="mbx-list-empty" id="mbx-list-empty" hidden>
+          <p><strong>No messages match.</strong></p>
+          <p>Try removing a search filter or choosing “All messages” in the sidebar.</p>
+        </div>
+        <!-- Parsing state -->
+        <div class="mbx-progress" id="mbx-progress" hidden role="status">
+          <div class="mbx-progress-track"><div class="mbx-progress-bar" id="mbx-progress-bar"></div></div>
+          <span class="mbx-progress-label" id="mbx-progress-label">Reading file…</span>
+          <button class="btn btn-sm btn-secondary" id="mbx-progress-cancel">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Message viewer -->
+      <div class="mbx-viewer" id="mbx-viewer">
+        <div class="mbx-viewer-empty" id="mbx-viewer-empty">
+          <div>
+            <p><strong>Select a message to read it.</strong></p>
+            <p>Keyboard: <kbd>j</kbd>/<kbd>k</kbd> next/previous · <kbd>s</kbd> star · <kbd>u</kbd> unread · <kbd>/</kbd> search · <kbd>e</kbd> edit</p>
+          </div>
+        </div>
+
+        <div class="mbx-viewer-content" id="mbx-viewer-content" hidden>
+          <div class="mbx-viewer-head">
+            <h2 class="mbx-viewer-subject" id="mbx-viewer-subject"></h2>
+            <div class="mbx-viewer-badges" id="mbx-viewer-badges"></div>
+            <div class="mbx-viewer-meta" id="mbx-viewer-meta"></div>
+          </div>
+
+          <div class="mbx-thread-info" id="mbx-thread-info" hidden></div>
+
+          <div class="mbx-viewer-actions" role="toolbar" aria-label="Message actions">
+            <button class="btn btn-sm btn-ghost" id="mbx-act-star" title="Star (s)">☆ Star</button>
+            <button class="btn btn-sm btn-ghost" id="mbx-act-read" title="Toggle read (u)">Mark unread</button>
+            <button class="btn btn-sm btn-ghost" id="mbx-act-label" title="Add a local label">Label</button>
+            <button class="btn btn-sm btn-ghost" id="mbx-act-edit" title="Edit message locally (e)">Edit</button>
+            <button class="btn btn-sm btn-ghost" id="mbx-act-copy" title="Copy raw source">Copy source</button>
+            <button class="btn btn-sm btn-ghost" id="mbx-act-print" title="Print message">Print</button>
+            <button class="btn btn-sm btn-ghost" id="mbx-act-window" title="Open in a separate reading window">Open in window</button>
+          </div>
+
+          <div class="mbx-tabs" id="mbx-tabs" role="tablist" aria-label="Message view">
+            <button data-tab="rendered" class="active" role="tab">Rendered</button>
+            <button data-tab="text" role="tab">Plain text</button>
+            <button data-tab="headers" role="tab">Headers</button>
+            <button data-tab="raw" role="tab">Raw source</button>
+            <button data-tab="edit" role="tab">Edit</button>
+          </div>
+
+          <div class="mbx-body">
+            <div id="mbx-body-rendered" style="display:flex;flex-direction:column;flex:1;min-height:0;">
+              <div class="mbx-remote-banner" id="mbx-remote-banner" hidden>
+                <span>🛡 Remote images and styles were blocked to protect your privacy.</span>
+                <button class="btn btn-sm btn-secondary" id="mbx-load-remote-btn">Load remote content</button>
+                <span>Loading remote content contacts third-party servers.</span>
+              </div>
+              <iframe class="mbx-body-frame" id="mbx-body-frame" sandbox="" title="Email content (sandboxed)"></iframe>
+            </div>
+            <div class="mbx-body-text" id="mbx-body-text" hidden></div>
+            <div class="mbx-body-headers" id="mbx-body-headers" hidden></div>
+            <pre class="mbx-body-raw" id="mbx-body-raw" hidden></pre>
+
+            <!-- Editor -->
+            <div class="mbx-body-edit" id="mbx-body-edit" hidden>
+              <div class="mbx-edit-warning">
+                ⚠ Edits are stored as a local working copy — your original .mbox file is never modified.
+                Any modification invalidates cryptographic signatures (DKIM, S/MIME, PGP) and exact message fidelity in exports.
+              </div>
+              <div class="mbx-edit-grid">
+                <label for="mbx-edit-subject">Subject</label><input id="mbx-edit-subject" type="text">
+                <label for="mbx-edit-from">From</label><input id="mbx-edit-from" type="text" placeholder="Name <address@example.com>">
+                <label for="mbx-edit-to">To</label><input id="mbx-edit-to" type="text">
+                <label for="mbx-edit-cc">Cc</label><input id="mbx-edit-cc" type="text">
+                <label for="mbx-edit-date">Date</label><input id="mbx-edit-date" type="datetime-local">
+                <label for="mbx-edit-labels">Labels</label><input id="mbx-edit-labels" type="text" placeholder="comma, separated">
+              </div>
+              <div class="mbx-edit-bodylabel"><span>Plain-text body</span></div>
+              <textarea id="mbx-edit-text" aria-label="Plain-text body" spellcheck="false"></textarea>
+              <div class="mbx-edit-bodylabel">
+                <span>HTML body</span>
+                <button class="btn btn-sm btn-ghost" id="mbx-edit-htmlmode">Rich-text mode</button>
+              </div>
+              <textarea id="mbx-edit-html" aria-label="HTML body source" spellcheck="false"></textarea>
+              <div class="mbx-edit-rich" id="mbx-edit-rich" aria-label="Rich-text HTML editor"></div>
+              <div class="mbx-edit-actions">
+                <button class="btn btn-sm btn-primary" id="mbx-edit-save" title="Save edits locally (Ctrl+S)">Save edits</button>
+                <button class="btn btn-sm btn-ghost" id="mbx-edit-preview" title="Preview in the Rendered tab">Sanitized preview</button>
+                <button class="btn btn-sm btn-ghost" id="mbx-edit-undo" title="Undo (Ctrl+Z)">Undo</button>
+                <button class="btn btn-sm btn-ghost" id="mbx-edit-redo" title="Redo (Ctrl+Shift+Z)">Redo</button>
+                <button class="btn btn-sm btn-danger" id="mbx-edit-revert">Revert to original</button>
+                <span class="mbx-edit-dirty" id="mbx-edit-dirty" hidden>● Unsaved changes</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mbx-attachments" id="mbx-attachments" hidden>
+            <div class="mbx-attachments-title">Attachments</div>
+            <div id="mbx-attachments-list"></div>
+          </div>
+
+          <div class="mbx-note-wrap">
+            <textarea id="mbx-note" placeholder="Local note for this message (stays on your device)…" aria-label="Local note"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Hidden file input -->
+  <input type="file" id="mbx-file-input" multiple hidden aria-hidden="true">
+
+  <!-- Drag-and-drop overlay -->
+  <div class="mbx-drop-overlay" id="mbx-drop-overlay" hidden aria-hidden="true">
+    <div class="mbx-drop-overlay-box">Drop .mbox files to open them</div>
+  </div>
+
+  <!-- Context menu -->
+  <div class="mbx-context-menu" id="mbx-context-menu" hidden role="menu">
+    <button data-ctx="open">Open</button>
+    <button data-ctx="star">Star</button>
+    <button data-ctx="unstar">Remove star</button>
+    <button data-ctx="read">Mark read</button>
+    <button data-ctx="unread">Mark unread</button>
+    <button data-ctx="label">Add label…</button>
+    <button data-ctx="eml">Export as .eml</button>
+    <button data-ctx="mbox">Export selection as .mbox</button>
+  </div>
+
+  <!-- Import report modal -->
+  <div class="modal-overlay" id="mbx-report-modal" hidden role="dialog" aria-modal="true" aria-labelledby="mbx-report-title">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="mbx-report-title">Import report</h3>
+        <button class="btn btn-ghost btn-icon modal-close" aria-label="Close dialog">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="mbx-report-body"></div>
+      <div class="modal-footer">
+        <button class="btn btn-primary modal-close">Start reading</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings / storage modal -->
+  <div class="modal-overlay" id="mbx-settings-modal" hidden role="dialog" aria-modal="true" aria-labelledby="mbx-settings-title">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="mbx-settings-title">Settings &amp; local storage</h3>
+        <button class="btn btn-ghost btn-icon modal-close" aria-label="Close dialog">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="mbx-settings-body"></div>
+      <div class="modal-footer">
+        <span class="tool-hint" style="margin-right:auto;">Browser storage is specific to this device and browser.</span>
+        <button class="btn btn-secondary modal-close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SEO content sections ═══════════════ -->
+
+  <section class="how-it-works-section" id="how-to-open">
+    <div class="section-inner">
+      <h2 class="section-title">How to Open an MBOX File</h2>
+      <p class="section-subtitle">Four steps, entirely in your browser.</p>
+      <div class="steps-list">
+        <div class="step">
+          <div class="step-number" aria-hidden="true">1</div>
+          <div class="step-content">
+            <h3 class="step-title">Export your mailbox as .mbox</h3>
+            <p class="step-desc">Gmail: Google Takeout → Mail. Thunderbird: ImportExportTools NG. Apple Mail: Mailbox → Export Mailbox. Most mail servers can also produce mbox archives.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number" aria-hidden="true">2</div>
+          <div class="step-content">
+            <h3 class="step-title">Drop the file on this page</h3>
+            <p class="step-desc">Or click “Choose MBOX File”. Files without an extension and multiple archives at once work too. Parsing runs in a background worker with live progress.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number" aria-hidden="true">3</div>
+          <div class="step-content">
+            <h3 class="step-title">Browse, search, and read</h3>
+            <p class="step-desc">A three-pane layout like a desktop email client: folders and filters on the left, the message list in the middle, and a sandboxed reader on the right — with thread view, stars, labels, and notes.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number" aria-hidden="true">4</div>
+          <div class="step-content">
+            <h3 class="step-title">Export what you need</h3>
+            <p class="step-desc">Save single messages as <code>.eml</code>, print to PDF, or export selections and whole archives as <code>.mbox</code>, ZIP of .eml, CSV, JSON, or HTML.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="features-section" id="search-help">
+    <div class="section-inner">
+      <h2 class="section-title">Search Your Email Archive</h2>
+      <p class="section-subtitle">Fast local search with Gmail-style operators.</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <h3 class="feature-title">Filter operators</h3>
+          <p class="feature-desc"><code>from:</code> <code>to:</code> <code>cc:</code> <code>subject:</code> <code>label:</code> <code>after:2025-01-01</code> <code>before:</code> <code>has:attachment</code> <code>is:read</code> <code>is:unread</code> <code>is:starred</code></p>
+        </div>
+        <div class="feature-card">
+          <h3 class="feature-title">Phrases &amp; exclusions</h3>
+          <p class="feature-desc">Exact phrases in quotes — <code>subject:"project update"</code> — and negative terms with a minus: <code>invoice -label:archive</code>. Active filters appear as removable chips.</p>
+        </div>
+        <div class="feature-card">
+          <h3 class="feature-title">Everything searchable</h3>
+          <p class="feature-desc">Subjects, senders, recipients, full bodies, raw headers, attachment filenames, plus your own local labels and notes. Matches are highlighted in the list and message.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="features-section" id="exports">
+    <div class="section-inner">
+      <h2 class="section-title">Convert &amp; Export MBOX</h2>
+      <p class="section-subtitle">From one message to the whole archive.</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <h3 class="feature-title">MBOX to EML</h3>
+          <p class="feature-desc">Save any message as a standard <code>.eml</code> file, or export a selection or the entire archive as a ZIP of .eml files — unedited messages stay byte-for-byte identical.</p>
+        </div>
+        <div class="feature-card">
+          <h3 class="feature-title">MBOX to CSV / JSON</h3>
+          <p class="feature-desc">Build a spreadsheet-ready CSV index (date, from, to, subject, Message-ID, attachments, labels) or a structured JSON export for further processing.</p>
+        </div>
+        <div class="feature-card">
+          <h3 class="feature-title">New .mbox &amp; PDF</h3>
+          <p class="feature-desc">Re-export filtered selections as a clean new .mbox with correct From-line escaping, or print any message to PDF via the browser dialog.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="privacy-section" id="privacy">
+    <div class="section-inner">
+      <div class="privacy-box">
+        <div class="privacy-box-icon" aria-hidden="true">
+          <svg viewBox="0 0 20 20" fill="none" width="24" height="24">
+            <path d="M10 2l7 3v5c0 4-3 7-7 8-4-1-7-4-7-8V5l7-3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M7 10l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="privacy-box-text">
+          <h2 class="privacy-box-title">Your email archive stays in your browser and is not uploaded.</h2>
+          <p>Parsing, search, editing, and export all run locally on your device — there is no server that could receive your emails. HTML messages are sanitized and rendered in a sandboxed frame with scripts and forms blocked, and remote images and tracking pixels are blocked by default. No analytics, no tracking. Optional saving uses your browser’s own storage (IndexedDB) on this device only, and only after you explicitly choose “Save locally”.</p>
+          <a href="/privacy.html" class="privacy-link">Read our privacy policy →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="faq-section" id="faq">
+    <div class="section-inner">
+      <h2 class="section-title">FAQ</h2>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary class="faq-question">How do I open an MBOX file?</summary>
+          <div class="faq-answer"><p>Click “Choose MBOX File” at the top of this page or drag your <code>.mbox</code> file onto the dropzone. The archive is parsed locally in your browser and shown like a desktop email client — no signup, no install, no upload.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-question">What is an MBOX file?</summary>
+          <div class="faq-answer"><p>MBOX is a standard mailbox format that stores many email messages in a single plain-text file, separated by lines beginning with <code>From </code>. Gmail (via Google Takeout), Thunderbird, Apple Mail, and most mail servers export archives in this format. The common <em>mboxo</em> and <em>mboxrd</em> variants are supported.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-question">Can I open a Google Takeout MBOX file?</summary>
+          <div class="faq-answer"><p>Yes. Gmail exports from Google Takeout are standard MBOX files, and Gmail labels (<code>X-Gmail-Labels</code>) show up in the sidebar so you can filter by them.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-question">Is this MBOX viewer private?</summary>
+          <div class="faq-answer"><p>Yes. Your email archive stays in your browser and is not uploaded. There is no backend, no analytics, and no tracking. Remote images in HTML emails are blocked by default so senders cannot see that you opened a message.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-question">Can I search inside an MBOX file?</summary>
+          <div class="faq-answer"><p>Yes. Search across subject, sender, recipients, body, headers, and attachment names with operators like <code>from:</code>, <code>subject:</code>, <code>after:</code>, <code>before:</code>, <code>has:attachment</code>, <code>is:unread</code>, exact phrases in quotes, and <code>-negated</code> terms.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-question">Can I view and download attachments?</summary>
+          <div class="faq-answer"><p>Yes. Attachments are listed with name, type, and size. Images, PDFs, text, audio, and video can be previewed; anything can be downloaded individually or as a ZIP. Potentially unsafe file types (HTML, SVG, executables, macro documents) trigger a warning and are never opened automatically.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-question">Can I edit emails in an MBOX file?</summary>
+          <div class="faq-answer"><p>Yes — locally and safely. Edits create a working copy with undo, redo, and revert; the original file is never touched. Note that any modification invalidates DKIM, S/MIME, and PGP signatures, so edited exports are clearly marked.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-question">Can I convert MBOX to EML, CSV, or PDF?</summary>
+          <div class="faq-answer"><p>Yes. Individual messages export as <code>.eml</code>, text, HTML, JSON, or PDF (via print). Selections and full archives export as a new <code>.mbox</code>, a ZIP of .eml files, CSV metadata, JSON, or a combined HTML archive.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-question">How large can my archive be?</summary>
+          <div class="faq-answer"><p>Parsing runs in a Web Worker with chunked reading, and the message list is virtualized, so archives with tens of thousands of messages stay responsive. The practical limit is your device’s memory — multi-gigabyte archives may be slow on low-end hardware.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-question">Does it work offline or from a local file?</summary>
+          <div class="faq-answer"><p>Once loaded, the app works offline. Opening <code>index.html</code> directly from <code>file://</code> is restricted by browsers (ES modules and workers are blocked); serve the folder over HTTP instead — see the README for a one-line command.</p></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-brand">Files Online</span>
+      <nav class="footer-nav" aria-label="Footer navigation">
+        <a href="/">File Manager</a>
+        <a href="/open-md-file/">MD Viewer</a>
+        <a href="/privacy.html">Privacy Policy</a>
+        <a href="/imprint.html">Imprint</a>
+      </nav>
+      <span class="footer-meta">Runs entirely in your browser. No server. No upload.</span>
+    </div>
+  </footer>
+
+  <!-- App entry point -->
+  <script type="module" src="/assets/js/mbox/app.js?v=3"></script>
+
+  <!-- Service Worker registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+      });
+    }
+  </script>
+
+</body>
+</html>

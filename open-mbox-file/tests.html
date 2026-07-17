@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MBOX Viewer — Test Runner</title>
+  <meta name="robots" content="noindex">
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('fo-theme');
+        if (t !== 'light' && t !== 'dark') {
+          t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) { }
+    })();
+  </script>
+  <link rel="stylesheet" href="/assets/css/styles.css?v=8">
+</head>
+<body style="padding:2rem;max-width:820px;margin:0 auto;">
+  <h1 style="font-size:1.3rem;margin-bottom:.5rem;">MBOX Viewer — Test Runner</h1>
+  <p style="color:var(--text-2);font-size:13px;margin-bottom:1rem;">
+    Browser-based tests for the parsing, search, thread, and export modules.
+    <a href="/open-mbox-file/">← back to the viewer</a>
+  </p>
+  <p id="summary" style="margin-bottom:1rem;">Running…</p>
+  <div id="results" style="border:1px solid var(--border);border-radius:6px;background:var(--surface);"></div>
+  <script type="module" src="/assets/js/mbox/tests.js?v=1"></script>
+</body>
+</html>
