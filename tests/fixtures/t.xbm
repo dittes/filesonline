@@ -1,0 +1,3 @@
+#define logo_width 16
+#define logo_height 8
+static char logo_bits[] = {0};

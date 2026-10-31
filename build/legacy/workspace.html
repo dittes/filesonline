@@ -1,0 +1,148 @@
+  <!-- ═══════════════════════════════════════════════════════════
+       WORKSPACE
+  ════════════════════════════════════════════════════════════ -->
+  <div class="workspace" id="workspace" role="main" aria-label="File workspace" hidden>
+
+    <!-- Workspace Header -->
+    <header class="workspace-header">
+      <div class="workspace-header-left">
+        <button class="btn btn-ghost btn-icon" id="workspace-back" aria-label="Back to home" title="Back to home">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <span class="workspace-brand">Files Online</span>
+      </div>
+
+      <nav class="workspace-tabs" role="tablist" aria-label="Workspace modules">
+        <button class="tab active" data-module-tab="browser" role="tab" aria-selected="true" aria-controls="module-panel-browser">Browse</button>
+        <button class="tab" data-module-tab="archive" role="tab" aria-selected="false" aria-controls="module-panel-archive">Archive</button>
+        <button class="tab" data-module-tab="rename" role="tab" aria-selected="false" aria-controls="module-panel-rename">Rename</button>
+        <button class="tab" data-module-tab="metadata" role="tab" aria-selected="false" aria-controls="module-panel-metadata">Metadata</button>
+        <button class="tab" data-module-tab="inspect" role="tab" aria-selected="false" aria-controls="module-panel-inspect">Inspect</button>
+        <button class="tab" data-module-tab="tools" role="tab" aria-selected="false" aria-controls="module-panel-tools">Tools</button>
+        <button class="tab" data-module-tab="recipes" role="tab" aria-selected="false" aria-controls="module-panel-recipes">Recipes</button>
+      </nav>
+
+      <div class="workspace-header-right">
+        <button class="btn btn-ghost btn-sm" data-action="open-files">+ Files</button>
+        <button class="btn btn-ghost btn-sm" data-action="open-folder">+ Folder</button>
+        <button class="btn btn-ghost btn-icon theme-toggle" data-action="toggle-theme" aria-label="Toggle dark mode" title="Toggle dark mode">
+          <svg class="icon-moon" viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><path d="M13.5 9.5A5.5 5.5 0 016.5 2.5a5.5 5.5 0 107 7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          <svg class="icon-sun" viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M12.6 3.4l-1.4 1.4M4.8 11.2l-1.4 1.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <button class="btn btn-ghost btn-icon" id="workspace-help-btn" aria-label="Browser support info" title="Browser support info">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M6 6.5a2 2 0 113 1.73L8 9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11.5" r=".75" fill="currentColor"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Workspace Body: 3-pane layout -->
+    <div class="workspace-body">
+
+      <!-- Left pane: folder tree -->
+      <aside class="pane-left" id="pane-left" aria-label="Folder tree">
+        <button class="pane-toggle" id="pane-left-toggle" aria-label="Toggle folder panel" aria-expanded="true">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="tree" id="folder-tree" role="tree" aria-label="Folder tree">
+          <!-- rendered by folder-tree.js -->
+        </div>
+      </aside>
+
+      <!-- Center pane: file table + module panels -->
+      <main class="pane-center" id="pane-center">
+
+        <!-- Browse module -->
+        <div id="module-panel-browser" data-module-panel="browser" class="module-view active-module" role="tabpanel" aria-labelledby="tab-browser">
+          <div id="file-table-container">
+            <!-- rendered by app.js renderFileTable() -->
+          </div>
+        </div>
+
+        <!-- Archive module -->
+        <div id="module-panel-archive" data-module-panel="archive" class="module-view" hidden role="tabpanel" aria-labelledby="tab-archive">
+          <div id="archive-module-container" class="module-panel">
+            <!-- rendered by archives.js initArchiveModule() -->
+          </div>
+        </div>
+
+        <!-- Rename module -->
+        <div id="module-panel-rename" data-module-panel="rename" class="module-view" hidden role="tabpanel" aria-labelledby="tab-rename">
+          <div id="rename-module-container" class="module-panel">
+            <!-- rendered by rename.js initRenameModule() -->
+          </div>
+        </div>
+
+        <!-- Metadata module -->
+        <div id="module-panel-metadata" data-module-panel="metadata" class="module-view" hidden role="tabpanel" aria-labelledby="tab-metadata">
+          <div id="metadata-module-container" class="module-panel">
+            <!-- rendered by metadata.js initMetadataModule() -->
+          </div>
+        </div>
+
+        <!-- Inspect module -->
+        <div id="module-panel-inspect" data-module-panel="inspect" class="module-view" hidden role="tabpanel" aria-labelledby="tab-inspect">
+          <div id="inspect-module-container" class="module-panel">
+            <!-- rendered by inspect/module.js -->
+          </div>
+        </div>
+
+        <!-- Tools module -->
+        <div id="module-panel-tools" data-module-panel="tools" class="module-view" hidden role="tabpanel" aria-labelledby="tab-tools">
+          <div id="tools-module-container" class="module-panel">
+            <!-- rendered by tools.js initToolsModule() -->
+          </div>
+        </div>
+
+        <!-- Recipes module -->
+        <div id="module-panel-recipes" data-module-panel="recipes" class="module-view" hidden role="tabpanel" aria-labelledby="tab-recipes">
+          <div id="recipes-module-container" class="module-panel">
+            <!-- rendered by recipes.js initRecipesModule() -->
+          </div>
+        </div>
+
+      </main>
+
+      <!-- Right pane: preview panel -->
+      <aside class="pane-right" id="pane-right" aria-label="File preview">
+        <button class="pane-toggle pane-toggle-right" id="pane-right-toggle" aria-label="Toggle preview panel" aria-expanded="true">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div id="preview-panel-container">
+          <!-- rendered by preview.js initPreviewPanel() -->
+        </div>
+      </aside>
+
+    </div><!-- /workspace-body -->
+
+    <!-- Status bar -->
+    <footer class="status-bar" id="status-bar" role="status" aria-live="polite">
+      <span class="status-bar-item" id="file-count-status">No files loaded</span>
+      <span class="status-bar-item" id="browser-support-status"></span>
+      <span class="status-bar-item status-bar-right">
+        <span class="status-kbd-hint"><kbd>⌘K</kbd> commands</span>
+        <a href="#" id="browser-support-link" class="status-link">Browser support</a>
+      </span>
+    </footer>
+
+  </div><!-- /workspace -->
+
+
+  <!-- Browser Support Modal -->
+  <div class="modal-overlay" id="browser-support-modal" hidden role="dialog" aria-modal="true" aria-labelledby="browser-support-modal-title">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="browser-support-modal-title">Browser Support</h3>
+        <button class="btn btn-ghost btn-icon modal-close" aria-label="Close browser support dialog">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="browser-support-panel-content">
+          <!-- rendered by browser-support.js renderSupportPanel() -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary modal-close">Close</button>
+      </div>
+    </div>
+  </div>

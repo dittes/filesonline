@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="urn:example"><book id="b1" lang="en"><title>XML Basics</title><price>12.50</price></book><book id="b2"><title>Second Book</title><!-- comment --><price>8.00</price></book></catalog>

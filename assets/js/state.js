@@ -255,9 +255,11 @@ export function selectNone() {
 
 /**
  * Switch the active module.
- * @param {'browser'|'archive'|'rename'|'metadata'|'tools'|'recipes'} name
+ * @param {'browser'|'archive'|'rename'|'metadata'|'inspect'|'tools'|'recipes'} name
  */
 export function setActiveModule(name) {
+  // app.js re-enters here from its module:change listener; repeating would never end
+  if (state.activeModule === name) return;
   state.activeModule = name;
   emit('module:change', { activeModule: name });
 }
@@ -359,6 +361,7 @@ export function getFilteredFiles() {
  * Mark the workspace as open.
  */
 export function openWorkspace() {
+  if (state.workspaceOpen) return;
   state.workspaceOpen = true;
   emit('workspace:open', null);
 }
@@ -367,6 +370,7 @@ export function openWorkspace() {
  * Mark the workspace as closed.
  */
 export function closeWorkspace() {
+  if (!state.workspaceOpen) return;
   state.workspaceOpen = false;
   emit('workspace:close', null);
 }

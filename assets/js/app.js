@@ -709,6 +709,11 @@ function _showContextMenu(x, y, id, entry) {
       action: () => _copyText(entry.relativePath || entry.name, 'Path'),
     },
     {
+      label: 'Inspect File',
+      icon: `<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" width="14" height="14"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`,
+      action: () => { setSelectedIds([id]); setActiveModule('inspect'); },
+    },
+    {
       label: 'Get Metadata',
       icon: `<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" width="14" height="14"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 7v5M8 5v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
       action: () => { setSelectedIds([id]); setActiveModule('metadata'); },
@@ -1513,6 +1518,13 @@ async function init() {
     }
   }
 
+  // ── 13c. Inspect module (text, metadata, embedded files for any file) ──────
+  const inspectModule = await tryImport('./inspect/module.js');
+  const inspectPanel = document.querySelector('[data-module-panel="inspect"]');
+  if (inspectModule && inspectPanel) {
+    try { inspectModule.initInspectModule(inspectPanel); } catch (e) { console.warn('app: inspect init error', e); }
+  }
+
   // ── 14. Landing page buttons ──────────────────────────────────────────────
   _initLandingPage();
 
@@ -1591,6 +1603,7 @@ async function init() {
         { id: 'go-rename', label: 'Go to Rename', run: () => goModule('rename') },
         { id: 'go-metadata', label: 'Go to Metadata', run: () => goModule('metadata') },
         { id: 'go-tools', label: 'Go to Tools', run: () => goModule('tools') },
+        { id: 'go-inspect', label: 'Go to Inspect', run: () => goModule('inspect') },
         { id: 'go-recipes', label: 'Go to Recipes', run: () => goModule('recipes') },
         { id: 'toggle-theme', label: 'Toggle dark mode', run: () => { if (_themeModule) _themeModule.toggleTheme(); } },
         { id: 'view-grid', label: 'Switch to grid view', run: () => { _viewMode = 'grid'; try { localStorage.setItem('fo-view', 'grid'); } catch { } if (browsePanel) _refreshFileTable(browsePanel); goModule('browser'); } },

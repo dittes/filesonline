@@ -1,0 +1,9 @@
+{
+  "name": "files-online",
+  "private": true,
+  "description": "Static site generator for files-online.com. Output is committed; GitHub Pages serves it as is.",
+  "scripts": {
+    "build": "node build/build.mjs",
+    "check:strings": "node build/extract-strings.mjs --missing"
+  }
+}

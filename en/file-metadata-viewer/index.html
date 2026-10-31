@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'sha256-WFHbN6LP8QnU5HOG4yJKIvGNw+g6h+js71iCvoKrkr4='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self' data: blob:; connect-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <title>File Metadata Viewer – See What Is Inside Any File, No Upload</title>
+  <meta name="description" content="Drop any file to see its real type, metadata, text, checksums and embedded files. Reads PDF, Office, images, audio, email, archives and more. Nothing is uploaded.">
+  
+  <link rel="canonical" href="https://files-online.com/en/file-metadata-viewer/">
+  <link rel="alternate" hreflang="en" href="https://files-online.com/en/file-metadata-viewer/">
+  <link rel="alternate" hreflang="de" href="https://files-online.com/de/datei-metadaten-anzeigen/">
+  <link rel="alternate" hreflang="pl" href="https://files-online.com/pl/metadane-pliku/">
+  <link rel="alternate" hreflang="cs" href="https://files-online.com/cs/metadata-souboru/">
+  <link rel="alternate" hreflang="x-default" href="https://files-online.com/en/file-metadata-viewer/">
+  <meta name="theme-color" content="#f4f1e8" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#121317" media="(prefers-color-scheme: dark)">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Files Online">
+  <meta property="og:url" content="https://files-online.com/en/file-metadata-viewer/">
+  <meta property="og:title" content="File Metadata Viewer – See What Is Inside Any File, No Upload">
+  <meta property="og:description" content="Drop any file to see its real type, metadata, text, checksums and embedded files. Reads PDF, Office, images, audio, email, archives and more. Nothing is uploaded.">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="de_DE">
+  <meta property="og:locale:alternate" content="pl_PL">
+  <meta property="og:locale:alternate" content="cs_CZ">
+  <meta property="og:image" content="https://files-online.com/assets/icons/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <script>(function(){try{var t=localStorage.getItem('fo-theme');if(t!=='light'&&t!=='dark'){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}document.documentElement.setAttribute('data-theme',t)}catch(e){}})();</script>
+  <link rel="preload" href="/assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/css/inspect.css?v=9756b2f2">
+  <link rel="stylesheet" href="/assets/css/site.css?v=de3a7534">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":["SoftwareApplication","WebApplication"],"name":"File Inspector","url":"https://files-online.com/en/file-metadata-viewer/","description":"Drop any file to see its real type, metadata, text, checksums and embedded files. Reads PDF, Office, images, audio, email, archives and more. Nothing is uploaded.","inLanguage":"en","applicationCategory":"UtilitiesApplication","operatingSystem":"Windows, macOS, Linux, Android, iOS","browserRequirements":"Requires a modern web browser with JavaScript enabled","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"publisher":{"@id":"https://files-online.com/#org"},"featureList":["Real file type","All the metadata","Full text and summary","Files inside files","What your file reveals","Checksums and raw bytes","Text from scans","Export for your workflow"]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://files-online.com/en/"},{"@type":"ListItem","position":2,"name":"File Inspector"}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","name":"How to inspect a file","step":[{"@type":"HowToStep","position":1,"text":"Choose files or drop them onto this page. Whole folders work too, and so does pasting."},{"@type":"HowToStep","position":2,"text":"Read the overview, then switch between Text, Metadata, Embedded, Structure and Bytes."},{"@type":"HowToStep","position":3,"text":"Copy what you need or export it. With several files, compare them all in one table."}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How do I see the metadata of a file?","acceptedAnswer":{"@type":"Answer","text":"Drop the file onto this page and open the Metadata tab. You get everything the format stores, such as author, dates, software and location, grouped and searchable."}},{"@type":"Question","name":"How can I tell what type a file really is?","acceptedAnswer":{"@type":"Answer","text":"The tool reads the first bytes and internal structure of the file instead of trusting its name. If the extension does not match the content, you get a warning."}},{"@type":"Question","name":"Can I see what a document reveals about me?","acceptedAnswer":{"@type":"Answer","text":"Yes. “What this file reveals” lists names, GPS positions, tracked changes, hidden sheets and more, and links to a tool that removes them."}},{"@type":"Question","name":"Is this the same as Apache Tika?","acceptedAnswer":{"@type":"Answer","text":"It does the same job in your browser: detect the type, then extract text and metadata, including from embedded files. It is its own implementation and uses Tika-style field names in exports. Tika itself runs on a server or desktop with Java, and it supports more rare formats."}},{"@type":"Question","name":"What are the limits?","acceptedAnswer":{"@type":"Answer","text":"Files up to 1 GB, depending on your device. Old Office files are read from their internal structure, so unusual documents can come out incomplete. RAR and 7Z archives can only be listed or described here, and the file manager can extract them. Rare formats often show only what their header stores."}},{"@type":"Question","name":"Are my files uploaded?","acceptedAnswer":{"@type":"Answer","text":"No. The file is opened and processed by your own browser. You can check it yourself: open your browser's network tab while using the tool, or disconnect from the internet after the page has loaded."}},{"@type":"Question","name":"Is this tool free?","acceptedAnswer":{"@type":"Answer","text":"Yes, completely. There is no sign-up, no paid tier and no watermark on your files."}}]}</script>
+</head>
+<body class="s-page">
+  <a class="s-skip" href="#main">Skip to content</a>
+  <header class="s-header">
+    <div class="s-wrap s-header__row">
+      <a class="s-logo" href="/en/"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect width="32" height="32" rx="7" fill="#1B4FD8"/><path d="M10 6.5h8.200l5 5v13A1.500 1.500 0 0 1 21.700 26H10a1.500 1.500 0 0 1-1.500-1.500V8A1.500 1.500 0 0 1 10 6.500z" fill="#fff"/><path d="M18.200 6.500V10a1.500 1.500 0 0 0 1.500 1.500h3.500" fill="none" stroke="#1B4FD8" stroke-width="1.100" stroke-linejoin="round"/><rect x="11.300" y="15" width="9" height="1.700" rx=".85" fill="#1B4FD8"/><rect x="11.300" y="18.400" width="9" height="1.700" rx=".85" fill="#1B4FD8"/><rect x="11.300" y="21.800" width="5.500" height="1.700" rx=".85" fill="#1B4FD8"/></svg><span>Files Online</span></a>
+      <nav class="s-nav" aria-label="Main navigation">
+        <details class="s-menu">
+          <summary>PDF tools<svg class="s-caret" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></summary>
+          <div class="s-mega">
+            <div>
+              <h3>Organize pages</h3>
+              <a href="/en/merge-pdf/">Merge PDF</a><a href="/en/split-pdf/">Split PDF</a><a href="/en/extract-pdf-pages/">Extract PDF Pages</a><a href="/en/delete-pdf-pages/">Delete PDF Pages</a><a href="/en/organize-pdf/">Organize PDF</a><a href="/en/rotate-pdf/">Rotate PDF</a><a href="/en/crop-pdf/">Crop PDF</a>
+            </div><div>
+              <h3>Optimize</h3>
+              <a href="/en/compress-pdf/">Compress PDF</a><a href="/en/ocr-pdf/">OCR PDF</a><a href="/en/flatten-pdf/">Flatten PDF</a>
+            </div><div>
+              <h3>Convert</h3>
+              <a href="/en/pdf-to-word/">PDF to Word</a><a href="/en/pdf-to-excel/">PDF to Excel</a><a href="/en/pdf-to-jpg/">PDF to JPG</a><a href="/en/pdf-to-png/">PDF to PNG</a><a href="/en/pdf-to-text/">PDF to Text</a><a href="/en/jpg-to-pdf/">JPG to PDF</a><a href="/en/png-to-pdf/">PNG to PDF</a>
+            </div><div>
+              <h3>Edit &amp; sign</h3>
+              <a href="/en/edit-pdf/">Edit PDF</a><a href="/en/sign-pdf/">Sign PDF</a><a href="/en/fill-pdf-form/">Fill PDF Form</a><a href="/en/add-watermark-to-pdf/">Add Watermark</a><a href="/en/add-page-numbers-to-pdf/">Add Page Numbers</a>
+            </div><div>
+              <h3>Security &amp; privacy</h3>
+              <a href="/en/protect-pdf/">Protect PDF</a><a href="/en/unlock-pdf/">Unlock PDF</a><a href="/en/redact-pdf/">Redact PDF</a><a href="/en/edit-pdf-metadata/">Edit PDF Metadata</a>
+            </div>
+            <a class="s-mega__all" href="/en/pdf-tools/">All PDF tools →</a>
+          </div>
+        </details>
+        <a href="/en/file-metadata-viewer/" aria-current="page">File Inspector</a>
+        <a href="/en/file-manager/">File Manager</a>
+        <a href="/en/open-md-file/">MD Viewer</a>
+        <a href="/en/open-mbox-file/">MBOX Viewer</a>
+      </nav>
+      <div class="s-actions">
+        <details class="s-lang">
+          <summary aria-label="Language">en</summary>
+          <ul>
+            <li><a href="/en/file-metadata-viewer/" hreflang="en" lang="en" data-set-lang="en" aria-current="true">English</a></li><li><a href="/de/datei-metadaten-anzeigen/" hreflang="de" lang="de" data-set-lang="de">Deutsch</a></li><li><a href="/pl/metadane-pliku/" hreflang="pl" lang="pl" data-set-lang="pl">Polski</a></li><li><a href="/cs/metadata-souboru/" hreflang="cs" lang="cs" data-set-lang="cs">Čeština</a></li>
+          </ul>
+        </details>
+        <button class="s-icon-btn" type="button" data-action="toggle-theme" aria-label="Switch between light and dark" title="Switch between light and dark">
+          <svg class="icon-moon" viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><path d="M13.5 9.5A5.5 5.5 0 016.5 2.5a5.5 5.5 0 107 7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          <svg class="icon-sun" viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M12.6 3.4l-1.4 1.4M4.8 11.2l-1.4 1.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <button class="s-icon-btn s-burger" type="button" aria-label="Menu" aria-expanded="false"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+      </div>
+    </div>
+  </header>
+  <main id="main">
+    <div class="s-wrap">
+      <ol class="s-crumbs"><li><a href="/en/">Home</a></li><li><span aria-current="page">File Inspector</span></li></ol>
+      <div class="s-toolhead">
+        <h1>See what is really inside any file</h1>
+        <p>Real file type, all metadata, full text, checksums and files hidden inside. It works with more than 200 formats and everything stays on your device.</p>
+      </div>
+      <div id="file-inspector" class="pt">
+        <div class="pt-drop">
+          <span class="s-stamp">Stays on your device<small>no upload</small></span>
+          <svg class="pt-drop__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><circle cx="11" cy="14" r="2.6"/><path d="M13 16l2.4 2.4"/></svg>
+          <button class="s-btn s-btn--primary pt-drop__btn" type="button">Choose files</button>
+          <p class="pt-drop__or">or drop files and folders here. You can also paste.</p>
+          <noscript><p class="pt-drop__error">This tool needs JavaScript, because your file is processed in your browser.</p></noscript>
+        </div>
+        <div class="fi-mount" hidden></div>
+        <ul class="s-trust"><li>No upload</li><li>Free</li><li>No account</li><li>Works offline once loaded</li></ul>
+      </div>
+    </div>
+    <section class="s-section">
+      <div class="s-wrap">
+        <h2>Much more than the file properties dialog</h2>
+        <div class="s-benefits" style="margin-top:18px">
+          <div><h3>Real file type</h3><p>Identifies files by their content, not their name, and warns when the extension is wrong, a common trick for disguising risky files.</p></div><div><h3>All the metadata</h3><p>Authors, dates, software, camera and lens, GPS, XMP, IPTC and color profiles, shown readably or under standard field names.</p></div><div><h3>Full text and summary</h3><p>Extracts the text, picks out key sentences, topics and language, and finds emails, links, dates and amounts.</p></div><div><h3>Files inside files</h3><p>Opens email attachments, ZIP contents, images in Word files and PDF attachments, each inspected like a file of its own.</p></div><div><h3>What your file reveals</h3><p>Flags names, locations, tracked changes, hidden sheets and macros before you share a document with anyone.</p></div><div><h3>Checksums and raw bytes</h3><p>MD5, SHA-1, SHA-256, SHA-512 and CRC32, plus entropy, hex view and a check for data hidden after the end of a file.</p></div><div><h3>Text from scans</h3><p>Recognizes text in images and scanned PDFs with built-in OCR, in English, German, Polish and Czech.</p></div><div><h3>Export for your workflow</h3><p>Save as text, JSON, XHTML or CSV. Field names follow Apache Tika, so results fit existing pipelines.</p></div>
+        </div>
+      </div>
+    </section>
+    <section class="s-section s-section--tint" id="how">
+    <div class="s-wrap">
+      <h2>How to inspect a file</h2>
+      <ol class="s-steps"><li><p>Choose files or drop them onto this page. Whole folders work too, and so does pasting.</p></li><li><p>Read the overview, then switch between Text, Metadata, Embedded, Structure and Bytes.</p></li><li><p>Copy what you need or export it. With several files, compare them all in one table.</p></li></ol>
+    </div>
+  </section>
+    <section class="s-section">
+      <div class="s-wrap">
+        <h2>Formats it understands</h2>
+        <p class="s-section__lede">Files in other formats still get their type, checksums, entropy, readable strings and a hex view.</p>
+        <div class="fi-formats">
+          <div><h3>Documents</h3><p>PDF, DOCX, DOC, ODT, RTF, EPUB, MOBI, HTML, Markdown, PostScript, XPS, DjVu, WordPerfect, CHM, DVI, Apple Pages</p></div><div><h3>Spreadsheets and slides</h3><p>XLSX, XLS, ODS, CSV, TSV, PPTX, PPT, ODP, Apple Numbers, Apple Keynote</p></div><div><h3>Images</h3><p>JPEG, PNG, GIF, WebP, TIFF, BMP, HEIC, AVIF, ICO, SVG, PSD, JPEG 2000, JPEG XL, OpenEXR, camera RAW, ICNS, XCF, DDS, WMF, EMF, FITS</p></div><div><h3>Audio and video</h3><p>MP3, FLAC, Ogg, WAV, M4A, AIFF, MIDI, MP4, MOV, WebM, MKV, AVI, FLV, WMV, AAC, AC-3, AMR, CAF, MOD, XM, S3M, SID, DSF, SWF, IVF</p></div><div><h3>Email and contacts</h3><p>EML, MSG, MBOX, iCalendar, vCard</p></div><div><h3>Archives</h3><p>ZIP, TAR, GZ, RAR, 7Z, CPIO, AR, CAB, RPM, ISO, BZ2, XZ, Zstandard, DMG, VHD, VMDK, QCOW, VDI, WIM, SquashFS, LZ4, XAR, ARJ, LHA</p></div><div><h3>Data and code</h3><p>JSON, XML, YAML, SQLite, Parquet, NumPy, property lists, WARC, source code in many languages, PCAP, HDF5, NetCDF, Avro, Access, SPSS, GPX, KML, shapefile, HAR, BitTorrent, OpenAPI</p></div><div><h3>Fonts and programs</h3><p>TTF, OTF, TTC, WOFF, WOFF2, EXE, DLL, ELF, Mach-O, Java class, WebAssembly, PEM, DWG, EOT, Type 1, APK, LNK, EVTX, JKS, KDBX, PGP, SSH, PKCS#12</p></div><div><h3>CAD, 3D and AI models</h3><p>DXF, STEP, IGES, OBJ, PLY, FBX, 3MF, STL, glTF, Blender, LAS, GGUF, safetensors</p></div>
+        </div>
+      </div>
+    </section>
+    <section class="s-section" id="faq">
+    <div class="s-wrap">
+      <h2>Frequently asked questions</h2>
+      <div class="s-faq">
+        <details open><summary>How do I see the metadata of a file?</summary><p>Drop the file onto this page and open the Metadata tab. You get everything the format stores, such as author, dates, software and location, grouped and searchable.</p></details>
+        <details><summary>How can I tell what type a file really is?</summary><p>The tool reads the first bytes and internal structure of the file instead of trusting its name. If the extension does not match the content, you get a warning.</p></details>
+        <details><summary>Can I see what a document reveals about me?</summary><p>Yes. “What this file reveals” lists names, GPS positions, tracked changes, hidden sheets and more, and links to a tool that removes them.</p></details>
+        <details><summary>Is this the same as Apache Tika?</summary><p>It does the same job in your browser: detect the type, then extract text and metadata, including from embedded files. It is its own implementation and uses Tika-style field names in exports. Tika itself runs on a server or desktop with Java, and it supports more rare formats.</p></details>
+        <details><summary>What are the limits?</summary><p>Files up to 1 GB, depending on your device. Old Office files are read from their internal structure, so unusual documents can come out incomplete. RAR and 7Z archives can only be listed or described here, and the file manager can extract them. Rare formats often show only what their header stores.</p></details>
+        <details><summary>Are my files uploaded?</summary><p>No. The file is opened and processed by your own browser. You can check it yourself: open your browser's network tab while using the tool, or disconnect from the internet after the page has loaded.</p></details>
+        <details><summary>Is this tool free?</summary><p>Yes, completely. There is no sign-up, no paid tier and no watermark on your files.</p></details>
+      </div>
+    </div>
+  </section>
+    <section class="s-section">
+    <div class="s-wrap">
+      <h2>Related on our other sites</h2>
+      <p class="s-section__lede">These sister sites work the same way: free, and in your browser.</p>
+      <div class="s-links"><a href="https://remove-online.com/en/tools/pdf-metadata-remover/" rel="noopener"><strong>Remove PDF metadata</strong><small>Remove Online ↗</small></a><a href="https://remove-online.com/en/tools/image-metadata-remover/" rel="noopener"><strong>Remove photo metadata</strong><small>Remove Online ↗</small></a><a href="https://remove-online.com/en/tools/office-metadata-remover/" rel="noopener"><strong>Remove Office metadata</strong><small>Remove Online ↗</small></a><a href="https://open-online.com/en/formats" rel="noopener"><strong>All file formats you can open</strong><small>Open Online ↗</small></a><a href="https://aintob.com/en/file-converter/" rel="noopener"><strong>File converter</strong><small>AintoB ↗</small></a></div>
+    </div>
+  </section>
+  </main>
+  <footer class="s-footer">
+    <div class="s-wrap">
+      <div class="s-footer__toc">
+        <section>
+          <h2>Organize pages</h2>
+          <a href="/en/merge-pdf/">Merge PDF<span>PDF</span></a><a href="/en/split-pdf/">Split PDF<span>PDF</span></a><a href="/en/extract-pdf-pages/">Extract PDF Pages<span>PDF</span></a><a href="/en/delete-pdf-pages/">Delete PDF Pages<span>PDF</span></a><a href="/en/organize-pdf/">Organize PDF<span>PDF</span></a><a href="/en/rotate-pdf/">Rotate PDF<span>PDF</span></a><a href="/en/crop-pdf/">Crop PDF<span>PDF</span></a>
+        </section><section>
+          <h2>Optimize</h2>
+          <a href="/en/compress-pdf/">Compress PDF<span>PDF</span></a><a href="/en/ocr-pdf/">OCR PDF<span>PDF</span></a><a href="/en/flatten-pdf/">Flatten PDF<span>PDF</span></a>
+        </section><section>
+          <h2>Convert</h2>
+          <a href="/en/pdf-to-word/">PDF to Word<span>PDF</span></a><a href="/en/pdf-to-excel/">PDF to Excel<span>PDF</span></a><a href="/en/pdf-to-jpg/">PDF to JPG<span>PDF</span></a><a href="/en/pdf-to-png/">PDF to PNG<span>PDF</span></a><a href="/en/pdf-to-text/">PDF to Text<span>PDF</span></a><a href="/en/jpg-to-pdf/">JPG to PDF<span>PDF</span></a><a href="/en/png-to-pdf/">PNG to PDF<span>PDF</span></a>
+        </section><section>
+          <h2>Edit &amp; sign</h2>
+          <a href="/en/edit-pdf/">Edit PDF<span>PDF</span></a><a href="/en/sign-pdf/">Sign PDF<span>PDF</span></a><a href="/en/fill-pdf-form/">Fill PDF Form<span>PDF</span></a><a href="/en/add-watermark-to-pdf/">Add Watermark<span>PDF</span></a><a href="/en/add-page-numbers-to-pdf/">Add Page Numbers<span>PDF</span></a>
+        </section><section>
+          <h2>Security &amp; privacy</h2>
+          <a href="/en/protect-pdf/">Protect PDF<span>PDF</span></a><a href="/en/unlock-pdf/">Unlock PDF<span>PDF</span></a><a href="/en/redact-pdf/">Redact PDF<span>PDF</span></a><a href="/en/edit-pdf-metadata/">Edit PDF Metadata<span>PDF</span></a>
+        </section>
+        <section>
+          <h2>File tools</h2>
+          <a href="/en/file-metadata-viewer/">File Inspector<span>any file</span></a><a href="/en/file-manager/">File Manager<span>ZIP</span></a><a href="/en/open-md-file/">MD Viewer<span>.md</span></a><a href="/en/open-mbox-file/">MBOX Viewer<span>.mbox</span></a>
+        </section>
+        <section>
+          <h2>Our other sites</h2>
+          <a href="https://open-online.com/en/" rel="noopener">Open Online<span>↗</span></a><a href="https://remove-online.com/en/" rel="noopener">Remove Online<span>↗</span></a><a href="https://aintob.com/en/" rel="noopener">AintoB<span>↗</span></a>
+        </section>
+      </div>
+      <div class="s-footer__bottom">
+        <a href="/en/privacy/">Privacy</a>
+        <a href="/en/imprint/">Imprint</a>
+        <a href="/en/file-metadata-viewer/" hreflang="en" lang="en" data-set-lang="en">English</a><a href="/de/datei-metadaten-anzeigen/" hreflang="de" lang="de" data-set-lang="de">Deutsch</a><a href="/pl/metadane-pliku/" hreflang="pl" lang="pl" data-set-lang="pl">Polski</a><a href="/cs/metadata-souboru/" hreflang="cs" lang="cs" data-set-lang="cs">Čeština</a>
+        <span class="s-footer__note">Runs in your browser. No upload, no account, no tracking.</span>
+      </div>
+    </div>
+  </footer>
+  <script src="/assets/js/site.js?v=21b41bad" defer></script>
+  <script type="module" src="/assets/js/inspect/main.js?v=f21f41c1"></script>
+</body>
+</html>

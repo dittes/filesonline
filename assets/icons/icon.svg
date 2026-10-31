@@ -1,8 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="96" fill="#1B4FD8"/>
-  <!-- Folder shape -->
-  <path d="M120 180 a20 20 0 0 1 20-20 h100 l30 28 h122 a20 20 0 0 1 20 20 v144 a20 20 0 0 1-20 20 H140 a20 20 0 0 1-20-20 Z" fill="none" stroke="white" stroke-width="22" stroke-linejoin="round"/>
-  <!-- Document lines inside -->
-  <line x1="180" y1="280" x2="332" y2="280" stroke="white" stroke-width="18" stroke-linecap="round"/>
-  <line x1="180" y1="312" x2="300" y2="312" stroke="white" stroke-width="18" stroke-linecap="round"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="#1B4FD8"/><path d="M10 6.5h8.200l5 5v13A1.500 1.500 0 0 1 21.700 26H10a1.500 1.500 0 0 1-1.500-1.500V8A1.500 1.500 0 0 1 10 6.500z" fill="#fff"/><path d="M18.200 6.500V10a1.500 1.500 0 0 0 1.500 1.500h3.500" fill="none" stroke="#1B4FD8" stroke-width="1.100" stroke-linejoin="round"/><rect x="11.300" y="15" width="9" height="1.700" rx=".85" fill="#1B4FD8"/><rect x="11.300" y="18.400" width="9" height="1.700" rx=".85" fill="#1B4FD8"/><rect x="11.300" y="21.800" width="5.500" height="1.700" rx=".85" fill="#1B4FD8"/></svg>

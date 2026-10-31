@@ -364,7 +364,7 @@ body.mbx-edit-richmode #mbx-edit-html { display: none; }
 /* ─── Responsive ───────────────────────────────────────────────────────── */
 
 @media (max-width: 980px) {
-  .mbx-layout { grid-template-columns: 0 minmax(240px, 340px) 1fr; }
+  .mbx-layout { grid-template-columns: minmax(240px, 340px) 1fr; }
   .mbx-sidebar { display: none; }
   body.mbx-sidebar-collapsed .mbx-layout { grid-template-columns: 220px minmax(240px, 320px) 1fr; }
   body.mbx-sidebar-collapsed .mbx-sidebar { display: block; }

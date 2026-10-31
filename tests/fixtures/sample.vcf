@@ -1,0 +1,8 @@
+BEGIN:VCARD
+VERSION:3.0
+FN:Jane Example
+N:Example;Jane;;;
+ORG:Example GmbH
+TEL;TYPE=WORK:+49 30 1234567
+EMAIL:jane@example.com
+END:VCARD

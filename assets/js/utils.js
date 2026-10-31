@@ -25,7 +25,7 @@ export function formatBytes(bytes, decimals = 2) {
 export function formatDate(date) {
   const d = date instanceof Date ? date : new Date(date);
   if (isNaN(d.getTime())) return '—';
-  return d.toLocaleString('en-US', {
+  return d.toLocaleString((typeof document !== 'undefined' && document.documentElement.lang) || 'en', {
     month: 'short',
     day: 'numeric',
     year: 'numeric',

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://files-online.com/sitemap.xml

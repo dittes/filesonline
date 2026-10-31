@@ -1216,7 +1216,7 @@ async function handleExport(what) {
 // ─── Wiring ─────────────────────────────────────────────────────────────────
 
 function wireToolbar() {
-  $('#mbx-open-btn').addEventListener('click', openFilePicker);
+  $('#mbx-open-btn')?.addEventListener('click', openFilePicker);
   $('#mbx-add-btn').addEventListener('click', openFilePicker);
   $('#mbx-choose-btn').addEventListener('click', openFilePicker);
   $('#mbx-demo-btn').addEventListener('click', () => importFiles([generateDemoFile()]));

@@ -1,0 +1,122 @@
+  <section class="hero mdv-hero" id="open">
+    <div class="hero-inner">
+      <div class="hero-badges">
+        <span class="badge badge-neutral">100% Private</span>
+        <span class="badge badge-neutral">No Upload</span>
+        <span class="badge badge-neutral">No Signup</span>
+      </div>
+      <h1 class="hero-title">Open MD File Online</h1>
+      <p class="hero-subtitle">Free online MD viewer, Markdown editor, and Markdown converter. Open, view, edit, and convert .md Markdown files online — free, private, no signup. Export to PDF, HTML, or Markdown.</p>
+
+      <div class="mdv-dropzone" id="mdv-dropzone" tabindex="0" role="button" aria-label="Drop your Markdown file here or press Enter to choose a file">
+        <svg viewBox="0 0 48 48" fill="none" width="40" height="40" aria-hidden="true">
+          <path d="M10 6h20l8 8v28H10z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M30 6v8h8" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M17 30l3-8 3 5 3-5 3 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <p class="mdv-dropzone-title">Drop your .md file here</p>
+        <div class="mdv-dropzone-actions">
+          <button class="btn btn-primary" id="mdv-choose-btn">Choose MD File</button>
+          <button class="btn btn-secondary" id="mdv-paste-btn">Paste Markdown</button>
+          <button class="btn btn-secondary" id="mdv-sample-btn">Try sample</button>
+        </div>
+        <p class="mdv-dropzone-note">Supported: <code>.md</code>, <code>.markdown</code>, <code>.txt</code>, <code>.html</code> — processed locally, never uploaded.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MD Viewer / Editor -->
+  <section class="mdv-tool" id="editor" aria-label="Markdown editor and viewer">
+
+    <div class="mdv-toolbar" role="toolbar" aria-label="Markdown tools">
+      <div class="mdv-toolbar-group">
+        <button class="btn btn-sm btn-ghost" id="mdv-open-btn" title="Open file (Ctrl+O)">Open</button>
+        <button class="btn btn-sm btn-ghost" id="mdv-save-btn" title="Save MD (Ctrl+S)">Save MD</button>
+        <button class="btn btn-sm btn-ghost" id="mdv-saveas-btn" title="Save As">Save As</button>
+        <button class="btn btn-sm btn-ghost" id="mdv-import-html-btn" title="Import an HTML file and convert it to Markdown">Import HTML</button>
+      </div>
+      <div class="mdv-toolbar-group">
+        <button class="btn btn-sm btn-ghost" id="mdv-export-pdf-btn" title="Export PDF (Ctrl+P)">Export PDF</button>
+        <button class="btn btn-sm btn-ghost" id="mdv-export-html-btn" title="Export HTML (Ctrl+E)">Export HTML</button>
+        <button class="btn btn-sm btn-ghost" id="mdv-export-standalone-btn" title="Export standalone HTML with inline CSS">Standalone HTML</button>
+        <button class="btn btn-sm btn-ghost" id="mdv-export-txt-btn" title="Export plain text">Plain Text</button>
+      </div>
+      <div class="mdv-toolbar-group">
+        <button class="btn btn-sm btn-ghost" id="mdv-copy-md-btn" title="Copy Markdown to clipboard">Copy MD</button>
+        <button class="btn btn-sm btn-ghost" id="mdv-copy-html-btn" title="Copy rendered HTML to clipboard">Copy HTML</button>
+        <button class="btn btn-sm btn-danger" id="mdv-clear-btn" title="Clear the editor">Clear</button>
+      </div>
+      <div class="mdv-toolbar-spacer"></div>
+      <div class="view-toggle mdv-view-toggle" role="group" aria-label="View mode">
+        <button data-mdv-view="split" class="active" title="Split view">Split</button>
+        <button data-mdv-view="editor" title="Editor only">Editor</button>
+        <button data-mdv-view="preview" title="Preview only">Preview</button>
+        <button data-mdv-view="raw" title="Raw HTML output">HTML</button>
+      </div>
+    </div>
+
+    <div class="mdv-stats" aria-live="polite">
+      <span id="mdv-filename">untitled.md</span>
+      <span class="mdv-dirty" id="mdv-dirty" hidden title="Unsaved changes">●</span>
+      <span class="mdv-stats-right">
+        <span id="mdv-stat-words">0 words</span> ·
+        <span id="mdv-stat-chars">0 characters</span> ·
+        <span id="mdv-stat-lines">0 lines</span>
+      </span>
+    </div>
+
+    <div class="mdv-panes" id="mdv-panes" data-view="split">
+      <textarea
+        class="mdv-editor"
+        id="mdv-editor"
+        spellcheck="false"
+        aria-label="Markdown source"
+        placeholder="# Start typing Markdown here…&#10;&#10;Or drop a .md file anywhere on this page."></textarea>
+
+      <div class="mdv-preview-pane" id="mdv-preview-pane">
+        <details class="mdv-toc" id="mdv-toc" hidden>
+          <summary>Table of contents</summary>
+          <nav id="mdv-toc-list" aria-label="Table of contents"></nav>
+        </details>
+        <article class="md-preview" id="mdv-preview" aria-label="Rendered Markdown preview">
+          <div class="mdv-empty">
+            <p>Nothing to preview yet.</p>
+            <p>Open a <code>.md</code> file, paste Markdown, or try the sample.</p>
+          </div>
+        </article>
+      </div>
+
+      <pre class="mdv-raw" id="mdv-raw" hidden aria-label="Generated HTML source"><code id="mdv-raw-code"></code></pre>
+    </div>
+  </section>
+
+  <!-- Hidden file inputs -->
+  <input type="file" id="mdv-file-input" accept=".md,.markdown,.txt,.text,text/markdown,text/plain" hidden>
+  <input type="file" id="mdv-html-input" accept=".html,.htm,text/html" hidden>
+
+  <!-- Paste / import modal -->
+  <div class="modal-overlay" id="mdv-paste-modal" hidden role="dialog" aria-modal="true" aria-labelledby="mdv-paste-title">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="mdv-paste-title">Paste Markdown or HTML</h3>
+        <button class="btn btn-ghost btn-icon modal-close" aria-label="Close dialog">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <textarea class="input mdv-paste-textarea" id="mdv-paste-textarea" rows="10" placeholder="Paste Markdown or HTML here…" aria-label="Paste content"></textarea>
+        <div class="mdv-url-row">
+          <input type="url" class="input input-sm" id="mdv-url-input" placeholder="…or import from URL (https://example.com/page.html)" aria-label="Import from URL">
+          <button class="btn btn-sm btn-secondary" id="mdv-url-fetch-btn">Fetch</button>
+        </div>
+        <p class="tool-hint">URL import only works when the source allows browser CORS.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary modal-close">Cancel</button>
+        <button class="btn btn-secondary" id="mdv-paste-html-btn" title="Convert the pasted HTML to Markdown">Convert HTML → Markdown</button>
+        <button class="btn btn-primary" id="mdv-paste-md-btn">Load as Markdown</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SEO content sections ═══════════════ -->

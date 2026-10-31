@@ -1,0 +1,30 @@
+From: <Saved by Open Online tests>
+Subject: Saved page
+Date: Tue, 14 Jul 2026 09:30:00 +0200
+MIME-Version: 1.0
+Content-Type: multipart/related;
+ boundary="===============0741798121319576145=="
+
+--===============0741798121319576145==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+<html><body><h1>Saved page</h1><img src=3D"https://example.com/logo.png"></bo=
+dy></html>
+
+--===============0741798121319576145==
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="logo.png"
+Content-ID: <x>
+MIME-Version: 1.0
+Content-Location: https://example.com/logo.png
+
+iVBORw0KGgoAAAANSUhEUgAAAEAAAAAwCAYAAAChS3wfAAAA7klEQVR4nO2UMQ7CQAwE/RkkfsTP
++Q4UaSgoIB7ba2UjRa7usjs3uYiIexzPVadEiNEpEcIGDE6JEDZgcEqEuIQBt8fz9evbmUum9BAM
+7fIdEPBNyeJfQGgbUFm+CsKq8gUQ9pWnIchdeH8AIPLvLE9CWFsegpAjOF2euAtswObyBITV+gO/
+gQ2wATbABtgAG2ADbIANWAshkz9lgMpvkD1EG7AZApE/tXgSApE7Ti6SuAuow0M26YYA5mbKd0Ig
+86LlOyAU5GXLf07BC6/HABpCZb44uagcRmeulo8IT4kQo1MihA0YnBIhbMDQfAOJbLmddZORrgAA
+AABJRU5ErkJggg==
+
+--===============0741798121319576145==--
