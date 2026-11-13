@@ -1252,6 +1252,293 @@ export async function ocrPdf(bytes, { lang = 'eng', dpi = 220, onProgress } = {}
 
 // ─── Misc ─────────────────────────────────────────────────────────────────────
 
+// ─── Compare ──────────────────────────────────────────────────────────────────
+
+/**
+ * Every word of a PDF with its position in PDF user space, for diffing and
+ * for drawing highlights back onto the page.
+ */
+export async function pageWords(bytes, onProgress) {
+  const pdf = await openPdfjs(bytes);
+  const words = [];
+  for (let n = 1; n <= pdf.numPages; n++) {
+    const page = await pdf.getPage(n);
+    const content = await page.getTextContent();
+    for (const item of content.items) {
+      if (!item.str?.trim() || !item.width) continue;
+      const [a, b, c, d, e, f] = item.transform;
+      const h = Math.hypot(c, d) || item.height || 10;
+      const angle = Math.atan2(b, a);
+      const charW = item.width / item.str.length;
+      for (const m of item.str.matchAll(/\S+/g)) {
+        const off = m.index * charW;
+        words.push({
+          text: m[0].normalize('NFKC'), page: n - 1,
+          x: e + off * Math.cos(angle), y: f + off * Math.sin(angle),
+          w: m[0].length * charW, h, angle,
+        });
+      }
+    }
+    page.cleanup();
+    onProgress?.(n / pdf.numPages);
+    await yieldToUi();
+  }
+  await pdf.destroy();
+  return words;
+}
+
+/**
+ * Word diff (Myers). Returns segments {type:'same'|'del'|'add', a:[indexes], b:[indexes]}.
+ * Throws RangeError when the texts differ in more than `limit` words.
+ */
+export function diffWords(a, b, { limit = 4000 } = {}) {
+  const ids = new Map();
+  const id = w => { let v = ids.get(w); if (v === undefined) ids.set(w, v = ids.size); return v; };
+  const A = Int32Array.from(a, id);
+  const B = Int32Array.from(b, id);
+  let start = 0;
+  while (start < A.length && start < B.length && A[start] === B[start]) start++;
+  let endA = A.length, endB = B.length;
+  while (endA > start && endB > start && A[endA - 1] === B[endB - 1]) { endA--; endB--; }
+  const ops = [];
+  for (let i = 0; i < start; i++) ops.push(['=', i, i]);
+
+  const N = endA - start, M = endB - start, max = N + M, off = max + 1;
+  const V = new Int32Array(2 * max + 3);
+  const trace = [];
+  let found = N === 0 && M === 0;
+  for (let d = 0; d <= max && !found; d++) {
+    if (d > limit) throw new RangeError('too many differences');
+    trace.push(V.slice(off - d, off + d + 1));
+    for (let k = -d; k <= d; k += 2) {
+      let x = (k === -d || (k !== d && V[off + k - 1] < V[off + k + 1])) ? V[off + k + 1] : V[off + k - 1] + 1;
+      let y = x - k;
+      while (x < N && y < M && A[start + x] === B[start + y]) { x++; y++; }
+      V[off + k] = x;
+      if (x >= N && y >= M) { found = true; break; }
+    }
+  }
+  const middle = [];
+  let x = N, y = M;
+  for (let d = trace.length - 1; d > 0; d--) {
+    const prev = trace[d];
+    const get = k => prev[k + d];
+    const k = x - y;
+    const prevK = (k === -d || (k !== d && get(k - 1) < get(k + 1))) ? k + 1 : k - 1;
+    const prevX = get(prevK);
+    const prevY = prevX - prevK;
+    while (x > prevX && y > prevY) { middle.push(['=', start + x - 1, start + y - 1]); x--; y--; }
+    if (x === prevX) middle.push(['+', -1, start + y - 1]);
+    else middle.push(['-', start + x - 1, -1]);
+    x = prevX; y = prevY;
+  }
+  while (x > 0 && y > 0) { middle.push(['=', start + x - 1, start + y - 1]); x--; y--; }
+  ops.push(...middle.reverse());
+  for (let i = 0; i < A.length - endA; i++) ops.push(['=', endA + i, endB + i]);
+
+  const segments = [];
+  const TYPE = { '=': 'same', '-': 'del', '+': 'add' };
+  for (const [op, i, j] of ops) {
+    const type = TYPE[op];
+    let seg = segments[segments.length - 1];
+    // Keep deletions before additions inside one change, whatever order Myers chose
+    if (type !== 'same' && seg && seg.type !== 'same') {
+      const other = segments[segments.length - 2];
+      if (seg.type !== type && other?.type === type) seg = other;
+    }
+    if (!seg || seg.type !== type) segments.push(seg = { type, a: [], b: [] });
+    if (i >= 0) seg.a.push(i);
+    if (j >= 0) seg.b.push(j);
+  }
+  return segments;
+}
+
+/** Draw translucent marks over words; neighbours on one line become one mark. */
+export async function markWords(bytes, words, hex) {
+  const { rgb, degrees, BlendMode } = await pdfLib();
+  const doc = await loadDoc(bytes);
+  const pages = doc.getPages();
+  const c = hexColor(hex);
+  const runs = [];
+  for (const w of words) {
+    const last = runs[runs.length - 1];
+    if (last && last.page === w.page && Math.abs(last.y - w.y) < 0.5 && Math.abs(last.angle - w.angle) < 0.01
+      && w.x >= last.x && w.x - (last.x + last.w) < w.h * 1.5) {
+      last.w = w.x + w.w - last.x;
+      last.h = Math.max(last.h, w.h);
+    } else {
+      runs.push({ ...w });
+    }
+  }
+  for (const r of runs) {
+    const page = pages[r.page];
+    if (!page) continue;
+    const dy = r.h * 0.22;
+    page.drawRectangle({
+      x: r.x + dy * Math.sin(r.angle), y: r.y - dy * Math.cos(r.angle),
+      width: r.w, height: r.h * 1.15, rotate: degrees(r.angle * 180 / Math.PI),
+      color: rgb(c.r, c.g, c.b), opacity: 0.38, blendMode: BlendMode.Multiply,
+    });
+  }
+  return doc.save();
+}
+
+// ─── Extract images ───────────────────────────────────────────────────────────
+
+/** Image XObjects in page order, each once, with the first page it appears on. */
+async function imagesInPageOrder(doc, lib) {
+  const { PDFName, PDFDict, PDFRef, PDFRawStream } = lib;
+  const ctx = doc.context;
+  const found = new Map();
+  const seenForms = new Set();
+  const walk = (resources, page) => {
+    resources = ctx.lookup(resources);
+    if (!(resources instanceof PDFDict)) return;
+    const xobjects = ctx.lookup(resources.get(PDFName.of('XObject')));
+    if (!(xobjects instanceof PDFDict)) return;
+    for (const [, value] of xobjects.entries()) {
+      if (!(value instanceof PDFRef)) continue;
+      const obj = ctx.lookup(value);
+      if (!(obj instanceof PDFRawStream)) continue;
+      const subtype = ctx.lookup(obj.dict.get(PDFName.of('Subtype')))?.decodeText?.();
+      if (subtype === 'Image') {
+        if (!found.has(value.tag)) found.set(value.tag, { ref: value, stream: obj, page });
+      } else if (subtype === 'Form' && !seenForms.has(value.tag)) {
+        seenForms.add(value.tag);
+        walk(obj.dict.get(PDFName.of('Resources')), page);
+      }
+    }
+  };
+  doc.getPages().forEach((page, i) => walk(page.node.Resources(), i));
+  return [...found.values()];
+}
+
+async function imageDataToPng(data) {
+  const canvas = new OffscreenCanvas(data.width, data.height);
+  canvas.getContext('2d').putImageData(data, 0, 0);
+  return canvas.convertToBlob({ type: 'image/png' });
+}
+
+/**
+ * Pull the images out of a PDF. JPEG and JPEG 2000 images are copied byte for
+ * byte; other images are decoded and saved as PNG (with transparency when the
+ * PDF has a soft mask). Returns {images:[{page, blob, ext, width, height}], skipped}.
+ */
+export async function extractImages(bytes, { minSize = 0, asPng = false, onProgress } = {}) {
+  const lib = await pdfLib();
+  const zlib = await fflate();
+  const { PDFName, PDFArray, PDFRawStream } = lib;
+  const doc = await loadDoc(bytes);
+  const ctx = doc.context;
+  const list = await imagesInPageOrder(doc, lib);
+  const images = [];
+  let skipped = 0;
+  for (let n = 0; n < list.length; n++) {
+    const { stream, page } = list[n];
+    const get = key => ctx.lookup(stream.dict.get(PDFName.of(key)));
+    const width = get('Width')?.asNumber?.() || 0;
+    const height = get('Height')?.asNumber?.() || 0;
+    if (Math.max(width, height) < minSize) continue;
+    let filter = get('Filter');
+    if (filter instanceof PDFArray) filter = filter.size() === 1 ? ctx.lookup(filter.get(0)) : null;
+    const name = filter?.decodeText?.();
+    const hasMask = !!stream.dict.get(PDFName.of('SMask'));
+    try {
+      if (name === 'DCTDecode' && !(asPng || hasMask)) {
+        images.push({ page, width, height, ext: 'jpg', blob: new Blob([stream.getContents()], { type: 'image/jpeg' }) });
+      } else if (name === 'JPXDecode') {
+        images.push({ page, width, height, ext: 'jp2', blob: new Blob([stream.getContents()], { type: 'image/jp2' }) });
+      } else {
+        let data;
+        if (name === 'DCTDecode') {
+          const bitmap = await createImageBitmap(new Blob([stream.getContents()], { type: 'image/jpeg' }));
+          const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+          const c2d = canvas.getContext('2d');
+          c2d.drawImage(bitmap, 0, 0);
+          bitmap.close();
+          data = c2d.getImageData(0, 0, canvas.width, canvas.height);
+        } else {
+          data = await decodeImageStream(stream, lib, ctx, zlib);
+        }
+        if (!(data instanceof ImageData)) { skipped++; continue; }
+        const mask = ctx.lookup(stream.dict.get(PDFName.of('SMask')));
+        if (mask instanceof PDFRawStream) {
+          const alpha = await decodeImageStream(mask, lib, ctx, zlib).catch(() => null);
+          if (alpha instanceof ImageData && alpha.width === data.width && alpha.height === data.height) {
+            for (let i = 3; i < data.data.length; i += 4) data.data[i] = alpha.data[i - 3];
+          }
+        }
+        images.push({ page, width: data.width, height: data.height, ext: 'png', blob: await imageDataToPng(data) });
+      }
+    } catch {
+      skipped++;
+    }
+    onProgress?.((n + 1) / list.length);
+    await yieldToUi();
+  }
+  return { images, skipped };
+}
+
+// ─── Blank pages ──────────────────────────────────────────────────────────────
+
+/**
+ * Share of "ink" pixels on each page, ignoring a thin border where scanners
+ * leave shadows. A blank page scores close to 0, a page of text a few percent.
+ */
+export async function inkCoverage(bytes, { onProgress } = {}) {
+  const pdf = await openPdfjs(bytes);
+  const out = [];
+  const canvas = document.createElement('canvas');
+  const c2d = canvas.getContext('2d', { willReadFrequently: true });
+  for (let n = 1; n <= pdf.numPages; n++) {
+    const page = await pdf.getPage(n);
+    const base = page.getViewport({ scale: 1 });
+    const viewport = page.getViewport({ scale: 360 / Math.max(base.width, base.height) });
+    canvas.width = Math.ceil(viewport.width);
+    canvas.height = Math.ceil(viewport.height);
+    await renderOffscreen(page, c2d, viewport);
+    const mx = Math.round(canvas.width * 0.04), my = Math.round(canvas.height * 0.04);
+    const w = canvas.width - 2 * mx, h = canvas.height - 2 * my;
+    const px = c2d.getImageData(mx, my, w, h).data;
+    const hist = new Uint32Array(256);
+    const luma = new Uint8Array(w * h);
+    for (let i = 0, p = 0; p < luma.length; i += 4, p++) {
+      luma[p] = (px[i] * 299 + px[i + 1] * 587 + px[i + 2] * 114) / 1000;
+      hist[luma[p]]++;
+    }
+    let median = 0;
+    for (let acc = 0; median < 256; median++) { acc += hist[median]; if (acc >= luma.length / 2) break; }
+    const cutoff = median - 48;
+    let ink = 0;
+    for (let p = 0; p < luma.length; p++) if (luma[p] < cutoff) ink++;
+    out.push(ink / luma.length);
+    page.cleanup();
+    onProgress?.(n / pdf.numPages);
+    await yieldToUi();
+  }
+  canvas.width = canvas.height = 0;
+  await pdf.destroy();
+  return out;
+}
+
+export const BLANK_THRESHOLDS = { strict: 0.00005, normal: 0.0015, lenient: 0.005 };
+
+// ─── Front and back scans ─────────────────────────────────────────────────────
+
+/**
+ * Order of pages when interleaving fronts and backs.
+ * Returns [{side:'front'|'back', index}]; leftover pages of the longer side go last.
+ */
+export function interleaveOrder(frontCount, backCount, { reverseBacks = true } = {}) {
+  const order = [];
+  const back = i => (reverseBacks ? backCount - 1 - i : i);
+  for (let i = 0; i < Math.max(frontCount, backCount); i++) {
+    if (i < frontCount) order.push({ side: 'front', index: i });
+    if (i < backCount) order.push({ side: 'back', index: back(i) });
+  }
+  return order;
+}
+
 /**
  * Render for output rather than display. The default display intent paces itself with
  * requestAnimationFrame, which stops in background tabs and would stall long jobs.

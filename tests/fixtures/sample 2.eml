@@ -1,0 +1,66 @@
+Subject: Quarterly report: =?utf-8?q?=C3=9Cbersicht_f=C3=BCr_Q3_=E2=98=95?=
+From: Ada Lovelace <ada@example.com>
+To: Grace Hopper <grace@example.com>, Alan Turing <alan@example.com>
+Cc: =?utf-8?q?Zo=C3=AB_M=C3=BCller?= <zoe@example.com>
+Date: Tue, 14 Jul 2026 09:30:00 +0200
+Message-ID: <report-1@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============1288114073482466376=="
+
+--===============1288114073482466376==
+Content-Type: multipart/alternative;
+ boundary="===============5946078996582133556=="
+
+--===============5946078996582133556==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hello Grace,
+
+the report is attached. Details: https://example.com/report
+
+Best,
+Ada
+
+--===============5946078996582133556==
+MIME-Version: 1.0
+Content-Type: multipart/related;
+ boundary="===============2036096801545940895=="
+
+--===============2036096801545940895==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+<html><body><h1>Quarterly report</h1><p>Hello Grace, the <b>report</b> is att=
+ached. <a href=3D"https://example.com/report">Details</a></p><img src=3D"cid:=
+logo123" alt=3D"logo" width=3D"64"><img src=3D"https://tracker.example.com/pi=
+xel.gif" alt=3D"pixel"><script>alert(1)</script></body></html>
+
+--===============2036096801545940895==
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Disposition: inline; filename="logo.png"
+Content-ID: <logo123>
+MIME-Version: 1.0
+
+iVBORw0KGgoAAAANSUhEUgAAAEAAAAAwCAYAAAChS3wfAAAA7klEQVR4nO2UMQ7CQAwE/RkkfsTP
++Q4UaSgoIB7ba2UjRa7usjs3uYiIexzPVadEiNEpEcIGDE6JEDZgcEqEuIQBt8fz9evbmUum9BAM
+7fIdEPBNyeJfQGgbUFm+CsKq8gUQ9pWnIchdeH8AIPLvLE9CWFsegpAjOF2euAtswObyBITV+gO/
+gQ2wATbABtgAG2ADbIANWAshkz9lgMpvkD1EG7AZApE/tXgSApE7Ti6SuAuow0M26YYA5mbKd0Ig
+86LlOyAU5GXLf07BC6/HABpCZb44uagcRmeulo8IT4kQo1MihA0YnBIhbMDQfAOJbLmddZORrgAA
+AABJRU5ErkJggg==
+
+--===============2036096801545940895==--
+
+--===============5946078996582133556==--
+
+--===============1288114073482466376==
+Content-Type: text/csv
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="numbers.csv"
+MIME-Version: 1.0
+
+aWQ7bmFtZTt6aXA7YW1vdW50CjE7QW5uYTswMTIzNDsxMCw1MAoyOyJCZW4gIiJCIiIiOzEwODI5
+OzcKMzsiTXVsdGkKbGluZSI7OTk5OTk7MAo=
+
+--===============1288114073482466376==--

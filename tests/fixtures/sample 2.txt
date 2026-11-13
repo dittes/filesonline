@@ -1,0 +1,4 @@
+Plain text fixture.
+Second line with Ümlauts and emoji ✓.
+
+A longer paragraph for the overview feature, which needs at least ten words to count as meaningful text.

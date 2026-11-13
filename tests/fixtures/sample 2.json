@@ -1,0 +1,36 @@
+{
+  "name": "Open Online",
+  "version": 1,
+  "tags": [
+    "pdf",
+    "docx"
+  ],
+  "nested": {
+    "deep": {
+      "value": true,
+      "nothing": null
+    }
+  },
+  "items": [
+    {
+      "id": 0,
+      "label": "Item 0"
+    },
+    {
+      "id": 1,
+      "label": "Item 1"
+    },
+    {
+      "id": 2,
+      "label": "Item 2"
+    },
+    {
+      "id": 3,
+      "label": "Item 3"
+    },
+    {
+      "id": 4,
+      "label": "Item 4"
+    }
+  ]
+}

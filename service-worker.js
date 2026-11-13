@@ -1,7 +1,7 @@
 // Files Online — Service Worker
 // Cache-first for app shell, network-first for CDN resources.
 
-const CACHE_VERSION = '1ac29d1c46';
+const CACHE_VERSION = '1c8e7b2747';
 const SHELL_CACHE = `files-online-shell-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `files-online-runtime-${CACHE_VERSION}`;
 
@@ -10,6 +10,7 @@ const SHELL_FILES = [
   "/",
   "/manifest.webmanifest",
   "/assets/icons/icon.svg",
+  "/assets/css/fm.css",
   "/assets/css/inspect.css",
   "/assets/css/mbox-viewer.css",
   "/assets/css/md-viewer.css",
@@ -25,6 +26,9 @@ const SHELL_FILES = [
   "/assets/i18n/app.cs.js",
   "/assets/i18n/app.de.js",
   "/assets/i18n/app.pl.js",
+  "/assets/i18n/fm.cs.js",
+  "/assets/i18n/fm.de.js",
+  "/assets/i18n/fm.pl.js",
   "/assets/i18n/inspect.cs.js",
   "/assets/i18n/inspect.de.js",
   "/assets/i18n/inspect.pl.js",
@@ -35,13 +39,19 @@ const SHELL_FILES = [
   "/assets/i18n/routes.de.js",
   "/assets/i18n/routes.en.js",
   "/assets/i18n/routes.pl.js",
-  "/assets/js/app.js",
-  "/assets/js/archives.js",
-  "/assets/js/browser-support.js",
-  "/assets/js/command-palette.js",
-  "/assets/js/export.js",
-  "/assets/js/file-access.js",
-  "/assets/js/folder-tree.js",
+  "/assets/js/fm/actions.js",
+  "/assets/js/fm/archive.js",
+  "/assets/js/fm/demo.js",
+  "/assets/js/fm/details.js",
+  "/assets/js/fm/dialogs.js",
+  "/assets/js/fm/dom.js",
+  "/assets/js/fm/i18n.js",
+  "/assets/js/fm/intake.js",
+  "/assets/js/fm/kinds.js",
+  "/assets/js/fm/main.js",
+  "/assets/js/fm/preview.js",
+  "/assets/js/fm/store.js",
+  "/assets/js/handoff.js",
   "/assets/js/i18n-dom.js",
   "/assets/js/inspect/app.js",
   "/assets/js/inspect/extractors.js",
@@ -50,7 +60,6 @@ const SHELL_FILES = [
   "/assets/js/inspect/formats.js",
   "/assets/js/inspect/i18n.js",
   "/assets/js/inspect/main.js",
-  "/assets/js/inspect/module.js",
   "/assets/js/inspect/ocr.js",
   "/assets/js/inspect/summarize.js",
   "/assets/js/inspect/tika.js",
@@ -66,21 +75,14 @@ const SHELL_FILES = [
   "/assets/js/mbox/threads.js",
   "/assets/js/mbox/worker.js",
   "/assets/js/md-viewer.js",
-  "/assets/js/metadata.js",
   "/assets/js/pdf/lib.js",
   "/assets/js/pdf/main.js",
   "/assets/js/pdf/ops.js",
   "/assets/js/pdf/pages.js",
   "/assets/js/pdf/tools.js",
   "/assets/js/pdf/ui.js",
-  "/assets/js/preview.js",
-  "/assets/js/recipes.js",
-  "/assets/js/rename.js",
   "/assets/js/site.js",
-  "/assets/js/state.js",
-  "/assets/js/storage.js",
   "/assets/js/theme.js",
-  "/assets/js/tools.js",
   "/assets/js/ui.js",
   "/assets/js/utils.js"
 ];

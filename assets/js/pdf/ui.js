@@ -3,6 +3,7 @@
 // controls, progress, results and the hand-off between tools.
 
 import { fflate } from './lib.js';
+import { sendTo, takeHandoff as takeFiles, handoffIdFromUrl } from '../handoff.js';
 
 // ─── i18n ─────────────────────────────────────────────────────────────────────
 
@@ -136,41 +137,15 @@ export function triggerDownload(blob, name) {
 
 // ─── Hand-off between tools (stays on this device, in IndexedDB) ──────────────
 
-const HANDOFF_DB = 'fo-pdf-handoff';
-
-function handoffStore(mode) {
-  return new Promise((resolve, reject) => {
-    const open = indexedDB.open(HANDOFF_DB, 1);
-    open.onupgradeneeded = () => open.result.createObjectStore('files');
-    open.onerror = () => reject(open.error);
-    open.onsuccess = () => {
-      const tx = open.result.transaction('files', mode);
-      tx.oncomplete = () => open.result.close();
-      resolve(tx.objectStore('files'));
-    };
-  });
+/** Open another tool of this site with these files already loaded. */
+function continueIn(url, files) {
+  return sendTo(url, files.map(f => ({ name: f.name, blob: f.blob })), { newTab: false });
 }
 
-export async function saveHandoff(name, blob) {
-  const store = await handoffStore('readwrite');
-  await new Promise((res, rej) => {
-    const r = store.put({ name, blob, at: Date.now() }, 'current');
-    r.onsuccess = res;
-    r.onerror = () => rej(r.error);
-  });
-}
-
+/** Files another tool handed over, or an empty list. */
 export async function takeHandoff() {
-  const store = await handoffStore('readwrite');
-  return new Promise(resolve => {
-    const r = store.get('current');
-    r.onsuccess = () => {
-      store.delete('current');
-      const v = r.result;
-      resolve(v && Date.now() - v.at < 3600000 ? new File([v.blob], v.name, { type: 'application/pdf' }) : null);
-    };
-    r.onerror = () => resolve(null);
-  });
+  const id = handoffIdFromUrl();
+  return id ? takeFiles(id) : [];
 }
 
 // ─── Stage: progress and results ──────────────────────────────────────────────
@@ -229,6 +204,7 @@ export async function showResult(stage, files, opt) {
   const next = canContinue
     ? (opt.nextTools || []).map(id => opt.routes[id]).filter(Boolean)
     : [];
+  const manager = opt.pages?.fileManager;
 
   stage.replaceChildren(el('div.pt-result',
     el('div.pt-result__mark', { 'aria-hidden': 'true' }, '✓'),
@@ -240,16 +216,17 @@ export async function showResult(stage, files, opt) {
       button(normalized.length > 1 ? t('Download all as ZIP') : t('Download'), downloadAll, 'primary'),
       button(t('Start over'), opt.onRestart, 'ghost')),
     list,
-    next.length ? el('div.pt-next',
-      el('h3.pt-next__title', t('Continue with this file')),
-      el('div.pt-next__list', next.map(route => el('a.pt-next__link', {
-        href: `${route.url}?handoff=1`,
-        onclick: async ev => {
-          ev.preventDefault();
-          await saveHandoff(single.name, single.blob);
-          location.href = `${route.url}?handoff=1`;
-        },
-      }, route.name)))) : null,
+    next.length || manager ? el('div.pt-next',
+      el('h3.pt-next__title', normalized.length > 1 ? t('Continue with these files') : t('Continue with this file')),
+      el('div.pt-next__list',
+        next.map(route => el('a.pt-next__link', {
+          href: route.url,
+          onclick: ev => { ev.preventDefault(); continueIn(route.url, [single]); },
+        }, route.name)),
+        manager ? el('a.pt-next__link', {
+          href: manager.url,
+          onclick: ev => { ev.preventDefault(); continueIn(manager.url, normalized); },
+        }, manager.name) : null)) : null,
     el('p.pt-result__privacy', t('This file was made on your device and has not been sent anywhere.'))));
   stage.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }

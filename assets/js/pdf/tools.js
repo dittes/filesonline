@@ -7,7 +7,7 @@ import { PageGrid, PageEditor } from './pages.js';
 import { openPdfjs } from './lib.js';
 import {
   t, el, lang, formatBytes, field, textInput, numberInput, select, checkbox, choice, button,
-  notice, pickFiles,
+  notice, pickFiles, showProgress,
 } from './ui.js';
 
 const PDF = { accept: '.pdf,application/pdf', kind: 'pdf' };
@@ -887,6 +887,278 @@ function imagesToPdfTool() {
     },
   };
 }
+
+// ─── Compare, extract images, blank pages, front and back scans ──────────────
+
+const CONTEXT_WORDS = 8;
+const MAX_CHANGES_SHOWN = 300;
+
+/** Readable change list: a little context, then what was removed and added. */
+function diffView(segments, oldWords, newWords) {
+  const words = (list, idx) => idx.map(i => list[i].text).join(' ');
+  const blocks = [];
+  segments.forEach((seg, i) => {
+    if (seg.type === 'same') return;
+    const prev = segments[i - 1]?.type === 'same' ? segments[i - 1] : null;
+    const next = segments[i + 1]?.type === 'same' ? segments[i + 1] : null;
+    const last = blocks[blocks.length - 1];
+    // A deletion directly followed by an addition is one change
+    if (last && last.open && seg.type === 'add' && segments[i - 1] === last.seg) {
+      last.add = seg; last.after = next; last.open = false;
+      return;
+    }
+    blocks.push({ seg, del: seg.type === 'del' ? seg : null, add: seg.type === 'add' ? seg : null, before: prev, after: next, open: seg.type === 'del' });
+  });
+  const shown = blocks.slice(0, MAX_CHANGES_SHOWN);
+  const items = shown.map(b => {
+    let pageOf = 0;
+    if (b.add) pageOf = newWords[b.add.b[0]].page;
+    else if (b.after) pageOf = newWords[b.after.b[0]].page;
+    else if (b.before) pageOf = newWords[b.before.b[b.before.b.length - 1]].page;
+    const before = b.before ? words(newWords, b.before.b.slice(-CONTEXT_WORDS)) : '';
+    const after = b.after ? words(newWords, b.after.b.slice(0, CONTEXT_WORDS)) : '';
+    return el('li.pt-diff__item',
+      el('span.pt-diff__page', t('Page {n}', { n: pageOf + 1 })),
+      el('p.pt-diff__text',
+        before ? `… ${before} ` : '',
+        b.del ? el('del', words(oldWords, b.del.a)) : null,
+        b.del && b.add ? ' ' : '',
+        b.add ? el('ins', words(newWords, b.add.b)) : null,
+        after ? ` ${after} …` : ''));
+  });
+  return { list: el('ol.pt-diff', items), count: blocks.length, hidden: blocks.length - shown.length };
+}
+
+Object.assign(TOOLS, {
+  compare: {
+    ...PDF, multiple: true, next: [],
+    async open(ctx) {
+      const build = async () => {
+        if (ctx.files.length < 2) {
+          ctx.panel({
+            main: el('div', ctx.fileCard(ctx.files[0]),
+              notice(t('Now add the other version of this document.')),
+              button(t('Add the second PDF'), () => ctx.addFiles(() => ctx.guard(build)), 'primary')),
+            side: [el('p.pt-hint', t('Compare two versions of a document and see which words were added, removed or changed.'))],
+          });
+          return;
+        }
+        ctx.files.splice(2);
+        const [older, newer] = ctx.files;
+        const progress = showProgress(ctx.stage, t('Reading both documents…'));
+        const oldWords = await ops.pageWords(older.bytes, f => progress(f / 2));
+        const newWords = await ops.pageWords(newer.bytes, f => progress(0.5 + f / 2));
+        if (!oldWords.length && !newWords.length) {
+          throw new UserError(t('These PDFs contain no text, only images. Run OCR on both first, then compare them.'));
+        }
+        let segments;
+        try {
+          segments = ops.diffWords(oldWords.map(w => w.text), newWords.map(w => w.text));
+        } catch (err) {
+          if (err instanceof RangeError) throw new UserError(t('These documents are too different to compare word by word.'));
+          throw err;
+        }
+        const removed = segments.filter(s => s.type === 'del').flatMap(s => s.a);
+        const added = segments.filter(s => s.type === 'add').flatMap(s => s.b);
+        const view = diffView(segments, oldWords, newWords);
+        const roles = el('div.pt-roles',
+          el('p', el('strong', t('Original')), ' ', older.name),
+          el('p', el('strong', t('Changed version')), ' ', newer.name),
+          button(t('Swap'), () => { ctx.files.reverse(); ctx.guard(build); }, 'ghost'));
+        ctx.panel({
+          wide: true,
+          main: view.count
+            ? el('div', view.list, view.hidden ? notice(t('{n} more changes are marked in the PDFs you can download.', { n: view.hidden })) : null)
+            : notice(t('No differences found. The text of both documents is the same.')),
+          side: [
+            el('h3.pt-sidehead', t('Changes found: {n}', { n: view.count })),
+            el('p.pt-count', el('span.pt-diff__legend.is-del', t('{n} words removed', { n: removed.length })), ' · ',
+              el('span.pt-diff__legend.is-add', t('{n} words added', { n: added.length }))),
+            roles,
+            el('p.pt-hint', t('This compares the text. Changes to images, colours or layout are not detected.')),
+          ],
+          action: view.count ? t('Download marked PDFs') : null,
+          run: () => ctx.process(t('Marking the changes…'), async progress => {
+            const a = await ops.markWords(older.bytes, removed.map(i => oldWords[i]), '#ef4444');
+            progress(0.5);
+            const b = await ops.markWords(newer.bytes, added.map(i => newWords[i]), '#22c55e');
+            return {
+              files: [
+                { name: pdfName(older.name, 'removed'), bytes: a },
+                { name: pdfName(newer.name, 'added'), bytes: b },
+              ],
+              zipName: `${stem(newer.name)}-comparison.zip`,
+              note: t('Removed words are marked red in the original, added words green in the changed version.'),
+            };
+          }),
+        });
+      };
+      await build();
+    },
+  },
+
+  'extract-images': {
+    ...PDF, next: [],
+    async open(ctx) {
+      const file = ctx.files[0];
+      const progress = showProgress(ctx.stage, t('Looking for images…'));
+      const original = await ops.extractImages(file.bytes, { onProgress: progress });
+      const urls = [];
+      ctx.onClose(() => urls.forEach(u => URL.revokeObjectURL(u)));
+      const skipSmall = checkbox(t('Skip small images such as icons and lines'), true);
+      const format = choice([
+        { value: 'original', label: t('Original format'), hint: t('JPEG images are copied unchanged. Others are saved as PNG.') },
+        { value: 'png', label: t('PNG for all'), hint: t('Every image as a lossless PNG file.') },
+      ], 'original');
+      const counter = el('p.pt-count');
+      const grid = el('div.pt-imgs');
+      const visible = () => original.images.filter(img => !skipSmall.input.checked || Math.max(img.width, img.height) >= 64);
+      const render = () => {
+        const list = visible();
+        counter.textContent = t('Images found: {n}', { n: list.length });
+        grid.replaceChildren(...list.map(img => {
+          const url = URL.createObjectURL(img.blob);
+          urls.push(url);
+          return el('figure.pt-imgs__item',
+            img.ext === 'jp2' ? el('div.pt-imgs__placeholder', 'JPEG 2000') : el('img', { src: url, alt: '', loading: 'lazy' }),
+            el('figcaption', `${t('Page {n}', { n: img.page + 1 })} · ${img.width}×${img.height} · ${img.ext.toUpperCase()}`));
+        }));
+      };
+      skipSmall.input.addEventListener('change', render);
+      render();
+      ctx.panel({
+        main: original.images.length ? grid : notice(t('This PDF contains no images that can be extracted.')),
+        side: [
+          counter,
+          original.skipped ? notice(t('{n} images use a format that cannot be exported yet, such as black-and-white fax compression.', { n: original.skipped })) : null,
+          el('h3.pt-sidehead', t('Save as')), format, skipSmall,
+        ],
+        action: original.images.length ? t('Download images') : null,
+        run: () => {
+          if (!visible().length) throw new UserError(t('There are no images to save with these settings.'));
+          return ctx.process(t('Saving images…'), async p => {
+            const minSize = skipSmall.input.checked ? 64 : 0;
+            const { images } = format.value === 'png'
+              ? await ops.extractImages(file.bytes, { asPng: true, minSize, onProgress: p })
+              : { images: visible() };
+            const perPage = {};
+            return {
+              files: images.map(img => {
+                perPage[img.page] = (perPage[img.page] || 0) + 1;
+                return { name: `${stem(file.name)}-page${img.page + 1}-${perPage[img.page]}.${img.ext}`, blob: img.blob };
+              }),
+              zipName: `${stem(file.name)}-images.zip`,
+            };
+          });
+        },
+      });
+    },
+  },
+
+  'remove-blank': {
+    ...PDF, next: ['compress', 'merge', 'organize'],
+    async open(ctx) {
+      const file = ctx.files[0];
+      const progress = showProgress(ctx.stage, t('Looking for blank pages…'));
+      const coverage = await ops.inkCoverage(file.bytes, { onProgress: progress });
+      const counter = el('p.pt-count');
+      const grid = new PageGrid({
+        selectable: true,
+        onChange: () => { counter.textContent = t('Pages to remove: {n}', { n: grid.selection.length }); },
+      });
+      grid.root.classList.add('pg--danger');
+      ctx.onClose(() => grid.destroy());
+      const count = await grid.addDocument(file.bytes, file.name);
+      const found = el('p.pt-sidehead');
+      const pick = level => {
+        const blank = coverage.flatMap((v, i) => (v < ops.BLANK_THRESHOLDS[level] ? [i] : []));
+        grid.setSelectedIndexes(blank);
+        found.textContent = t('Blank pages found: {n}', { n: blank.length });
+      };
+      const level = choice([
+        { value: 'strict', label: t('Only completely empty pages') },
+        { value: 'normal', label: t('Nearly empty pages'), hint: t('Also pages with scanner noise or a single short line.') },
+        { value: 'lenient', label: t('Mostly empty pages'), hint: t('Also pages with a few marks, such as a page number or stamp.') },
+      ], 'normal', pick);
+      pick('normal');
+      ctx.panel({
+        main: el('div', gridToolbar(grid), grid.root),
+        side: [found, counter, el('h3.pt-sidehead', t('What counts as blank')), level,
+          el('p.pt-hint', t('Check the marked pages before you continue. Click a page to keep or remove it.'))],
+        action: t('Remove blank pages'),
+        run: () => {
+          const pages = grid.selection.map(e => e.page);
+          if (!pages.length) throw new UserError(t('No pages are selected for removal.'));
+          if (pages.length >= count) throw new UserError(t('A PDF needs at least one page. Leave one unselected.'));
+          return ctx.process(t('Removing pages…'), async () => ({
+            files: [{ name: pdfName(file.name, 'no-blanks'), bytes: await ops.deletePages(file.bytes, pages) }],
+            stat: t('{n} pages removed', { n: pages.length }),
+          }));
+        },
+      });
+    },
+  },
+
+  alternate: {
+    ...PDF, multiple: true, next: ['compress', 'remove-blank', 'ocr'],
+    async open(ctx) {
+      const grid = new PageGrid();
+      ctx.onClose(() => grid.destroy());
+      const reverse = checkbox(t('The back sides are in reverse order'), true);
+      let counts = [];
+      let sources = [];
+      let order = [];
+
+      const load = async () => {
+        ctx.files.splice(2);
+        grid.docs.forEach(d => d.doc.destroy());
+        grid.docs = [];
+        grid.entries = [];
+        counts = [];
+        for (const f of ctx.files) counts.push(await grid.addDocument(f.bytes, f.name));
+      };
+      const compute = () => {
+        const two = ctx.files.length === 2;
+        const fronts = two ? counts[0] : Math.ceil(counts[0] / 2);
+        const backs = two ? counts[1] : counts[0] - fronts;
+        order = ops.interleaveOrder(fronts, backs, { reverseBacks: reverse.input.checked })
+          .map(({ side, index }) => (side === 'front' ? { file: 0, page: index } : two ? { file: 1, page: index } : { file: 0, page: fronts + index }));
+        grid.entries = order.map(o => ({ ...o, rotate: 0, selected: false }));
+        grid.render();
+        return { two, fronts, backs };
+      };
+      reverse.input.addEventListener('change', () => build());
+
+      const build = () => {
+        const { two, fronts, backs } = compute();
+        sources = ctx.files.map(f => f.bytes);
+        const roles = two
+          ? el('div.pt-roles',
+            el('p', el('strong', t('Front sides')), ' ', `${ctx.files[0].name} · ${fronts}`),
+            el('p', el('strong', t('Back sides')), ' ', `${ctx.files[1].name} · ${backs}`),
+            button(t('Swap'), async () => { ctx.files.reverse(); await load(); build(); }, 'ghost'))
+          : el('div.pt-roles',
+            el('p', t('One file: the first {a} pages are the front sides, the last {b} pages the back sides.', { a: fronts, b: backs })),
+            button(t('Add the back sides as a second PDF'), () => ctx.addFiles(async () => { await load(); build(); }), 'ghost'));
+        ctx.panel({
+          main: el('div', el('p.pt-hint', t('Preview of the new page order:')), grid.root),
+          side: [roles, reverse,
+            el('p.pt-hint', t('Leave this on if you turned the whole stack over to scan the back sides. The last back side then belongs to the first page.')),
+            two && fronts !== backs ? notice(t('The two files have a different number of pages. The extra pages are added at the end.')) : null],
+          action: t('Merge front and back'),
+          run: () => {
+            if (counts.reduce((a, b) => a + b, 0) < 2) throw new UserError(t('This needs at least two pages.'));
+            return ctx.process(t('Building your PDF…'), async () => ({
+              files: [{ name: pdfName(ctx.files[0].name, 'merged'), bytes: await ops.organize(sources, order.map(o => ({ ...o, rotate: 0 }))) }],
+            }));
+          },
+        });
+      };
+      await load();
+      build();
+    },
+  },
+});
 
 // ─── Signature pad ────────────────────────────────────────────────────────────
 

@@ -3,7 +3,7 @@
 // theme before first paint; this module owns everything after that.
 
 const STORAGE_KEY = 'fo-theme';
-const META_COLORS = { light: '#1B4FD8', dark: '#101013' };
+const META_COLORS = { light: '#ffffff', dark: '#111318' };
 
 /**
  * Return the currently applied theme.
@@ -44,12 +44,5 @@ export function initTheme() {
     btn.addEventListener('click', toggleTheme);
   });
 
-  // Follow OS changes only when no explicit preference is stored
-  const mq = window.matchMedia('(prefers-color-scheme: dark)');
-  const followOS = e => {
-    let stored = null;
-    try { stored = localStorage.getItem(STORAGE_KEY); } catch { /* ignore */ }
-    if (!stored) setTheme(e.matches ? 'dark' : 'light', false);
-  };
-  if (mq.addEventListener) mq.addEventListener('change', followOS);
+  // Light is the default; dark only applies after an explicit choice.
 }

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'sha256-WFHbN6LP8QnU5HOG4yJKIvGNw+g6h+js71iCvoKrkr4='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self' data: blob:; connect-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'sha256-2umU0MxQJqQrUkhC2ma0avyIwaZeSqNXdBh3CvB6PCc='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self' data: blob:; connect-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
   <title>PDF na tekst – Wyodrębnij tekst z PDF online, bez przesyłania</title>
   <meta name="description" content="Wyodrębnij cały tekst z PDF do zwykłego pliku .txt, z odtworzonymi akapitami. Za darmo, w przeglądarce, bez przesyłania.">
   
@@ -13,8 +13,7 @@
   <link rel="alternate" hreflang="pl" href="https://files-online.com/pl/pdf-na-tekst/">
   <link rel="alternate" hreflang="cs" href="https://files-online.com/cs/pdf-na-text/">
   <link rel="alternate" hreflang="x-default" href="https://files-online.com/en/pdf-to-text/">
-  <meta name="theme-color" content="#f4f1e8" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#121317" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#ffffff">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Files Online">
   <meta property="og:url" content="https://files-online.com/pl/pdf-na-tekst/">
@@ -29,10 +28,10 @@
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
   <link rel="manifest" href="/manifest.webmanifest">
-  <script>(function(){try{var t=localStorage.getItem('fo-theme');if(t!=='light'&&t!=='dark'){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}document.documentElement.setAttribute('data-theme',t)}catch(e){}})();</script>
+  <script>(function(){try{var t=localStorage.getItem('fo-theme')==='dark'?'dark':'light';document.documentElement.setAttribute('data-theme',t)}catch(e){}})();</script>
   <link rel="preload" href="/assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   
-  <link rel="stylesheet" href="/assets/css/site.css?v=de3a7534">
+  <link rel="stylesheet" href="/assets/css/site.css?v=1bf1a7b0">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":["SoftwareApplication","WebApplication"],"name":"PDF na tekst","url":"https://files-online.com/pl/pdf-na-tekst/","description":"Wyodrębnij cały tekst z PDF do zwykłego pliku .txt, z odtworzonymi akapitami. Za darmo, w przeglądarce, bez przesyłania.","inLanguage":"pl","applicationCategory":"UtilitiesApplication","operatingSystem":"Windows, macOS, Linux, Android, iOS","browserRequirements":"Requires a modern web browser with JavaScript enabled","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"publisher":{"@id":"https://files-online.com/#org"}}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Strona główna","item":"https://files-online.com/pl/"},{"@type":"ListItem","position":2,"name":"Narzędzia PDF","item":"https://files-online.com/pl/narzedzia-pdf/"},{"@type":"ListItem","position":3,"name":"PDF na tekst"}]}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","name":"Jak wyodrębnić tekst z PDF","step":[{"@type":"HowToStep","position":1,"text":"Wybierz plik PDF."},{"@type":"HowToStep","position":2,"text":"Kliknij „Wyodrębnij tekst”."},{"@type":"HowToStep","position":3,"text":"Pobierz plik .txt."}]}</script>
@@ -49,16 +48,16 @@
           <div class="s-mega">
             <div>
               <h3>Porządkowanie stron</h3>
-              <a href="/pl/polacz-pdf/">Połącz PDF</a><a href="/pl/podziel-pdf/">Podziel PDF</a><a href="/pl/wyodrebnij-strony-pdf/">Wyodrębnij strony PDF</a><a href="/pl/usun-strony-pdf/">Usuń strony PDF</a><a href="/pl/uporzadkuj-pdf/">Uporządkuj PDF</a><a href="/pl/obroc-pdf/">Obróć PDF</a><a href="/pl/przytnij-pdf/">Przytnij PDF</a>
+              <a href="/pl/polacz-pdf/">Połącz PDF</a><a href="/pl/podziel-pdf/">Podziel PDF</a><a href="/pl/wyodrebnij-strony-pdf/">Wyodrębnij strony PDF</a><a href="/pl/usun-strony-pdf/">Usuń strony PDF</a><a href="/pl/uporzadkuj-pdf/">Uporządkuj PDF</a><a href="/pl/obroc-pdf/">Obróć PDF</a><a href="/pl/przytnij-pdf/">Przytnij PDF</a><a href="/pl/usun-puste-strony-pdf/">Usuń puste strony</a><a href="/pl/polacz-skany-przodu-i-tylu-pdf/">Połącz skany przodu i tyłu</a>
             </div><div>
               <h3>Optymalizacja</h3>
               <a href="/pl/kompresuj-pdf/">Kompresuj PDF</a><a href="/pl/ocr-pdf/">OCR PDF</a><a href="/pl/splaszcz-pdf/">Spłaszcz PDF</a>
             </div><div>
               <h3>Konwersja</h3>
-              <a href="/pl/pdf-na-word/">PDF na Word</a><a href="/pl/pdf-na-excel/">PDF na Excel</a><a href="/pl/pdf-na-jpg/">PDF na JPG</a><a href="/pl/pdf-na-png/">PDF na PNG</a><a href="/pl/pdf-na-tekst/">PDF na tekst</a><a href="/pl/jpg-na-pdf/">JPG na PDF</a><a href="/pl/png-na-pdf/">PNG na PDF</a>
+              <a href="/pl/pdf-na-word/">PDF na Word</a><a href="/pl/pdf-na-excel/">PDF na Excel</a><a href="/pl/pdf-na-jpg/">PDF na JPG</a><a href="/pl/pdf-na-png/">PDF na PNG</a><a href="/pl/pdf-na-tekst/">PDF na tekst</a><a href="/pl/jpg-na-pdf/">JPG na PDF</a><a href="/pl/png-na-pdf/">PNG na PDF</a><a href="/pl/wyodrebnij-obrazy-z-pdf/">Wyodrębnij obrazy z PDF</a>
             </div><div>
               <h3>Edycja i podpis</h3>
-              <a href="/pl/edytuj-pdf/">Edytuj PDF</a><a href="/pl/podpisz-pdf/">Podpisz PDF</a><a href="/pl/wypelnij-formularz-pdf/">Wypełnij formularz PDF</a><a href="/pl/znak-wodny-pdf/">Dodaj znak wodny</a><a href="/pl/numeracja-stron-pdf/">Dodaj numery stron</a>
+              <a href="/pl/edytuj-pdf/">Edytuj PDF</a><a href="/pl/podpisz-pdf/">Podpisz PDF</a><a href="/pl/wypelnij-formularz-pdf/">Wypełnij formularz PDF</a><a href="/pl/znak-wodny-pdf/">Dodaj znak wodny</a><a href="/pl/numeracja-stron-pdf/">Dodaj numery stron</a><a href="/pl/porownaj-pdf/">Porównaj PDF</a>
             </div><div>
               <h3>Bezpieczeństwo i prywatność</h3>
               <a href="/pl/zabezpiecz-pdf/">Zabezpiecz PDF</a><a href="/pl/odblokuj-pdf/">Odblokuj PDF</a><a href="/pl/zaczernij-pdf/">Zaczernij PDF</a><a href="/pl/edytuj-metadane-pdf/">Edytuj metadane PDF</a>
@@ -95,7 +94,6 @@
       </div>
       <div class="pt" id="pdf-tool" data-tool="pdf-to-text">
         <div class="pt-drop" data-accept=".pdf,application/pdf" data-multiple="false">
-          <span class="s-stamp">Zostaje na Twoim urządzeniu<small>bez przesyłania</small></span>
           <svg class="pt-drop__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><path d="M9 11h6M9 14h6M9 17h4"/></svg>
           <button class="s-btn s-btn--primary pt-drop__btn" type="button">Wybierz plik PDF</button>
           <p class="pt-drop__or">lub upuść tutaj</p>
@@ -117,14 +115,6 @@
     <div class="s-wrap">
       <h2>Jak wyodrębnić tekst z PDF</h2>
       <ol class="s-steps"><li><p>Wybierz plik PDF.</p></li><li><p>Kliknij „Wyodrębnij tekst”.</p></li><li><p>Pobierz plik .txt.</p></li></ol>
-    </div>
-  </section>
-    <section class="s-section">
-    <div class="s-wrap">
-      <h2>Dlaczego warto</h2>
-      <div class="s-benefits">
-        <div><h3>Twój plik nie opuszcza urządzenia</h3><p>Inne narzędzia PDF online wysyłają dokument na swoje serwery. Tutaj cała praca odbywa się w przeglądarce, więc nie ma czego przechwycić, przechowywać ani później usuwać.</p></div><div><h3>Za darmo i bez ukrytych limitów</h3><p>Bez konta, adresu e-mail, dziennego limitu i znaku wodnego na wyniku. Jedynym ograniczeniem są możliwości Twojego urządzenia.</p></div><div><h3>Działa wszędzie tam, gdzie jest przeglądarka</h3><p>Windows, Mac, Linux, Android i iPhone. Nic nie trzeba instalować, a załadowana strona działa dalej bez internetu.</p></div>
-      </div>
     </div>
   </section>
     <section class="s-section" id="faq">
@@ -170,42 +160,15 @@
     </section>
   </main>
   <footer class="s-footer">
-    <div class="s-wrap">
-      <div class="s-footer__toc">
-        <section>
-          <h2>Porządkowanie stron</h2>
-          <a href="/pl/polacz-pdf/">Połącz PDF<span>PDF</span></a><a href="/pl/podziel-pdf/">Podziel PDF<span>PDF</span></a><a href="/pl/wyodrebnij-strony-pdf/">Wyodrębnij strony PDF<span>PDF</span></a><a href="/pl/usun-strony-pdf/">Usuń strony PDF<span>PDF</span></a><a href="/pl/uporzadkuj-pdf/">Uporządkuj PDF<span>PDF</span></a><a href="/pl/obroc-pdf/">Obróć PDF<span>PDF</span></a><a href="/pl/przytnij-pdf/">Przytnij PDF<span>PDF</span></a>
-        </section><section>
-          <h2>Optymalizacja</h2>
-          <a href="/pl/kompresuj-pdf/">Kompresuj PDF<span>PDF</span></a><a href="/pl/ocr-pdf/">OCR PDF<span>PDF</span></a><a href="/pl/splaszcz-pdf/">Spłaszcz PDF<span>PDF</span></a>
-        </section><section>
-          <h2>Konwersja</h2>
-          <a href="/pl/pdf-na-word/">PDF na Word<span>PDF</span></a><a href="/pl/pdf-na-excel/">PDF na Excel<span>PDF</span></a><a href="/pl/pdf-na-jpg/">PDF na JPG<span>PDF</span></a><a href="/pl/pdf-na-png/">PDF na PNG<span>PDF</span></a><a href="/pl/pdf-na-tekst/">PDF na tekst<span>PDF</span></a><a href="/pl/jpg-na-pdf/">JPG na PDF<span>PDF</span></a><a href="/pl/png-na-pdf/">PNG na PDF<span>PDF</span></a>
-        </section><section>
-          <h2>Edycja i podpis</h2>
-          <a href="/pl/edytuj-pdf/">Edytuj PDF<span>PDF</span></a><a href="/pl/podpisz-pdf/">Podpisz PDF<span>PDF</span></a><a href="/pl/wypelnij-formularz-pdf/">Wypełnij formularz PDF<span>PDF</span></a><a href="/pl/znak-wodny-pdf/">Dodaj znak wodny<span>PDF</span></a><a href="/pl/numeracja-stron-pdf/">Dodaj numery stron<span>PDF</span></a>
-        </section><section>
-          <h2>Bezpieczeństwo i prywatność</h2>
-          <a href="/pl/zabezpiecz-pdf/">Zabezpiecz PDF<span>PDF</span></a><a href="/pl/odblokuj-pdf/">Odblokuj PDF<span>PDF</span></a><a href="/pl/zaczernij-pdf/">Zaczernij PDF<span>PDF</span></a><a href="/pl/edytuj-metadane-pdf/">Edytuj metadane PDF<span>PDF</span></a>
-        </section>
-        <section>
-          <h2>Narzędzia do plików</h2>
-          <a href="/pl/metadane-pliku/">Inspektor plików<span>każdy plik</span></a><a href="/pl/menedzer-plikow/">Menedżer plików<span>ZIP</span></a><a href="/pl/otworz-plik-md/">Przeglądarka MD<span>.md</span></a><a href="/pl/otworz-plik-mbox/">Przeglądarka MBOX<span>.mbox</span></a>
-        </section>
-        <section>
-          <h2>Nasze inne strony</h2>
-          <a href="https://open-online.com/pl/" rel="noopener">Open Online<span>↗</span></a><a href="https://remove-online.com/pl/" rel="noopener">Remove Online<span>↗</span></a><a href="https://aintob.com/pl/" rel="noopener">AintoB<span>↗</span></a>
-        </section>
-      </div>
-      <div class="s-footer__bottom">
+    <div class="s-wrap s-footer__row">
+      <span class="s-footer__brand"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect width="32" height="32" rx="7" fill="#1B4FD8"/><path d="M10 6.5h8.200l5 5v13A1.500 1.500 0 0 1 21.700 26H10a1.500 1.500 0 0 1-1.500-1.500V8A1.500 1.500 0 0 1 10 6.500z" fill="#fff"/><path d="M18.200 6.500V10a1.500 1.500 0 0 0 1.500 1.500h3.500" fill="none" stroke="#1B4FD8" stroke-width="1.100" stroke-linejoin="round"/><rect x="11.300" y="15" width="9" height="1.700" rx=".85" fill="#1B4FD8"/><rect x="11.300" y="18.400" width="9" height="1.700" rx=".85" fill="#1B4FD8"/><rect x="11.300" y="21.800" width="5.500" height="1.700" rx=".85" fill="#1B4FD8"/></svg><span>Działa w przeglądarce. Bez przesyłania, bez konta, bez śledzenia.</span></span>
+      <nav class="s-footer__links" aria-label="Legal">
         <a href="/pl/prywatnosc/">Prywatność</a>
         <a href="/pl/nota-prawna/">Nota prawna</a>
-        <a href="/en/pdf-to-text/" hreflang="en" lang="en" data-set-lang="en">English</a><a href="/de/pdf-in-text/" hreflang="de" lang="de" data-set-lang="de">Deutsch</a><a href="/pl/pdf-na-tekst/" hreflang="pl" lang="pl" data-set-lang="pl">Polski</a><a href="/cs/pdf-na-text/" hreflang="cs" lang="cs" data-set-lang="cs">Čeština</a>
-        <span class="s-footer__note">Działa w przeglądarce. Bez przesyłania, bez konta, bez śledzenia.</span>
-      </div>
+      </nav>
     </div>
   </footer>
   <script src="/assets/js/site.js?v=21b41bad" defer></script>
-  <script type="module" src="/assets/js/pdf/main.js?v=e138265d"></script>
+  <script type="module" src="/assets/js/pdf/main.js?v=687d9ec7"></script>
 </body>
 </html>

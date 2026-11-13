@@ -41,19 +41,19 @@ function write(path, html) {
   writeFileSync(full, html);
 }
 
-const THEME_BOOT = `(function(){try{var t=localStorage.getItem('fo-theme');if(t!=='light'&&t!=='dark'){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}document.documentElement.setAttribute('data-theme',t)}catch(e){}})();`;
+const THEME_BOOT = `(function(){try{var t=localStorage.getItem('fo-theme')==='dark'?'dark':'light';document.documentElement.setAttribute('data-theme',t)}catch(e){}})();`;
 const inlineHash = src => `'sha256-${createHash('sha256').update(src).digest('base64')}'`;
 
 /** Pages without CDN libraries get a policy that makes "no upload" verifiable. */
-function csp(inlineScripts = [THEME_BOOT]) {
+function csp(inlineScripts = [THEME_BOOT], { cdn = '' } = {}) {
   return [
     "default-src 'self'",
-    `script-src 'self' 'wasm-unsafe-eval' ${inlineScripts.map(inlineHash).join(' ')}`,
+    `script-src 'self' 'wasm-unsafe-eval' ${cdn ? `blob: ${cdn} ` : ''}${inlineScripts.map(inlineHash).join(' ')}`,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob:",
     "media-src 'self' blob:",
     "font-src 'self' data: blob:",
-    "connect-src 'self' blob: data:",
+    `connect-src 'self' blob: data:${cdn ? ` ${cdn}` : ''}`,
     "worker-src 'self' blob:",
     "object-src 'none'",
     "base-uri 'self'",
@@ -67,7 +67,7 @@ const toolById = id => TOOLS.find(t => t.id === id);
 
 // ─── Shared page parts ────────────────────────────────────────────────────────
 
-function head({ lang, title, desc, paths, jsonLd = [], useCsp = true, extraCss = [], ogType = 'website', noindex = false }) {
+function head({ lang, title, desc, paths, jsonLd = [], useCsp = true, cspCdn = '', extraCss = [], ogType = 'website', noindex = false }) {
   const url = `${SITE}${paths[lang]}`;
   const alternates = LANGS.map(l => `<link rel="alternate" hreflang="${l}" href="${SITE}${paths[l]}">`).join('\n  ');
   const ogAlt = LANGS.filter(l => l !== lang).map(l => `<meta property="og:locale:alternate" content="${LOCALES[l]}">`).join('\n  ');
@@ -77,15 +77,14 @@ function head({ lang, title, desc, paths, jsonLd = [], useCsp = true, extraCss =
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  ${useCsp ? `<meta http-equiv="Content-Security-Policy" content="${e(csp())}">` : ''}
+  ${useCsp ? `<meta http-equiv="Content-Security-Policy" content="${e(csp([THEME_BOOT], { cdn: cspCdn }))}">` : ''}
   <title>${e(title)}</title>
   <meta name="description" content="${e(desc)}">
   ${noindex ? '<meta name="robots" content="noindex">' : ''}
   <link rel="canonical" href="${url}">
   ${alternates}
   <link rel="alternate" hreflang="x-default" href="${SITE}${paths.en}">
-  <meta name="theme-color" content="#f4f1e8" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#121317" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#ffffff">
   <meta property="og:type" content="${ogType}">
   <meta property="og:site_name" content="Files Online">
   <meta property="og:url" content="${url}">
@@ -153,35 +152,17 @@ function header(lang, paths, current) {
 
 function footer(lang, paths, { noTheme = false } = {}) {
   const c = content[lang];
-  const tocBlock = (title, links) => `<section>
-          <h2>${e(title)}</h2>
-          ${links.join('')}
-        </section>`;
-  const toolLink = t => `<a href="${toolPath(t, lang)}">${e(c.tools[t.id].name)}<span>PDF</span></a>`;
   return `<footer class="s-footer">
-    <div class="s-wrap">
-      <div class="s-footer__toc">
-        ${CATEGORIES.map(cat => tocBlock(c.cats[cat], TOOLS.filter(t => t.cat === cat).map(toolLink))).join('')}
-        ${tocBlock(c.footer.files, [
-    `<a href="${pagePath('inspector', lang)}">${e(c.nav.inspector)}<span>${e(c.footer.anyFile)}</span></a>`,
-    `<a href="${pagePath('fileManager', lang)}">${e(c.nav.fileManager)}<span>ZIP</span></a>`,
-    `<a href="${pagePath('md', lang)}">${e(c.nav.md)}<span>.md</span></a>`,
-    `<a href="${pagePath('mbox', lang)}">${e(c.nav.mbox)}<span>.mbox</span></a>`,
-  ])}
-        ${tocBlock(c.footer.family, Object.entries(SISTER_SITES).map(([key, s]) => `<a href="${s.host}/${lang}/" rel="noopener">${e(s.name)}<span>↗</span></a>`))}
-      </div>
-      <div class="s-footer__bottom">
+    <div class="s-wrap s-footer__row">
+      <span class="s-footer__brand">${LOGO}<span>${e(c.footer.note)}</span></span>
+      <nav class="s-footer__links" aria-label="Legal">
         <a href="${pagePath('privacy', lang)}">${e(c.nav.privacy)}</a>
         <a href="${pagePath('imprint', lang)}">${e(c.nav.imprint)}</a>
-        ${LANGS.map(l => `<a href="${paths[l]}" hreflang="${l}" lang="${l}" data-set-lang="${l}">${LANG_NAMES[l]}</a>`).join('')}
-        <span class="s-footer__note">${e(c.footer.note)}</span>
-      </div>
+      </nav>
     </div>
   </footer>
   <script src="${assetUrl('assets/js/site.js')}" defer${noTheme ? ' data-no-theme="true"' : ''}></script>`;
 }
-
-const stamp = c => `<span class="s-stamp">${e(c.stamp.main)}<small>${e(c.stamp.sub)}</small></span>`;
 
 function breadcrumbs(items) {
   return `<ol class="s-crumbs">${items.map(([label, href]) => `<li>${href ? `<a href="${href}">${e(label)}</a>` : `<span aria-current="page">${e(label)}</span>`}</li>`).join('')}</ol>`;
@@ -307,46 +288,28 @@ function homePage(lang) {
   const c = content[lang];
   const h = c.home;
   const paths = pathsFor('home');
-  const popular = TOOLS.filter(t => t.popular).slice(0, 8);
+  const popular = TOOLS.filter(t => t.popular);
   return `${head({ lang, title: h.title, desc: h.desc, paths, jsonLd: [ldOrg, ldApp(lang, 'Files Online', h.desc, paths[lang]), ldFaq(h.faqs)] })}
 <body class="s-page">
   ${header(lang, paths, 'home')}
   <main id="main">
     <section class="s-hero">
-      <div class="s-wrap s-hero__grid">
-        <div>
-          <p class="s-eyebrow">${e(h.eyebrow)}</p>
-          <h1>${h.h1Html}</h1>
-          <p class="s-hero__lede">${e(h.lede)}</p>
-          <div class="s-hero__cta">
-            <a class="s-btn s-btn--primary" href="${pagePath('pdfTools', lang)}">${e(h.ctaPdf)}</a>
-            <a class="s-btn s-btn--secondary" href="${pagePath('fileManager', lang)}">${e(h.ctaFiles)}</a>
-          </div>
-        </div>
-        <div class="s-stack" aria-hidden="true">
-          <div class="s-stack__sheet"></div>
-          <div class="s-stack__sheet"></div>
-          <div class="s-stack__sheet">
-            <div class="s-stack__line s-stack__line--h"></div>
-            <div class="s-stack__line"></div>
-            <div class="s-stack__line s-stack__line--m"></div>
-            <div class="s-stack__line"></div>
-            <div class="s-stack__line s-stack__line--x"></div>
-            <div class="s-stack__line"></div>
-            <div class="s-stack__line" style="width:78%"></div>
-          </div>
-          <span class="s-crop s-crop--tl"></span><span class="s-crop s-crop--br"></span>
-          ${stamp(c)}
-        </div>
+      <div class="s-wrap s-hero__inner">
+        <h1>${h.h1Html}</h1>
+        <p class="s-hero__lede">${e(h.lede)}</p>
+        <nav class="s-chips" aria-label="${e(h.popularTitle)}">
+          ${popular.map(t => `<a class="s-chip" href="${toolPath(t, lang)}">${e(c.tools[t.id].name)}</a>`).join('')}
+        </nav>
       </div>
     </section>
 
     <section class="s-section">
       <div class="s-wrap">
-        <h2>${e(h.popularTitle)}</h2>
-        <p class="s-section__lede">${e(h.popularLede)}</p>
-        <div class="s-cards">${popular.map(t => card(lang, t)).join('')}</div>
-        <p style="margin-top:22px"><a class="s-btn s-btn--secondary" href="${pagePath('pdfTools', lang)}">${e(fill(h.allTools, { n: TOOLS.length }))} →</a></p>
+        <div class="s-section__head">
+          <h2>${e(c.nav.allPdfTools)}</h2>
+          <a href="${pagePath('pdfTools', lang)}">${e(fill(h.allTools, { n: TOOLS.length }))} →</a>
+        </div>
+        ${toolGrid(lang)}
       </div>
     </section>
 
@@ -359,23 +322,12 @@ function homePage(lang) {
     </section>
 
     <section class="s-section">
-      <div class="s-wrap s-privacy">
-        ${stamp(c)}
-        <div class="s-prose">
-          <h2>${e(h.privacyTitle)}</h2>
-          <p>${e(h.privacyText)}</p>
-          <p><a href="${pagePath('privacy', lang)}">${e(h.privacyLink)} →</a></p>
-        </div>
-      </div>
-    </section>
-
-    <section class="s-section s-section--tint">
       <div class="s-wrap">
-        <h2>${e(h.familyTitle)}</h2>
-        <p class="s-section__lede">${e(h.familyLede)}</p>
-        <div class="s-sisters">
-          ${Object.entries(SISTER_SITES).map(([key, s]) => `<a class="s-sister" href="${s.host}/${lang}/" rel="noopener"><strong>${e(s.name)}</strong><span>${e(c.sisterSites[key])}</span><small>${e(s.host.replace('https://', ''))} ↗</small></a>`).join('')}
+        <h2>${e(h.privacyTitle)}</h2>
+        <div class="s-benefits">
+          ${c.toolPage.benefits.map(([bh, bp]) => `<div><h3>${e(bh)}</h3><p>${e(bp)}</p></div>`).join('')}
         </div>
+        <p class="s-section__more"><a href="${pagePath('privacy', lang)}">${e(h.privacyLink)} →</a></p>
       </div>
     </section>
 
@@ -442,7 +394,6 @@ function toolPage(lang, tool) {
       </div>
       <div class="pt" id="pdf-tool" data-tool="${tool.id}">
         <div class="pt-drop" data-accept="${isImage ? 'image/*' : '.pdf,application/pdf'}" data-multiple="${!!tool.multiple}">
-          ${stamp(c)}
           ${iconSvg(tool.icon, 'pt-drop__icon')}
           <button class="s-btn s-btn--primary pt-drop__btn" type="button">${e(isImage ? (tool.multiple ? c.toolPage.chooseImages : c.toolPage.chooseImage) : (tool.multiple ? c.toolPage.choosePdfs : c.toolPage.choosePdf))}</button>
           <p class="pt-drop__or">${e(c.toolPage.orDrop)}</p>
@@ -461,7 +412,6 @@ function toolPage(lang, tool) {
       </div>
     </section>
     ${howToSection(t.how, t.steps)}
-    ${benefitsSection(c)}
     ${faqSection(c, faqs)}
     ${sisterSection(lang, tool.sister)}
     <section class="s-section s-section--tint">
@@ -483,11 +433,15 @@ function fileManagerPage(lang) {
   const p = c.fileManagerPage;
   const paths = pathsFor('fileManager');
   const crumbs = [[c.nav.home, `/${lang}/`], [p.name]];
-  const workspace = translateFragment(readFileSync(join(BUILD, 'legacy/workspace.html'), 'utf8'), lang);
   const faqs = [...p.faqs];
-  return `${head({ lang, title: p.title, desc: p.desc, paths, useCsp: false, extraCss: ['assets/css/styles.css', 'assets/css/inspect.css'], jsonLd: [ldApp(lang, p.name, p.desc, paths[lang], p.features.map(f => f[0])), ldCrumbs(crumbs), ldFaq(faqs)] })}
-<body class="s-page">
-  <div class="landing" id="landing">
+  const toolLink = id => {
+    const tool = toolById(id);
+    return `<a href="${toolPath(tool, lang)}"><strong>${e(c.tools[id].name)}</strong><span>${e(c.tools[id].short)}</span></a>`;
+  };
+  const pageLink = key => `<a href="${pagePath(key, lang)}"><strong>${e(c.nav[key])}</strong><span>${e(c.fileCards[key])}</span></a>`;
+  return `${head({ lang, title: p.title, desc: p.desc, paths, cspCdn: 'https://cdn.jsdelivr.net', extraCss: ['assets/css/fm.css'], jsonLd: [ldApp(lang, p.name, p.desc, paths[lang], p.features.map(f => f[0])), ldCrumbs(crumbs), ldFaq(faqs)] })}
+<body class="s-page fm-page">
+  <div id="fm-landing">
   ${header(lang, paths, 'fileManager')}
   <main id="main">
     <div class="s-wrap">
@@ -496,15 +450,16 @@ function fileManagerPage(lang) {
         <h1>${e(p.h1)}</h1>
         <p>${e(p.lede)}</p>
       </div>
-      <div class="pt">
-        <div class="pt-drop" style="cursor:default">
-          ${stamp(c)}
+      <div class="pt fm-hero">
+        <div class="pt-drop">
           ${iconSvg('fileManager', 'pt-drop__icon')}
-          <div class="s-hero__cta" style="justify-content:center">
-            <button class="s-btn s-btn--primary pt-drop__btn hero-open-folder" type="button" data-action="open-folder">${e(p.openFolder)}</button>
-            <button class="s-btn s-btn--secondary pt-drop__btn hero-open-files" type="button" data-action="open-files">${e(p.openFiles)}</button>
+          <div class="fm-hero__cta">
+            <button class="s-btn s-btn--primary pt-drop__btn" type="button" data-fm="open-folder">${e(p.openFolder)}</button>
+            <button class="s-btn s-btn--secondary pt-drop__btn" type="button" data-fm="open-files">${e(p.openFiles)}</button>
           </div>
           <p class="pt-drop__or">${e(p.dropHint)}</p>
+          <button class="fm-hero__demo" type="button" data-fm="demo">${e(p.demo)}</button>
+          <noscript><p class="pt-drop__error">${e(c.toolPage.noJs)}</p></noscript>
         </div>
         <ul class="s-trust">${c.toolPage.trust.map(x => `<li>${e(x)}</li>`).join('')}</ul>
       </div>
@@ -517,15 +472,25 @@ function fileManagerPage(lang) {
         </div>
       </div>
     </section>
+    <section class="s-section s-section--tint">
+      <div class="s-wrap">
+        <h2>${e(p.toolsTitle)}</h2>
+        <p class="s-section__lede">${e(p.toolsLede)}</p>
+        <div class="fm-links">
+          ${['merge', 'compress', 'edit', 'sign', 'ocr', 'pdf-to-word', 'jpg-to-pdf', 'compare'].map(toolLink).join('')}
+          ${['inspector', 'md', 'mbox'].map(pageLink).join('')}
+          <a href="${pagePath('pdfTools', lang)}"><strong>${e(c.nav.allPdfTools)} →</strong><span>${e(fill(p.toolsAll, { n: TOOLS.length }))}</span></a>
+        </div>
+      </div>
+    </section>
     ${howToSection(p.how, p.steps)}
     ${faqSection(c, faqs)}
     ${sisterSection(lang, PAGE_SISTERS.fileManager)}
   </main>
-  ${footer(lang, paths, { noTheme: true })}
+  ${footer(lang, paths)}
   </div>
-  ${workspace}
-  ${appDictScripts(lang)}
-  <script type="module" src="${assetUrl('assets/js/app.js')}"></script>
+  <div class="fm" id="fm-app" hidden></div>
+  <script type="module" src="${assetUrl('assets/js/fm/main.js')}"></script>
 </body>
 </html>
 `;
@@ -549,7 +514,6 @@ function inspectorPage(lang) {
       </div>
       <div id="file-inspector" class="pt">
         <div class="pt-drop">
-          ${stamp(c)}
           ${iconSvg('inspector', 'pt-drop__icon')}
           <button class="s-btn s-btn--primary pt-drop__btn" type="button">${e(p.choose)}</button>
           <p class="pt-drop__or">${e(p.dropHint)}</p>
@@ -816,7 +780,15 @@ LANGS.filter(l => l !== 'en').forEach((lang, i) => {
 // Runtime URL table for "continue with" links, read by the PDF tools
 for (const lang of LANGS) {
   const routes = Object.fromEntries(TOOLS.map(t => [t.id, { url: toolPath(t, lang), name: content[lang].tools[t.id].name }]));
-  write(`assets/i18n/routes.${lang}.js`, `// Generated by build/build.mjs\nexport default ${JSON.stringify(routes)};\n`);
+  const c = content[lang];
+  const pages = {
+    fileManager: { url: pagePath('fileManager', lang), name: c.fileManagerPage.name },
+    inspector: { url: pagePath('inspector', lang), name: c.inspectorPage.name },
+    md: { url: pagePath('md', lang), name: c.mdPage.name },
+    mbox: { url: pagePath('mbox', lang), name: c.mboxPage.name },
+    pdfTools: { url: pagePath('pdfTools', lang), name: c.nav.allPdfTools },
+  };
+  write(`assets/i18n/routes.${lang}.js`, `// Generated by build/build.mjs\nexport default ${JSON.stringify(routes)};\nexport const pages = ${JSON.stringify(pages)};\n`);
 }
 
 let pages = 0;

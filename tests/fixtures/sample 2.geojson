@@ -1,0 +1,1 @@
+{"type":"FeatureCollection","features":[{"type":"Feature","properties":{"name":"Berlin"},"geometry":{"type":"Point","coordinates":[13.405,52.52]}},{"type":"Feature","properties":{"name":"Line"},"geometry":{"type":"LineString","coordinates":[[13.3,52.5],[13.5,52.6]]}}]}

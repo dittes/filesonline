@@ -4,6 +4,7 @@
 // worker + parser modules; this file is UI and state only.
 
 import { initTheme } from '../theme.js';
+import { handoffIdFromUrl, takeHandoff } from '../handoff.js';
 import { showToast } from '../ui.js';
 import { formatBytes, escapeHtml, debounce, downloadBlob, generateId, sanitizeFilename } from '../utils.js';
 import { decodeAttachmentBytes, decodePartText } from './mime-parser.js';
@@ -71,6 +72,9 @@ document.addEventListener('DOMContentLoaded', () => {
   wireKeyboard();
   wireContextMenu();
   refreshSavedArchives();
+  // A mailbox handed over by the file manager
+  const handoffId = handoffIdFromUrl();
+  if (handoffId) takeHandoff(handoffId).then(files => { if (files.length) importFiles(files); });
 });
 
 function applyPrefs() {

@@ -354,6 +354,69 @@ const scenarios = {
 };
 
 // Encrypted input is asked for its password before any other tool opens
+scenarios.compare = async w => {
+  const older = await PDFDocument.create();
+  const newer = await PDFDocument.create();
+  const font = await older.embedFont(StandardFonts.Helvetica);
+  const font2 = await newer.embedFont(StandardFonts.Helvetica);
+  older.addPage([595, 842]).drawText('The rent is 900 euros per month, due on the first day.', { x: 60, y: 760, size: 14, font });
+  newer.addPage([595, 842]).drawText('The rent is 950 euros per month, due on the third day.', { x: 60, y: 760, size: 14, font: font2 });
+  await drop(w, [
+    new File([await older.save()], 'old.pdf', { type: 'application/pdf' }),
+    new File([await newer.save()], 'new.pdf', { type: 'application/pdf' }),
+  ]);
+  await until(() => w.document.querySelector('.pt-diff'), 15000, 'diff list');
+  const ins = [...w.document.querySelectorAll('.pt-diff ins')].map(x => x.textContent);
+  const del = [...w.document.querySelectorAll('.pt-diff del')].map(x => x.textContent);
+  check(ins.includes('950') && ins.includes('third'), `added words ${ins}`);
+  check(del.includes('900') && del.includes('first'), `removed words ${del}`);
+  await run(w);
+  check(isZip(await captureDownload(w)), 'zip expected');
+  check(w.document.querySelectorAll('.pt-result__files li').length === 2, 'two marked files');
+};
+
+scenarios['extract-images'] = async w => {
+  const doc = await PDFDocument.create();
+  const jpg = await doc.embedJpg(await (await makeImage('image/jpeg')).arrayBuffer());
+  const png = await doc.embedPng(await (await makeImage('image/png')).arrayBuffer());
+  doc.addPage([595, 842]).drawImage(jpg, { x: 50, y: 400, width: 320, height: 240 });
+  doc.addPage([595, 842]).drawImage(png, { x: 50, y: 400, width: 320, height: 240 });
+  await drop(w, [new File([await doc.save()], 'photos.pdf', { type: 'application/pdf' })]);
+  check(w.document.querySelectorAll('.pt-imgs__item').length === 2, 'two images found');
+  await run(w);
+  const zip = await captureDownload(w);
+  check(isZip(zip), 'zip expected');
+  const names = [...w.document.querySelectorAll('.pt-result__name')].map(x => x.textContent);
+  check(names.includes('photos-page1-1.jpg') && names.includes('photos-page2-1.png'), `names ${names}`);
+};
+
+scenarios['remove-blank'] = async w => {
+  const doc = await PDFDocument.create();
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  for (const text of ['Chapter one', null, 'Chapter two', null]) {
+    const page = doc.addPage([595, 842]);
+    if (text) {
+      page.drawText(text, { x: 60, y: 760, size: 20, font });
+      for (let i = 0; i < 20; i++) page.drawText('A line of body text that fills the page with ink.', { x: 60, y: 700 - i * 22, size: 12, font });
+    }
+  }
+  await drop(w, [new File([await doc.save()], 'scan.pdf', { type: 'application/pdf' })]);
+  const selected = [...w.document.querySelectorAll('.pg__select')].map(b => b.checked);
+  check(selected.join() === 'false,true,false,true', `blank pages marked ${selected}`);
+  await run(w);
+  const text = await pdfText(await captureDownload(w));
+  check(text.length === 2 && text[1].includes('Chapter two'), 'blank pages removed');
+};
+
+scenarios.alternate = async w => {
+  await drop(w, [await makePdf(3, { label: 'Front' }), await makePdf(3, { label: 'Back' })]);
+  check(w.document.querySelectorAll('.pg__item').length === 6, 'preview of six pages');
+  await run(w);
+  const text = await pdfText(await captureDownload(w));
+  const order = text.map(x => x.match(/(Front|Back) \d/)[0]).join(', ');
+  check(order === 'Front 1, Back 3, Front 2, Back 2, Front 3, Back 1', `order ${order}`);
+};
+
 scenarios['password-gate'] = async () => {
   const { protect } = await import('/assets/js/pdf/ops.js');
   const locked = await protect(new Uint8Array(await (await makePdf(2)).arrayBuffer()), { userPassword: 'gate-pass' });

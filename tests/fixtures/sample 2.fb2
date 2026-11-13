@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:l="http://www.w3.org/1999/xlink">
+ <description>
+  <title-info>
+   <genre>sf</genre><genre>prose</genre>
+   <author><first-name>Jane</first-name><last-name>Example</last-name></author>
+   <book-title>The Test Book</book-title>
+   <annotation><p>A short book for testing the reader.</p></annotation>
+   <date>2026</date>
+   <coverpage><image l:href="#cover.png"/></coverpage>
+   <lang>en</lang>
+   <sequence name="Open Online Tales" number="1"/>
+  </title-info>
+ </description>
+ <body>
+  <title><p>The Test Book</p></title>
+  <section id="ch1"><title><p>Chapter 1</p></title>
+   <epigraph><p>An epigraph worth reading.</p><text-author>Example</text-author></epigraph>
+   <p>It was a quiet morning, with <emphasis>emphasis</emphasis>, <strong>strong</strong>, a note<a l:href="#n1" type="note">[1]</a>.</p>
+   <empty-line/>
+   <poem><stanza><v>Line one</v><v>Line two</v></stanza></poem>
+  </section>
+  <section id="ch2"><title><p>Chapter 1 2</p></title><p>Second chapter text.</p></section>
+ </body>
+ <body name="notes"><title><p>Notes</p></title><section id="n1"><title><p>1</p></title><p>The footnote.</p></section></body>
+ <binary id="cover.png" content-type="image/png">iVBORw0KGgoAAAANSUhEUgAAAEAAAAAwCAYAAAChS3wfAAAA7klEQVR4nO2UMQ7CQAwE/RkkfsTP+Q4UaSgoIB7ba2UjRa7usjs3uYiIexzPVadEiNEpEcIGDE6JEDZgcEqEuIQBt8fz9evbmUum9BAM7fIdEPBNyeJfQGgbUFm+CsKq8gUQ9pWnIchdeH8AIPLvLE9CWFsegpAjOF2euAtswObyBITV+gO/gQ2wATbABtgAG2ADbIANWAshkz9lgMpvkD1EG7AZApE/tXgSApE7Ti6SuAuow0M26YYA5mbKd0Ig86LlOyAU5GXLf07BC6/HABpCZb44uagcRmeulo8IT4kQo1MihA0YnBIhbMDQfAOJbLmddZORrgAAAABJRU5ErkJggg==</binary>
+</FictionBook>

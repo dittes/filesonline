@@ -1,0 +1,12 @@
+ID;PSheetJS;N;E
+P;PGeneral
+F;P0;DG0G8;M255
+B;Y3;X2;D0 0 1 2
+O;L;D;B;K47;G100 0.001
+C;Y1;X1;K"Name"
+C;Y1;X2;K"Value"
+C;Y2;X1;K"alpha"
+C;Y2;X2;K1
+C;Y3;X1;K"beta"
+C;Y3;X2;K2.5
+E

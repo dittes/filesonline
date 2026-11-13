@@ -1,0 +1,6 @@
+#EXTM3U
+#EXT-X-VERSION:3
+#EXTINF:10,
+seg1.ts
+#EXTINF:10,
+seg2.ts

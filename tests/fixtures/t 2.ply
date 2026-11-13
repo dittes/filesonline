@@ -1,0 +1,7 @@
+ply
+format ascii 1.0
+comment made by hand
+element vertex 8
+property float x
+element face 6
+end_header

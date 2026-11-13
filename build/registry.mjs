@@ -55,6 +55,14 @@ export const TOOLS = [
     slugs: { en: 'crop-pdf', de: 'pdf-zuschneiden', pl: 'przytnij-pdf', cs: 'oriznout-pdf' },
     related: ['rotate', 'organize', 'compress', 'page-numbers'],
     sister: ['open:pdf', 'aintob:resizeImage'] },
+  { id: 'remove-blank', cat: 'organize', icon: 'blank', accept: 'pdf',
+    slugs: { en: 'remove-blank-pages-from-pdf', de: 'leere-seiten-aus-pdf-entfernen', pl: 'usun-puste-strony-pdf', cs: 'odstranit-prazdne-stranky-pdf' },
+    related: ['delete', 'alternate', 'compress', 'ocr'],
+    sister: ['remove:pdfPageRemover', 'open:pdf'] },
+  { id: 'alternate', cat: 'organize', icon: 'alternate', accept: 'pdf', multiple: true,
+    slugs: { en: 'merge-front-and-back-scans', de: 'pdf-vorder-und-rueckseiten-zusammenfuegen', pl: 'polacz-skany-przodu-i-tylu-pdf', cs: 'spojit-licni-a-rubove-strany-pdf' },
+    related: ['merge', 'remove-blank', 'organize', 'ocr'],
+    sister: ['open:pdf', 'aintob:pdfToSearchable'] },
 
   // Optimize
   { id: 'compress', cat: 'optimize', icon: 'compress', accept: 'pdf', popular: true,
@@ -99,6 +107,10 @@ export const TOOLS = [
     slugs: { en: 'png-to-pdf', de: 'png-in-pdf', pl: 'png-na-pdf', cs: 'png-na-pdf' },
     related: ['jpg-to-pdf', 'merge', 'compress', 'pdf-to-png'],
     sister: ['aintob:webpToPdf', 'aintob:gifToPdf', 'remove:backgroundRemover'] },
+  { id: 'extract-images', cat: 'convert', icon: 'images', accept: 'pdf',
+    slugs: { en: 'extract-images-from-pdf', de: 'bilder-aus-pdf-extrahieren', pl: 'wyodrebnij-obrazy-z-pdf', cs: 'extrahovat-obrazky-z-pdf' },
+    related: ['pdf-to-jpg', 'pdf-to-png', 'compress', 'pdf-to-word'],
+    sister: ['aintob:compressImage', 'aintob:imageConverter', 'remove:imageMetadataRemover'] },
 
   // Edit
   { id: 'edit', cat: 'edit', icon: 'edit', accept: 'pdf', popular: true,
@@ -121,6 +133,10 @@ export const TOOLS = [
     slugs: { en: 'add-page-numbers-to-pdf', de: 'pdf-seitenzahlen', pl: 'numeracja-stron-pdf', cs: 'cislovani-stran-pdf' },
     related: ['watermark', 'merge', 'organize', 'edit'],
     sister: ['open:pdf'] },
+  { id: 'compare', cat: 'edit', icon: 'compare', accept: 'pdf', multiple: true, popular: true,
+    slugs: { en: 'compare-pdf', de: 'pdf-vergleichen', pl: 'porownaj-pdf', cs: 'porovnat-pdf' },
+    related: ['edit', 'pdf-to-text', 'ocr', 'merge'],
+    sister: ['open:pdf', 'remove:textCleaner'] },
 
   // Security
   { id: 'protect', cat: 'security', icon: 'protect', accept: 'pdf', popular: true,

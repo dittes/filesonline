@@ -1,0 +1,10 @@
+# YAML fixture
+services:
+  web:
+    image: nginx:1.27
+    ports:
+      - "8080:80"
+  db:
+    image: postgres
+---
+second: document

@@ -9,7 +9,7 @@ const stage = root.querySelector('.pt-stage');
 const dropView = root.querySelector('.pt-drop');
 const toolId = root.dataset.tool;
 
-let TOOLS, UserError, ops, routes = {};
+let TOOLS, UserError, ops, routes = {}, pages = {};
 let closers = [];
 
 function closeCurrent() {
@@ -143,6 +143,7 @@ function makeContext(def, inputs) {
       await showResult(stage, result.files, {
         ...result,
         routes,
+        pages,
         nextTools: def.next,
         onRestart: restart,
       });
@@ -210,7 +211,7 @@ async function boot() {
     loadStrings(),
     import('./tools.js').then(m => { TOOLS = m.TOOLS; UserError = m.UserError; }),
     import('./ops.js').then(m => { ops = m; }),
-    import(`/assets/i18n/routes.${lang}.js`).then(m => { routes = m.default; }),
+    import(`/assets/i18n/routes.${lang}.js`).then(m => { routes = m.default; pages = m.pages || {}; }),
   ]);
 
   const accept = dropView.dataset.accept;
@@ -238,11 +239,8 @@ async function boot() {
   });
 
   await ready;
-  if (new URLSearchParams(location.search).has('handoff')) {
-    history.replaceState(null, '', location.pathname);
-    const file = await takeHandoff();
-    if (file) start([file]);
-  }
+  const handed = await takeHandoff();
+  if (handed.length) start(handed);
 }
 
 boot();

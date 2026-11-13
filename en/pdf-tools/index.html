@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'sha256-WFHbN6LP8QnU5HOG4yJKIvGNw+g6h+js71iCvoKrkr4='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self' data: blob:; connect-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'sha256-2umU0MxQJqQrUkhC2ma0avyIwaZeSqNXdBh3CvB6PCc='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self' data: blob:; connect-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
   <title>Free Online PDF Tools – Edit, Convert, Merge, No Upload</title>
   <meta name="description" content="All the PDF tools you need in one place: compress, merge, split, convert, edit, sign, protect and more. Free, and your files are never uploaded.">
   
@@ -13,8 +13,7 @@
   <link rel="alternate" hreflang="pl" href="https://files-online.com/pl/narzedzia-pdf/">
   <link rel="alternate" hreflang="cs" href="https://files-online.com/cs/pdf-nastroje/">
   <link rel="alternate" hreflang="x-default" href="https://files-online.com/en/pdf-tools/">
-  <meta name="theme-color" content="#f4f1e8" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#121317" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#ffffff">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Files Online">
   <meta property="og:url" content="https://files-online.com/en/pdf-tools/">
@@ -29,11 +28,11 @@
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
   <link rel="manifest" href="/manifest.webmanifest">
-  <script>(function(){try{var t=localStorage.getItem('fo-theme');if(t!=='light'&&t!=='dark'){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}document.documentElement.setAttribute('data-theme',t)}catch(e){}})();</script>
+  <script>(function(){try{var t=localStorage.getItem('fo-theme')==='dark'?'dark':'light';document.documentElement.setAttribute('data-theme',t)}catch(e){}})();</script>
   <link rel="preload" href="/assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   
-  <link rel="stylesheet" href="/assets/css/site.css?v=de3a7534">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":["SoftwareApplication","WebApplication"],"name":"PDF tools","url":"https://files-online.com/en/pdf-tools/","description":"All the PDF tools you need in one place: compress, merge, split, convert, edit, sign, protect and more. Free, and your files are never uploaded.","inLanguage":"en","applicationCategory":"UtilitiesApplication","operatingSystem":"Windows, macOS, Linux, Android, iOS","browserRequirements":"Requires a modern web browser with JavaScript enabled","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"publisher":{"@id":"https://files-online.com/#org"},"featureList":["Merge PDF","Split PDF","Extract PDF Pages","Delete PDF Pages","Organize PDF","Rotate PDF","Crop PDF","Compress PDF","OCR PDF","Flatten PDF","PDF to Word","PDF to Excel","PDF to JPG","PDF to PNG","PDF to Text","JPG to PDF","PNG to PDF","Edit PDF","Sign PDF","Fill PDF Form","Add Watermark","Add Page Numbers","Protect PDF","Unlock PDF","Redact PDF","Edit PDF Metadata"]}</script>
+  <link rel="stylesheet" href="/assets/css/site.css?v=1bf1a7b0">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":["SoftwareApplication","WebApplication"],"name":"PDF tools","url":"https://files-online.com/en/pdf-tools/","description":"All the PDF tools you need in one place: compress, merge, split, convert, edit, sign, protect and more. Free, and your files are never uploaded.","inLanguage":"en","applicationCategory":"UtilitiesApplication","operatingSystem":"Windows, macOS, Linux, Android, iOS","browserRequirements":"Requires a modern web browser with JavaScript enabled","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"publisher":{"@id":"https://files-online.com/#org"},"featureList":["Merge PDF","Split PDF","Extract PDF Pages","Delete PDF Pages","Organize PDF","Rotate PDF","Crop PDF","Remove Blank Pages","Merge Front & Back Scans","Compress PDF","OCR PDF","Flatten PDF","PDF to Word","PDF to Excel","PDF to JPG","PDF to PNG","PDF to Text","JPG to PDF","PNG to PDF","Extract Images from PDF","Edit PDF","Sign PDF","Fill PDF Form","Add Watermark","Add Page Numbers","Compare PDF","Protect PDF","Unlock PDF","Redact PDF","Edit PDF Metadata"]}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://files-online.com/en/"},{"@type":"ListItem","position":2,"name":"PDF tools"}]}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How is this different from other online PDF tools?","acceptedAnswer":{"@type":"Answer","text":"Most services upload your file to their servers, process it there and delete it later. Here the work happens on your own device, so your document is never transmitted at all."}},{"@type":"Question","name":"Is there a file size limit?","acceptedAnswer":{"@type":"Answer","text":"There is no limit set by us. The practical limit depends on your device's memory. Files of several hundred megabytes usually work well on a computer."}},{"@type":"Question","name":"Do the tools add a watermark?","acceptedAnswer":{"@type":"Answer","text":"No. Your files come out exactly as you made them, with no branding added."}},{"@type":"Question","name":"Can I use several tools on one file?","acceptedAnswer":{"@type":"Answer","text":"Yes. After a tool finishes, you can send the result straight to another tool, for example merge, then compress, then protect. The file stays on your device the whole time."}}]}</script>
 </head>
@@ -48,16 +47,16 @@
           <div class="s-mega">
             <div>
               <h3>Organize pages</h3>
-              <a href="/en/merge-pdf/">Merge PDF</a><a href="/en/split-pdf/">Split PDF</a><a href="/en/extract-pdf-pages/">Extract PDF Pages</a><a href="/en/delete-pdf-pages/">Delete PDF Pages</a><a href="/en/organize-pdf/">Organize PDF</a><a href="/en/rotate-pdf/">Rotate PDF</a><a href="/en/crop-pdf/">Crop PDF</a>
+              <a href="/en/merge-pdf/">Merge PDF</a><a href="/en/split-pdf/">Split PDF</a><a href="/en/extract-pdf-pages/">Extract PDF Pages</a><a href="/en/delete-pdf-pages/">Delete PDF Pages</a><a href="/en/organize-pdf/">Organize PDF</a><a href="/en/rotate-pdf/">Rotate PDF</a><a href="/en/crop-pdf/">Crop PDF</a><a href="/en/remove-blank-pages-from-pdf/">Remove Blank Pages</a><a href="/en/merge-front-and-back-scans/">Merge Front &amp; Back Scans</a>
             </div><div>
               <h3>Optimize</h3>
               <a href="/en/compress-pdf/">Compress PDF</a><a href="/en/ocr-pdf/">OCR PDF</a><a href="/en/flatten-pdf/">Flatten PDF</a>
             </div><div>
               <h3>Convert</h3>
-              <a href="/en/pdf-to-word/">PDF to Word</a><a href="/en/pdf-to-excel/">PDF to Excel</a><a href="/en/pdf-to-jpg/">PDF to JPG</a><a href="/en/pdf-to-png/">PDF to PNG</a><a href="/en/pdf-to-text/">PDF to Text</a><a href="/en/jpg-to-pdf/">JPG to PDF</a><a href="/en/png-to-pdf/">PNG to PDF</a>
+              <a href="/en/pdf-to-word/">PDF to Word</a><a href="/en/pdf-to-excel/">PDF to Excel</a><a href="/en/pdf-to-jpg/">PDF to JPG</a><a href="/en/pdf-to-png/">PDF to PNG</a><a href="/en/pdf-to-text/">PDF to Text</a><a href="/en/jpg-to-pdf/">JPG to PDF</a><a href="/en/png-to-pdf/">PNG to PDF</a><a href="/en/extract-images-from-pdf/">Extract Images from PDF</a>
             </div><div>
               <h3>Edit &amp; sign</h3>
-              <a href="/en/edit-pdf/">Edit PDF</a><a href="/en/sign-pdf/">Sign PDF</a><a href="/en/fill-pdf-form/">Fill PDF Form</a><a href="/en/add-watermark-to-pdf/">Add Watermark</a><a href="/en/add-page-numbers-to-pdf/">Add Page Numbers</a>
+              <a href="/en/edit-pdf/">Edit PDF</a><a href="/en/sign-pdf/">Sign PDF</a><a href="/en/fill-pdf-form/">Fill PDF Form</a><a href="/en/add-watermark-to-pdf/">Add Watermark</a><a href="/en/add-page-numbers-to-pdf/">Add Page Numbers</a><a href="/en/compare-pdf/">Compare PDF</a>
             </div><div>
               <h3>Security &amp; privacy</h3>
               <a href="/en/protect-pdf/">Protect PDF</a><a href="/en/unlock-pdf/">Unlock PDF</a><a href="/en/redact-pdf/">Redact PDF</a><a href="/en/edit-pdf-metadata/">Edit PDF Metadata</a>
@@ -124,6 +123,14 @@
           <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2v16h16"/><path d="M2 6h16v16"/></svg>
           <span class="s-card__title">Crop PDF</span>
           <span class="s-card__desc">Trim margins and cut away page areas.</span>
+        </a><a class="s-card" data-cat="organize" href="/en/remove-blank-pages-from-pdf/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><path d="M8.5 12h7M8.5 15.5h7M8.5 19h4" stroke-dasharray="1.2 2.2"/></svg>
+          <span class="s-card__title">Remove Blank Pages</span>
+          <span class="s-card__desc">Find and delete empty pages automatically.</span>
+        </a><a class="s-card" data-cat="organize" href="/en/merge-front-and-back-scans/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h8v11H3z M13 10h8v11h-8z"/><path d="M6 17.5v3h4M18 6.5v-3h-4"/></svg>
+          <span class="s-card__title">Merge Front &amp; Back Scans</span>
+          <span class="s-card__desc">Put separately scanned page sides in order.</span>
         </a></div>
       </div><div class="s-cat">
         <div class="s-cat__head"><h2>Optimize</h2></div>
@@ -170,6 +177,10 @@
           <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h18v16H3z"/><circle cx="8.5" cy="9" r="1.6"/><path d="M3 17l5-4.5 3.5 3 4-4.5 5.5 6"/></svg>
           <span class="s-card__title">PNG to PDF</span>
           <span class="s-card__desc">Turn screenshots and graphics into a PDF.</span>
+        </a><a class="s-card" data-cat="convert" href="/en/extract-images-from-pdf/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h13v13H3z"/><circle cx="7.5" cy="7.5" r="1.4"/><path d="M3 13l4-3.5 3 2.5 3-3 3 3"/><path d="M13 20.5h8m0 0l-2.5-2.5M21 20.5L18.5 23"/></svg>
+          <span class="s-card__title">Extract Images from PDF</span>
+          <span class="s-card__desc">Save every picture in a PDF as a file.</span>
         </a></div>
       </div><div class="s-cat">
         <div class="s-cat__head"><h2>Edit &amp; sign</h2></div>
@@ -193,6 +204,10 @@
           <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><path d="M10.5 14l1.5-1v5.5M10.5 18.5h3"/></svg>
           <span class="s-card__title">Add Page Numbers</span>
           <span class="s-card__desc">Number the pages of your PDF.</span>
+        </a><a class="s-card" data-cat="edit" href="/en/compare-pdf/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h7v16H3z M14 4h7v16h-7z"/><path d="M5.5 9h2M5.5 12.5h2M16.5 9h2M16.5 12.5h2" /><path d="M12 2v20" stroke-dasharray="2 2"/></svg>
+          <span class="s-card__title">Compare PDF</span>
+          <span class="s-card__desc">See what changed between two versions.</span>
         </a></div>
       </div><div class="s-cat">
         <div class="s-cat__head"><h2>Security &amp; privacy</h2></div>
@@ -243,39 +258,12 @@
   </section>
   </main>
   <footer class="s-footer">
-    <div class="s-wrap">
-      <div class="s-footer__toc">
-        <section>
-          <h2>Organize pages</h2>
-          <a href="/en/merge-pdf/">Merge PDF<span>PDF</span></a><a href="/en/split-pdf/">Split PDF<span>PDF</span></a><a href="/en/extract-pdf-pages/">Extract PDF Pages<span>PDF</span></a><a href="/en/delete-pdf-pages/">Delete PDF Pages<span>PDF</span></a><a href="/en/organize-pdf/">Organize PDF<span>PDF</span></a><a href="/en/rotate-pdf/">Rotate PDF<span>PDF</span></a><a href="/en/crop-pdf/">Crop PDF<span>PDF</span></a>
-        </section><section>
-          <h2>Optimize</h2>
-          <a href="/en/compress-pdf/">Compress PDF<span>PDF</span></a><a href="/en/ocr-pdf/">OCR PDF<span>PDF</span></a><a href="/en/flatten-pdf/">Flatten PDF<span>PDF</span></a>
-        </section><section>
-          <h2>Convert</h2>
-          <a href="/en/pdf-to-word/">PDF to Word<span>PDF</span></a><a href="/en/pdf-to-excel/">PDF to Excel<span>PDF</span></a><a href="/en/pdf-to-jpg/">PDF to JPG<span>PDF</span></a><a href="/en/pdf-to-png/">PDF to PNG<span>PDF</span></a><a href="/en/pdf-to-text/">PDF to Text<span>PDF</span></a><a href="/en/jpg-to-pdf/">JPG to PDF<span>PDF</span></a><a href="/en/png-to-pdf/">PNG to PDF<span>PDF</span></a>
-        </section><section>
-          <h2>Edit &amp; sign</h2>
-          <a href="/en/edit-pdf/">Edit PDF<span>PDF</span></a><a href="/en/sign-pdf/">Sign PDF<span>PDF</span></a><a href="/en/fill-pdf-form/">Fill PDF Form<span>PDF</span></a><a href="/en/add-watermark-to-pdf/">Add Watermark<span>PDF</span></a><a href="/en/add-page-numbers-to-pdf/">Add Page Numbers<span>PDF</span></a>
-        </section><section>
-          <h2>Security &amp; privacy</h2>
-          <a href="/en/protect-pdf/">Protect PDF<span>PDF</span></a><a href="/en/unlock-pdf/">Unlock PDF<span>PDF</span></a><a href="/en/redact-pdf/">Redact PDF<span>PDF</span></a><a href="/en/edit-pdf-metadata/">Edit PDF Metadata<span>PDF</span></a>
-        </section>
-        <section>
-          <h2>File tools</h2>
-          <a href="/en/file-metadata-viewer/">File Inspector<span>any file</span></a><a href="/en/file-manager/">File Manager<span>ZIP</span></a><a href="/en/open-md-file/">MD Viewer<span>.md</span></a><a href="/en/open-mbox-file/">MBOX Viewer<span>.mbox</span></a>
-        </section>
-        <section>
-          <h2>Our other sites</h2>
-          <a href="https://open-online.com/en/" rel="noopener">Open Online<span>↗</span></a><a href="https://remove-online.com/en/" rel="noopener">Remove Online<span>↗</span></a><a href="https://aintob.com/en/" rel="noopener">AintoB<span>↗</span></a>
-        </section>
-      </div>
-      <div class="s-footer__bottom">
+    <div class="s-wrap s-footer__row">
+      <span class="s-footer__brand"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect width="32" height="32" rx="7" fill="#1B4FD8"/><path d="M10 6.5h8.200l5 5v13A1.500 1.500 0 0 1 21.700 26H10a1.500 1.500 0 0 1-1.500-1.500V8A1.500 1.500 0 0 1 10 6.500z" fill="#fff"/><path d="M18.200 6.500V10a1.500 1.500 0 0 0 1.500 1.500h3.500" fill="none" stroke="#1B4FD8" stroke-width="1.100" stroke-linejoin="round"/><rect x="11.300" y="15" width="9" height="1.700" rx=".85" fill="#1B4FD8"/><rect x="11.300" y="18.400" width="9" height="1.700" rx=".85" fill="#1B4FD8"/><rect x="11.300" y="21.800" width="5.500" height="1.700" rx=".85" fill="#1B4FD8"/></svg><span>Runs in your browser. No upload, no account, no tracking.</span></span>
+      <nav class="s-footer__links" aria-label="Legal">
         <a href="/en/privacy/">Privacy</a>
         <a href="/en/imprint/">Imprint</a>
-        <a href="/en/pdf-tools/" hreflang="en" lang="en" data-set-lang="en">English</a><a href="/de/pdf-tools/" hreflang="de" lang="de" data-set-lang="de">Deutsch</a><a href="/pl/narzedzia-pdf/" hreflang="pl" lang="pl" data-set-lang="pl">Polski</a><a href="/cs/pdf-nastroje/" hreflang="cs" lang="cs" data-set-lang="cs">Čeština</a>
-        <span class="s-footer__note">Runs in your browser. No upload, no account, no tracking.</span>
-      </div>
+      </nav>
     </div>
   </footer>
   <script src="/assets/js/site.js?v=21b41bad" defer></script>

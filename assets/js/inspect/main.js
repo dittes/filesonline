@@ -3,6 +3,7 @@
 
 import { createInspector, filesFromDrop } from './app.js';
 import { lang } from './i18n.js';
+import { handoffIdFromUrl, takeHandoff } from '../handoff.js';
 
 const page = document.getElementById('file-inspector');
 const drop = page.querySelector('.pt-drop');
@@ -61,3 +62,7 @@ document.addEventListener('paste', (e) => {
     add([new File([text], 'pasted-text.txt', { type: 'text/plain', lastModified: Date.now() })]);
   }
 });
+
+// Files handed over by the file manager
+const handoffId = handoffIdFromUrl();
+if (handoffId) add(await takeHandoff(handoffId));

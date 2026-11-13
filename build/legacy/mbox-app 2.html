@@ -1,0 +1,293 @@
+  <section class="hero mbx-hero" id="open">
+    <div class="hero-inner" id="mbx-hero">
+      <div class="hero-badges">
+        <span class="badge badge-neutral">100% Private</span>
+        <span class="badge badge-neutral">No Upload</span>
+        <span class="badge badge-neutral">No Signup</span>
+      </div>
+      <h1 class="hero-title">Open MBOX File Online</h1>
+      <p class="hero-subtitle">Free MBOX viewer for email archives from Gmail (Google Takeout), Thunderbird, and Apple Mail. Open, search, read, edit, and export .mbox files — <strong>your email archive stays in your browser and is not uploaded.</strong></p>
+
+      <div class="mbx-dropzone" id="mbx-dropzone" tabindex="0" role="button" aria-label="Drop your MBOX file here or press Enter to choose a file">
+        <svg viewBox="0 0 48 48" fill="none" width="40" height="40" aria-hidden="true">
+          <path d="M6 12h36v26H6z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M6 14l18 13 18-13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <p class="mbx-dropzone-title">Drop your .mbox file here</p>
+        <div class="mbx-dropzone-actions">
+          <button class="btn btn-primary" id="mbx-choose-btn">Choose MBOX File</button>
+          <button class="btn btn-secondary" id="mbx-demo-btn-2">Load demo archive</button>
+        </div>
+        <p class="mbx-dropzone-note">Supported: <code>.mbox</code>, <code>.mbx</code>, files without extension — Unix mbox, mboxo, mboxrd. Multiple files allowed. Processed locally, never uploaded.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ The app ═══════════════ -->
+  <section class="mbx-app" id="mbx-app" hidden aria-label="MBOX viewer application">
+
+    <!-- Toolbar -->
+    <div class="mbx-toolbar" role="toolbar" aria-label="Archive tools">
+      <div class="mbx-toolbar-group">
+        <button class="btn btn-sm btn-ghost" id="mbx-sidebar-toggle" title="Toggle sidebar" aria-label="Toggle sidebar">☰</button>
+        <button class="btn btn-sm btn-ghost" id="mbx-add-btn" title="Add another archive (Ctrl+O)">+ Add archive</button>
+        <button class="btn btn-sm btn-ghost" id="mbx-demo-btn" title="Load the generated demo archive">Demo</button>
+        <div class="mbx-toolbar-group" style="position:relative;">
+          <button class="btn btn-sm btn-secondary" id="mbx-export-btn" aria-haspopup="true">Export ▾</button>
+          <div class="mbx-menu" id="mbx-export-menu" hidden role="menu">
+            <div class="mbx-menu-label">Current message</div>
+            <button data-export="eml">Save as .eml</button>
+            <button data-export="txt">Save as plain text</button>
+            <button data-export="html-one">Save as sanitized HTML</button>
+            <button data-export="raw">Save raw source</button>
+            <button data-export="json-one">Save as JSON</button>
+            <button data-export="pdf">Print / PDF…</button>
+            <hr>
+            <div class="mbx-menu-label">Selection</div>
+            <button data-export="mbox-sel">New .mbox file</button>
+            <button data-export="zip-sel">ZIP of .eml files</button>
+            <button data-export="csv-sel">CSV metadata</button>
+            <button data-export="json-sel">JSON</button>
+            <button data-export="html-sel">HTML archive</button>
+            <button data-export="att-sel">Attachments as ZIP</button>
+            <hr>
+            <div class="mbx-menu-label">Full archive</div>
+            <button data-export="mbox-all">Full .mbox (incl. edits)</button>
+            <button data-export="zip-all">ZIP of all .eml files</button>
+            <button data-export="csv-all">CSV index</button>
+            <button data-export="json-all">JSON archive</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mbx-search-wrap">
+        <svg class="mbx-search-icon" viewBox="0 0 16 16" fill="none" width="14" height="14" aria-hidden="true"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <input type="search" class="mbx-search" id="mbx-search" placeholder='Search — try from:alice subject:"project update" has:attachment' aria-label="Search messages">
+      </div>
+
+      <div class="mbx-toolbar-group">
+        <button class="btn btn-sm btn-ghost" id="mbx-prev" title="Previous message (k)" aria-label="Previous message">↑</button>
+        <button class="btn btn-sm btn-ghost" id="mbx-next" title="Next message (j)" aria-label="Next message">↓</button>
+        <button class="btn btn-sm btn-ghost" id="mbx-settings-btn" title="Settings and local storage" aria-label="Settings">⚙</button>
+      </div>
+
+      <div class="mbx-toolbar-spacer"></div>
+
+      <div class="mbx-archive-info" aria-live="polite">
+        <span class="mbx-archive-name" id="mbx-archive-name"></span>
+        <span class="mbx-archive-stats" id="mbx-archive-stats"></span>
+      </div>
+      <span class="mbx-parse-status" id="mbx-parse-status" hidden></span>
+    </div>
+
+    <!-- Active search filter chips -->
+    <div class="mbx-chips" id="mbx-search-chips" hidden aria-label="Active search filters"></div>
+
+    <!-- Three-pane layout -->
+    <div class="mbx-layout">
+
+      <!-- Sidebar -->
+      <aside class="mbx-sidebar" id="mbx-sidebar" aria-label="Folders and filters">
+        <div class="mbx-nav-group">
+          <div class="mbx-nav-group-title">Filters</div>
+          <div id="mbx-sidebar-filters"></div>
+        </div>
+        <div class="mbx-nav-group">
+          <div class="mbx-nav-group-title">Dates</div>
+          <div id="mbx-sidebar-dates"></div>
+        </div>
+        <div class="mbx-nav-group">
+          <div class="mbx-nav-group-title">Top senders</div>
+          <div id="mbx-sidebar-senders"></div>
+        </div>
+        <div class="mbx-nav-group" hidden>
+          <div class="mbx-nav-group-title">Labels</div>
+          <div id="mbx-sidebar-labels"></div>
+        </div>
+        <div class="mbx-nav-group" hidden>
+          <div class="mbx-nav-group-title">Saved archives</div>
+          <div id="mbx-sidebar-archives"></div>
+        </div>
+      </aside>
+
+      <!-- Message list -->
+      <div class="mbx-listpane">
+        <div class="mbx-list-header">
+          <span class="mbx-list-count" id="mbx-list-count" aria-live="polite">0 messages</span>
+          <label>Sort
+            <select id="mbx-sort" aria-label="Sort messages">
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="sender">Sender</option>
+              <option value="subject">Subject</option>
+              <option value="attachments">Attachments</option>
+            </select>
+          </label>
+          <button class="btn btn-sm btn-ghost" id="mbx-threadview-btn" title="Toggle conversation thread view">Threads</button>
+          <button class="btn btn-sm btn-ghost" id="mbx-density-btn" title="Density: comfortable">☰≡</button>
+          <button class="btn btn-sm btn-ghost" id="mbx-select-all" title="Select all filtered messages">Select all</button>
+        </div>
+        <div class="mbx-list" id="mbx-list" role="listbox" aria-label="Message list" tabindex="0">
+          <div class="mbx-list-inner" id="mbx-list-inner"></div>
+        </div>
+        <div class="mbx-list-empty" id="mbx-list-empty" hidden>
+          <p><strong>No messages match.</strong></p>
+          <p>Try removing a search filter or choosing “All messages” in the sidebar.</p>
+        </div>
+        <!-- Parsing state -->
+        <div class="mbx-progress" id="mbx-progress" hidden role="status">
+          <div class="mbx-progress-track"><div class="mbx-progress-bar" id="mbx-progress-bar"></div></div>
+          <span class="mbx-progress-label" id="mbx-progress-label">Reading file…</span>
+          <button class="btn btn-sm btn-secondary" id="mbx-progress-cancel">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Message viewer -->
+      <div class="mbx-viewer" id="mbx-viewer">
+        <div class="mbx-viewer-empty" id="mbx-viewer-empty">
+          <div>
+            <p><strong>Select a message to read it.</strong></p>
+            <p>Keyboard: <kbd>j</kbd>/<kbd>k</kbd> next/previous · <kbd>s</kbd> star · <kbd>u</kbd> unread · <kbd>/</kbd> search · <kbd>e</kbd> edit</p>
+          </div>
+        </div>
+
+        <div class="mbx-viewer-content" id="mbx-viewer-content" hidden>
+          <div class="mbx-viewer-head">
+            <h2 class="mbx-viewer-subject" id="mbx-viewer-subject"></h2>
+            <div class="mbx-viewer-badges" id="mbx-viewer-badges"></div>
+            <div class="mbx-viewer-meta" id="mbx-viewer-meta"></div>
+          </div>
+
+          <div class="mbx-thread-info" id="mbx-thread-info" hidden></div>
+
+          <div class="mbx-viewer-actions" role="toolbar" aria-label="Message actions">
+            <button class="btn btn-sm btn-ghost" id="mbx-act-star" title="Star (s)">☆ Star</button>
+            <button class="btn btn-sm btn-ghost" id="mbx-act-read" title="Toggle read (u)">Mark unread</button>
+            <button class="btn btn-sm btn-ghost" id="mbx-act-label" title="Add a local label">Label</button>
+            <button class="btn btn-sm btn-ghost" id="mbx-act-edit" title="Edit message locally (e)">Edit</button>
+            <button class="btn btn-sm btn-ghost" id="mbx-act-copy" title="Copy raw source">Copy source</button>
+            <button class="btn btn-sm btn-ghost" id="mbx-act-print" title="Print message">Print</button>
+            <button class="btn btn-sm btn-ghost" id="mbx-act-window" title="Open in a separate reading window">Open in window</button>
+          </div>
+
+          <div class="mbx-tabs" id="mbx-tabs" role="tablist" aria-label="Message view">
+            <button data-tab="rendered" class="active" role="tab">Rendered</button>
+            <button data-tab="text" role="tab">Plain text</button>
+            <button data-tab="headers" role="tab">Headers</button>
+            <button data-tab="raw" role="tab">Raw source</button>
+            <button data-tab="edit" role="tab">Edit</button>
+          </div>
+
+          <div class="mbx-body">
+            <div id="mbx-body-rendered" style="display:flex;flex-direction:column;flex:1;min-height:0;">
+              <div class="mbx-remote-banner" id="mbx-remote-banner" hidden>
+                <span>🛡 Remote images and styles were blocked to protect your privacy.</span>
+                <button class="btn btn-sm btn-secondary" id="mbx-load-remote-btn">Load remote content</button>
+                <span>Loading remote content contacts third-party servers.</span>
+              </div>
+              <iframe class="mbx-body-frame" id="mbx-body-frame" sandbox="" title="Email content (sandboxed)"></iframe>
+            </div>
+            <div class="mbx-body-text" id="mbx-body-text" hidden></div>
+            <div class="mbx-body-headers" id="mbx-body-headers" hidden></div>
+            <pre class="mbx-body-raw" id="mbx-body-raw" hidden></pre>
+
+            <!-- Editor -->
+            <div class="mbx-body-edit" id="mbx-body-edit" hidden>
+              <div class="mbx-edit-warning">
+                ⚠ Edits are stored as a local working copy — your original .mbox file is never modified.
+                Any modification invalidates cryptographic signatures (DKIM, S/MIME, PGP) and exact message fidelity in exports.
+              </div>
+              <div class="mbx-edit-grid">
+                <label for="mbx-edit-subject">Subject</label><input id="mbx-edit-subject" type="text">
+                <label for="mbx-edit-from">From</label><input id="mbx-edit-from" type="text" placeholder="Name <address@example.com>">
+                <label for="mbx-edit-to">To</label><input id="mbx-edit-to" type="text">
+                <label for="mbx-edit-cc">Cc</label><input id="mbx-edit-cc" type="text">
+                <label for="mbx-edit-date">Date</label><input id="mbx-edit-date" type="datetime-local">
+                <label for="mbx-edit-labels">Labels</label><input id="mbx-edit-labels" type="text" placeholder="comma, separated">
+              </div>
+              <div class="mbx-edit-bodylabel"><span>Plain-text body</span></div>
+              <textarea id="mbx-edit-text" aria-label="Plain-text body" spellcheck="false"></textarea>
+              <div class="mbx-edit-bodylabel">
+                <span>HTML body</span>
+                <button class="btn btn-sm btn-ghost" id="mbx-edit-htmlmode">Rich-text mode</button>
+              </div>
+              <textarea id="mbx-edit-html" aria-label="HTML body source" spellcheck="false"></textarea>
+              <div class="mbx-edit-rich" id="mbx-edit-rich" aria-label="Rich-text HTML editor"></div>
+              <div class="mbx-edit-actions">
+                <button class="btn btn-sm btn-primary" id="mbx-edit-save" title="Save edits locally (Ctrl+S)">Save edits</button>
+                <button class="btn btn-sm btn-ghost" id="mbx-edit-preview" title="Preview in the Rendered tab">Sanitized preview</button>
+                <button class="btn btn-sm btn-ghost" id="mbx-edit-undo" title="Undo (Ctrl+Z)">Undo</button>
+                <button class="btn btn-sm btn-ghost" id="mbx-edit-redo" title="Redo (Ctrl+Shift+Z)">Redo</button>
+                <button class="btn btn-sm btn-danger" id="mbx-edit-revert">Revert to original</button>
+                <span class="mbx-edit-dirty" id="mbx-edit-dirty" hidden>● Unsaved changes</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mbx-attachments" id="mbx-attachments" hidden>
+            <div class="mbx-attachments-title">Attachments</div>
+            <div id="mbx-attachments-list"></div>
+          </div>
+
+          <div class="mbx-note-wrap">
+            <textarea id="mbx-note" placeholder="Local note for this message (stays on your device)…" aria-label="Local note"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Hidden file input -->
+  <input type="file" id="mbx-file-input" multiple hidden aria-hidden="true">
+
+  <!-- Drag-and-drop overlay -->
+  <div class="mbx-drop-overlay" id="mbx-drop-overlay" hidden aria-hidden="true">
+    <div class="mbx-drop-overlay-box">Drop .mbox files to open them</div>
+  </div>
+
+  <!-- Context menu -->
+  <div class="mbx-context-menu" id="mbx-context-menu" hidden role="menu">
+    <button data-ctx="open">Open</button>
+    <button data-ctx="star">Star</button>
+    <button data-ctx="unstar">Remove star</button>
+    <button data-ctx="read">Mark read</button>
+    <button data-ctx="unread">Mark unread</button>
+    <button data-ctx="label">Add label…</button>
+    <button data-ctx="eml">Export as .eml</button>
+    <button data-ctx="mbox">Export selection as .mbox</button>
+  </div>
+
+  <!-- Import report modal -->
+  <div class="modal-overlay" id="mbx-report-modal" hidden role="dialog" aria-modal="true" aria-labelledby="mbx-report-title">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="mbx-report-title">Import report</h3>
+        <button class="btn btn-ghost btn-icon modal-close" aria-label="Close dialog">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="mbx-report-body"></div>
+      <div class="modal-footer">
+        <button class="btn btn-primary modal-close">Start reading</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings / storage modal -->
+  <div class="modal-overlay" id="mbx-settings-modal" hidden role="dialog" aria-modal="true" aria-labelledby="mbx-settings-title">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="mbx-settings-title">Settings &amp; local storage</h3>
+        <button class="btn btn-ghost btn-icon modal-close" aria-label="Close dialog">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="mbx-settings-body"></div>
+      <div class="modal-footer">
+        <span class="tool-hint" style="margin-right:auto;">Browser storage is specific to this device and browser.</span>
+        <button class="btn btn-secondary modal-close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SEO content sections ═══════════════ -->

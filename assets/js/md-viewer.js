@@ -6,6 +6,7 @@
 // lazily from CDN only when a feature needs them.
 
 import { initTheme } from './theme.js';
+import { handoffIdFromUrl, takeHandoff } from './handoff.js';
 import { showToast } from './ui.js';
 import { downloadBlob, debounce, readFileAsText } from './utils.js';
 
@@ -774,6 +775,9 @@ function init() {
   setView('split');
   updateStats();
   console.info('MD Viewer Online: ready');
+  // A file handed over by the file manager
+  const handoffId = handoffIdFromUrl();
+  if (handoffId) takeHandoff(handoffId).then(files => { if (files[0]) loadFile(files[0]); });
 }
 
 if (document.readyState === 'loading') {
