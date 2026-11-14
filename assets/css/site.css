@@ -559,3 +559,26 @@ body.s-page > main { flex: 1; }
 .s-chooser a { display: block; padding: 14px 18px; background: var(--s-sheet); border: 1px solid var(--s-rule); border-radius: var(--s-radius-lg); text-decoration: none; font-weight: 600; transition: border-color .12s, box-shadow .12s; }
 .s-chooser a:hover { border-color: var(--s-rule-strong); box-shadow: var(--s-shadow-md); }
 .s-chooser small { display: block; font-weight: 400; color: var(--s-ink-3); }
+
+/* Start page: one drop zone for files and folders */
+.s-hero .s-hero__lede { margin-bottom: 28px; }
+.s-hero { padding-bottom: 8px; }
+.s-home { margin-bottom: 40px; }
+.s-home .pt-drop { cursor: default; }
+.s-home .pt-drop.is-busy { opacity: .7; pointer-events: none; }
+.s-home .pt-drop__error:not([hidden]) { color: var(--s-ink-2); }
+.s-home__cta { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.s-routes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+.s-routes a { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border: 1px solid var(--s-rule); border-radius: var(--s-radius-lg); background: var(--s-sheet); color: inherit; text-decoration: none; text-align: left; transition: border-color .15s, box-shadow .15s; }
+.s-routes a:hover { border-color: var(--s-rule-strong); box-shadow: var(--s-shadow-md); }
+.s-routes a:hover strong { color: var(--s-blue); }
+.s-routes__icon { width: 22px; height: 22px; flex: none; margin-top: 2px; color: var(--s-blue); }
+.s-routes span { display: grid; gap: 2px; min-width: 0; }
+.s-routes strong { font: 620 15px/1.3 var(--s-display); }
+.s-routes small { font-size: 13.5px; color: var(--s-ink-3); }
+.s-chips--left { justify-content: flex-start; margin-bottom: 20px; }
+@media (max-width: 760px) { .s-routes { grid-template-columns: 1fr; } }
+.s-home__install { text-align: center; margin-top: 10px; min-height: 1px; }
+.s-mega--files { grid-template-columns: repeat(3, minmax(0, 1fr)); width: min(640px, calc(100vw - 32px)); }
+@media (max-width: 960px) { .s-mega--files { width: auto; grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 460px) { .s-mega--files { grid-template-columns: 1fr; } }

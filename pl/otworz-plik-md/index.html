@@ -30,12 +30,11 @@
   <link rel="manifest" href="/manifest.webmanifest">
   <script>(function(){try{var t=localStorage.getItem('fo-theme')==='dark'?'dark':'light';document.documentElement.setAttribute('data-theme',t)}catch(e){}})();</script>
   <link rel="preload" href="/assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="/assets/css/styles.css?v=fc3e055b">
-  <link rel="stylesheet" href="/assets/css/md-viewer.css?v=3ea2b5fa">
-  <link rel="stylesheet" href="/assets/css/site.css?v=1bf1a7b0">
+  <link rel="stylesheet" href="/assets/css/md-viewer.css?v=993adc19">
+  <link rel="stylesheet" href="/assets/css/site.css?v=e28198ae">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":["SoftwareApplication","WebApplication"],"name":"Przeglądarka MD","url":"https://files-online.com/pl/otworz-plik-md/","description":"Otwieraj, przeglądaj, edytuj i konwertuj pliki .md online. Podgląd na żywo, Markdown na PDF i HTML oraz HTML na Markdown. Za darmo i bez przesyłania.","inLanguage":"pl","applicationCategory":"UtilitiesApplication","operatingSystem":"Windows, macOS, Linux, Android, iOS","browserRequirements":"Requires a modern web browser with JavaScript enabled","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"publisher":{"@id":"https://files-online.com/#org"}}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Strona główna","item":"https://files-online.com/pl/"},{"@type":"ListItem","position":2,"name":"Przeglądarka MD"}]}</script>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","name":"Jak otworzyć plik MD","step":[{"@type":"HowToStep","position":1,"text":"Kliknij „Wybierz plik MD” lub upuść plik .md na stronę. Możesz też wkleić tekst albo zacząć od pustego dokumentu."},{"@type":"HowToStep","position":2,"text":"Czytaj sformatowany podgląd lub edytuj tekst i obserwuj, jak podgląd zmienia się podczas pisania."},{"@type":"HowToStep","position":3,"text":"Zapisz plik Markdown albo wyeksportuj go jako PDF, HTML lub zwykły tekst."}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","name":"Jak otworzyć plik MD","step":[{"@type":"HowToStep","position":1,"text":"Kliknij „Wybierz plik” lub upuść plik .md na stronę. Możesz też wkleić tekst albo zacząć od pustego dokumentu."},{"@type":"HowToStep","position":2,"text":"Czytaj sformatowany podgląd lub edytuj tekst i obserwuj, jak podgląd zmienia się podczas pisania."},{"@type":"HowToStep","position":3,"text":"Zapisz plik Markdown albo wyeksportuj go jako PDF, HTML lub zwykły tekst."}]}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Jaki program otwiera pliki .md?","acceptedAnswer":{"@type":"Answer","text":"Otworzy je każdy edytor tekstu, także Notatnik i TextEdit, ale pokażą surowe znaczniki. Ta strona pokazuje wersję sformatowaną bez instalowania czegokolwiek."}},{"@type":"Question","name":"Czy mogę przekonwertować Markdown na PDF?","acceptedAnswer":{"@type":"Answer","text":"Tak. Otwórz plik i wybierz PDF w menu eksportu. Plik powstaje w Twojej przeglądarce."}},{"@type":"Question","name":"Czy mogę przekonwertować HTML na Markdown?","acceptedAnswer":{"@type":"Answer","text":"Tak. Wklej HTML w oknie importu, a zostanie przekonwertowany na czysty Markdown, który możesz dalej edytować."}},{"@type":"Question","name":"Czy mój dokument jest przesyłany?","acceptedAnswer":{"@type":"Answer","text":"Nie. Dokument jest przetwarzany w przeglądarce i nigdy nie trafia na serwer."}},{"@type":"Question","name":"Czy działa na Windows, Macu, iPhonie i Androidzie?","acceptedAnswer":{"@type":"Answer","text":"Tak, w każdej aktualnej przeglądarce. Na komputerze edytor i podgląd są obok siebie, a na telefonie jeden pod drugim."}}]}</script>
 </head>
 <body class="s-page mdv-page">
@@ -66,10 +65,24 @@
             <a class="s-mega__all" href="/pl/narzedzia-pdf/">Wszystkie narzędzia PDF →</a>
           </div>
         </details>
+        <details class="s-menu">
+          <summary>Narzędzia plików<svg class="s-caret" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></summary>
+          <div class="s-mega s-mega--files">
+            <div>
+              <h3>Otwieranie i podgląd</h3>
+              <a href="/pl/metadane-pliku/">Inspektor plików</a><a href="/pl/menedzer-plikow/">Menedżer plików</a><a href="/pl/otworz-plik-md/" aria-current="page">Przeglądarka MD</a><a href="/pl/otworz-plik-mbox/">Przeglądarka MBOX</a>
+            </div>
+            <div>
+              <h3>Foldery i pliki</h3>
+              <a href="/pl/znajdz-duplikaty-plikow/">Szukanie duplikatów</a><a href="/pl/masowa-zmiana-nazw-plikow/">Zmiana nazw hurtowo</a><a href="/pl/zip-z-haslem/">ZIP z hasłem</a><a href="/pl/rozpakuj-rar-zip-7z-online/">Rozpakuj archiwa</a><a href="/pl/usun-exif-ze-zdjec/">Usuwanie metadanych</a>
+            </div><div>
+              <h3>&nbsp;</h3>
+              <a href="/pl/sortuj-zdjecia-wedlug-daty/">Sortowanie zdjęć po dacie</a><a href="/pl/porownaj-foldery/">Porównanie folderów</a><a href="/pl/szukaj-tekstu-w-plikach/">Szukanie tekstu w plikach</a><a href="/pl/co-zajmuje-miejsce-na-dysku/">Mapa zajętości folderu</a><a href="/pl/suma-kontrolna-pliku/">Sumy kontrolne</a>
+            </div>
+          </div>
+        </details>
         <a href="/pl/metadane-pliku/">Inspektor plików</a>
         <a href="/pl/menedzer-plikow/">Menedżer plików</a>
-        <a href="/pl/otworz-plik-md/" aria-current="page">Przeglądarka MD</a>
-        <a href="/pl/otworz-plik-mbox/">Przeglądarka MBOX</a>
       </nav>
       <div class="s-actions">
         <details class="s-lang">
@@ -87,95 +100,114 @@
     </div>
   </header>
   <main id="main">
-    <section class="hero mdv-hero" id="open">
-    <div class="hero-inner">
-      <div class="hero-badges">
-        <span class="badge badge-neutral">100% prywatnie</span>
-        <span class="badge badge-neutral">Bez przesyłania</span>
-        <span class="badge badge-neutral">Bez rejestracji</span>
+  <div class="s-wrap">
+      <ol class="s-crumbs"><li><a href="/pl/">Strona główna</a></li><li><span aria-current="page">Przeglądarka MD</span></li></ol>
+      <div class="s-toolhead">
+        <h1>Otwórz plik MD online</h1>
+        <p>Otwieraj, czytaj i edytuj pliki Markdown w jednym oknie. Eksport do PDF lub HTML, wszystko w przeglądarce, bez wysyłania plików.</p>
       </div>
-      <h1 class="hero-title">Otwórz plik MD online</h1>
-      <p class="hero-subtitle">Darmowa przeglądarka MD, edytor i konwerter Markdown. Otwieraj, przeglądaj, edytuj i konwertuj pliki .md online: za darmo, prywatnie, bez rejestracji. Eksport do PDF, HTML lub Markdown.</p>
+        <section class="mdv-window" id="editor" data-empty="true" aria-label="Edytor i przeglądarka Markdown">
 
-      <div class="mdv-dropzone" id="mdv-dropzone" tabindex="0" role="button" aria-label="Upuść tutaj plik Markdown lub naciśnij Enter, aby go wybrać">
-        <svg viewBox="0 0 48 48" fill="none" width="40" height="40" aria-hidden="true">
+    <div class="mdv-toolbar" role="toolbar" aria-label="Narzędzia Markdown">
+      <div class="mdv-group">
+        <button class="mdv-tb mdv-tb--primary" type="button" id="mdv-open-btn" title="Otwórz plik (Ctrl+O)">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 4.5A1.5 1.5 0 0 1 3.5 3H6l1.5 1.5h5A1.5 1.5 0 0 1 14 6v5.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 11.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+          <span>Otwórz</span>
+        </button>
+        <button class="mdv-tb" type="button" id="mdv-save-btn" title="Zapisz MD (Ctrl+S)">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 2.5h8l2 2v9H3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M5.5 2.5v3h4v-3M5.5 13.5v-4h5v4" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+          <span>Zapisz</span>
+        </button>
+        <details class="mdv-menu" id="mdv-more-menu">
+          <summary class="mdv-tb" aria-label="Więcej działań na plikach" title="Więcej">
+            <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><circle cx="3.5" cy="8" r="1.3"/><circle cx="8" cy="8" r="1.3"/><circle cx="12.5" cy="8" r="1.3"/></svg>
+            <span class="mdv-tb__more">Więcej</span>
+          </summary>
+          <div class="mdv-menu__list">
+            <button type="button" id="mdv-saveas-btn" title="Zapisz jako">Zapisz jako</button>
+            <button type="button" id="mdv-import-html-btn" title="Zaimportuj plik HTML i skonwertuj na Markdown">Importuj HTML</button>
+            <button type="button" id="mdv-paste-menu-btn">Wklej Markdown</button>
+          </div>
+        </details>
+      </div>
+
+      <details class="mdv-menu" id="mdv-export-menu">
+        <summary class="mdv-tb" aria-label="Eksportuj" title="Eksportuj">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2.5v7M5 6.5l3 3 3-3M3 11.5v1.5h10v-1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Eksportuj</span>
+          <svg class="mdv-caret" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </summary>
+        <div class="mdv-menu__list">
+          <button type="button" id="mdv-export-pdf-btn" title="Eksportuj PDF (Ctrl+P)">PDF</button>
+          <button type="button" id="mdv-export-html-btn" title="Eksportuj HTML (Ctrl+E)">HTML</button>
+          <button type="button" id="mdv-export-standalone-btn" title="Eksportuj samodzielny HTML z wbudowanym CSS">Samodzielny HTML</button>
+          <button type="button" id="mdv-export-txt-btn" title="Eksportuj zwykły tekst">Zwykły tekst</button>
+          <hr>
+          <button type="button" id="mdv-copy-md-btn" title="Skopiuj Markdown do schowka">Kopiuj MD</button>
+          <button type="button" id="mdv-copy-html-btn" title="Skopiuj HTML do schowka">Kopiuj HTML</button>
+        </div>
+      </details>
+
+      <div class="mdv-spacer"></div>
+
+      <div class="mdv-seg" role="group" aria-label="Widok">
+        <button type="button" data-mdv-view="split" class="active" title="Widok podzielony">Podział</button>
+        <button type="button" data-mdv-view="editor" title="Tylko edytor">Edytor</button>
+        <button type="button" data-mdv-view="preview" title="Tylko podgląd">Podgląd</button>
+        <button type="button" data-mdv-view="raw" title="Surowy kod HTML">HTML</button>
+      </div>
+
+      <button class="mdv-tb mdv-tb--quiet" type="button" id="mdv-clear-btn" title="Wyczyść edytor">
+        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.6 8h5.8l.6-8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Wyczyść</span>
+      </button>
+    </div>
+
+    <div class="mdv-body">
+      <div class="mdv-empty-state" id="mdv-dropzone">
+        <svg class="mdv-empty-state__icon" viewBox="0 0 48 48" fill="none" width="56" height="56" aria-hidden="true">
           <path d="M10 6h20l8 8v28H10z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
           <path d="M30 6v8h8" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
           <path d="M17 30l3-8 3 5 3-5 3 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <p class="mdv-dropzone-title">Upuść tutaj plik .md</p>
-        <div class="mdv-dropzone-actions">
-          <button class="btn btn-primary" id="mdv-choose-btn">Wybierz plik MD</button>
-          <button class="btn btn-secondary" id="mdv-paste-btn">Wklej Markdown</button>
-          <button class="btn btn-secondary" id="mdv-sample-btn">Wypróbuj przykład</button>
+        <p class="mdv-empty-state__title">Upuść tutaj plik Markdown</p>
+        <div class="mdv-empty-state__actions">
+          <button class="s-btn s-btn--primary" type="button" id="mdv-choose-btn">Wybierz plik</button>
+          <button class="s-btn s-btn--secondary" type="button" id="mdv-paste-btn">Wklej Markdown</button>
+          <button class="s-btn s-btn--secondary" type="button" id="mdv-sample-btn">Wypróbuj przykład</button>
+          <button class="s-btn s-btn--link" type="button" id="mdv-write-btn">Zacznij pisać</button>
         </div>
-        <p class="mdv-dropzone-note">Obsługiwane: <code>.md</code>, <code>.markdown</code>, <code>.txt</code>, <code>.html</code> Przetwarzane lokalnie, nigdy nie przesyłane.</p>
+        <p class="mdv-empty-state__note">Obsługiwane: <code>.md</code>, <code>.markdown</code>, <code>.txt</code>, <code>.html</code> Przetwarzane lokalnie, nigdy nie przesyłane.</p>
       </div>
-    </div>
-  </section>
 
-  <!-- MD Viewer / Editor -->
-  <section class="mdv-tool" id="editor" aria-label="Edytor i przeglądarka Markdown">
+      <div class="mdv-panes" id="mdv-panes" data-view="split">
+        <textarea
+          class="mdv-editor"
+          id="mdv-editor"
+          spellcheck="false"
+          aria-label="Źródło Markdown"
+          placeholder="# Start typing Markdown here…&#10;&#10;Or drop a .md file anywhere on this page."></textarea>
 
-    <div class="mdv-toolbar" role="toolbar" aria-label="Narzędzia Markdown">
-      <div class="mdv-toolbar-group">
-        <button class="btn btn-sm btn-ghost" id="mdv-open-btn" title="Otwórz plik (Ctrl+O)">Otwórz</button>
-        <button class="btn btn-sm btn-ghost" id="mdv-save-btn" title="Zapisz MD (Ctrl+S)">Zapisz MD</button>
-        <button class="btn btn-sm btn-ghost" id="mdv-saveas-btn" title="Zapisz jako">Zapisz jako</button>
-        <button class="btn btn-sm btn-ghost" id="mdv-import-html-btn" title="Zaimportuj plik HTML i skonwertuj na Markdown">Importuj HTML</button>
-      </div>
-      <div class="mdv-toolbar-group">
-        <button class="btn btn-sm btn-ghost" id="mdv-export-pdf-btn" title="Eksportuj PDF (Ctrl+P)">Eksportuj PDF</button>
-        <button class="btn btn-sm btn-ghost" id="mdv-export-html-btn" title="Eksportuj HTML (Ctrl+E)">Eksportuj HTML</button>
-        <button class="btn btn-sm btn-ghost" id="mdv-export-standalone-btn" title="Eksportuj samodzielny HTML z wbudowanym CSS">Samodzielny HTML</button>
-        <button class="btn btn-sm btn-ghost" id="mdv-export-txt-btn" title="Eksportuj zwykły tekst">Zwykły tekst</button>
-      </div>
-      <div class="mdv-toolbar-group">
-        <button class="btn btn-sm btn-ghost" id="mdv-copy-md-btn" title="Skopiuj Markdown do schowka">Kopiuj MD</button>
-        <button class="btn btn-sm btn-ghost" id="mdv-copy-html-btn" title="Skopiuj HTML do schowka">Kopiuj HTML</button>
-        <button class="btn btn-sm btn-danger" id="mdv-clear-btn" title="Wyczyść edytor">Wyczyść</button>
-      </div>
-      <div class="mdv-toolbar-spacer"></div>
-      <div class="view-toggle mdv-view-toggle" role="group" aria-label="Widok">
-        <button data-mdv-view="split" class="active" title="Widok podzielony">Podział</button>
-        <button data-mdv-view="editor" title="Tylko edytor">Edytor</button>
-        <button data-mdv-view="preview" title="Tylko podgląd">Podgląd</button>
-        <button data-mdv-view="raw" title="Surowy kod HTML">HTML</button>
+        <div class="mdv-preview-pane" id="mdv-preview-pane">
+          <details class="mdv-toc" id="mdv-toc" hidden>
+            <summary>Spis treści</summary>
+            <nav id="mdv-toc-list" aria-label="Spis treści"></nav>
+          </details>
+          <article class="md-preview" id="mdv-preview" aria-label="Podgląd Markdown"></article>
+        </div>
+
+        <pre class="mdv-raw" id="mdv-raw" hidden aria-label="Wygenerowany kod HTML"><code id="mdv-raw-code"></code></pre>
       </div>
     </div>
 
-    <div class="mdv-stats" aria-live="polite">
-      <span id="mdv-filename">untitled.md</span>
+    <div class="mdv-status" aria-live="polite">
+      <span class="mdv-status__name" id="mdv-filename">untitled.md</span>
       <span class="mdv-dirty" id="mdv-dirty" hidden title="Niezapisane zmiany">●</span>
-      <span class="mdv-stats-right">
-        <span id="mdv-stat-words">0 words</span> ·
-        <span id="mdv-stat-chars">0 characters</span> ·
+      <span class="mdv-status__stats">
+        <span id="mdv-stat-words">0 words</span>
+        <span id="mdv-stat-chars">0 characters</span>
         <span id="mdv-stat-lines">0 lines</span>
       </span>
-    </div>
-
-    <div class="mdv-panes" id="mdv-panes" data-view="split">
-      <textarea
-        class="mdv-editor"
-        id="mdv-editor"
-        spellcheck="false"
-        aria-label="Źródło Markdown"
-        placeholder="# Start typing Markdown here…&#10;&#10;Or drop a .md file anywhere on this page."></textarea>
-
-      <div class="mdv-preview-pane" id="mdv-preview-pane">
-        <details class="mdv-toc" id="mdv-toc" hidden>
-          <summary>Spis treści</summary>
-          <nav id="mdv-toc-list" aria-label="Spis treści"></nav>
-        </details>
-        <article class="md-preview" id="mdv-preview" aria-label="Podgląd Markdown">
-          <div class="mdv-empty">
-            <p>Nie ma jeszcze nic do podglądu.</p>
-            <p>Otwórz plik <code>.md</code> , wklej Markdown lub wypróbuj przykład.</p>
-          </div>
-        </article>
-      </div>
-
-      <pre class="mdv-raw" id="mdv-raw" hidden aria-label="Wygenerowany kod HTML"><code id="mdv-raw-code"></code></pre>
     </div>
   </section>
 
@@ -184,32 +216,31 @@
   <input type="file" id="mdv-html-input" accept=".html,.htm,text/html" hidden>
 
   <!-- Paste / import modal -->
-  <div class="modal-overlay" id="mdv-paste-modal" hidden role="dialog" aria-modal="true" aria-labelledby="mdv-paste-title">
-    <div class="modal">
-      <div class="modal-header">
+  <div class="mdv-modal-overlay" id="mdv-paste-modal" hidden role="dialog" aria-modal="true" aria-labelledby="mdv-paste-title">
+    <div class="mdv-modal">
+      <div class="mdv-modal__header">
         <h3 id="mdv-paste-title">Wklej Markdown lub HTML</h3>
-        <button class="btn btn-ghost btn-icon modal-close" aria-label="Zamknij okno">
+        <button class="mdv-modal__close mdv-modal-close" type="button" aria-label="Zamknij okno">
           <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         </button>
       </div>
-      <div class="modal-body">
-        <textarea class="input mdv-paste-textarea" id="mdv-paste-textarea" rows="10" placeholder="Wklej tutaj Markdown lub HTML…" aria-label="Wklej treść"></textarea>
+      <div class="mdv-modal__body">
+        <textarea class="mdv-input mdv-paste-textarea" id="mdv-paste-textarea" rows="10" placeholder="Wklej tutaj Markdown lub HTML…" aria-label="Wklej treść"></textarea>
         <div class="mdv-url-row">
-          <input type="url" class="input input-sm" id="mdv-url-input" placeholder="…lub zaimportuj z adresu URL (https://example.com/page.html)" aria-label="Importuj z adresu URL">
-          <button class="btn btn-sm btn-secondary" id="mdv-url-fetch-btn">Pobierz</button>
+          <input type="url" class="mdv-input" id="mdv-url-input" placeholder="…lub zaimportuj z adresu URL (https://example.com/page.html)" aria-label="Importuj z adresu URL">
+          <button class="s-btn s-btn--secondary mdv-fetch" type="button" id="mdv-url-fetch-btn">Pobierz</button>
         </div>
-        <p class="tool-hint">Import z adresu URL działa tylko, gdy źródło zezwala na CORS.</p>
+        <p class="mdv-hint">Import z adresu URL działa tylko, gdy źródło zezwala na CORS.</p>
       </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary modal-close">Anuluj</button>
-        <button class="btn btn-secondary" id="mdv-paste-html-btn" title="Skonwertuj wklejony HTML na Markdown">Konwertuj HTML → Markdown</button>
-        <button class="btn btn-primary" id="mdv-paste-md-btn">Wczytaj jako Markdown</button>
+      <div class="mdv-modal__footer">
+        <button class="s-btn s-btn--secondary mdv-modal-close" type="button">Anuluj</button>
+        <button class="s-btn s-btn--secondary" type="button" id="mdv-paste-html-btn" title="Skonwertuj wklejony HTML na Markdown">Konwertuj HTML → Markdown</button>
+        <button class="s-btn s-btn--primary" type="button" id="mdv-paste-md-btn">Wczytaj jako Markdown</button>
       </div>
     </div>
   </div>
 
-  <!-- ═══════════════ SEO content sections ═══════════════ -->
-
+    </div>
     <section class="s-section">
       <div class="s-wrap s-prose">
         <h2>Czym jest plik MD?</h2>
@@ -219,7 +250,7 @@
     <section class="s-section s-section--tint" id="how">
     <div class="s-wrap">
       <h2>Jak otworzyć plik MD</h2>
-      <ol class="s-steps"><li><p>Kliknij „Wybierz plik MD” lub upuść plik .md na stronę. Możesz też wkleić tekst albo zacząć od pustego dokumentu.</p></li><li><p>Czytaj sformatowany podgląd lub edytuj tekst i obserwuj, jak podgląd zmienia się podczas pisania.</p></li><li><p>Zapisz plik Markdown albo wyeksportuj go jako PDF, HTML lub zwykły tekst.</p></li></ol>
+      <ol class="s-steps"><li><p>Kliknij „Wybierz plik” lub upuść plik .md na stronę. Możesz też wkleić tekst albo zacząć od pustego dokumentu.</p></li><li><p>Czytaj sformatowany podgląd lub edytuj tekst i obserwuj, jak podgląd zmienia się podczas pisania.</p></li><li><p>Zapisz plik Markdown albo wyeksportuj go jako PDF, HTML lub zwykły tekst.</p></li></ol>
     </div>
   </section>
     <section class="s-section" id="faq">
@@ -252,8 +283,8 @@
     </div>
   </footer>
   <script src="/assets/js/site.js?v=21b41bad" defer data-no-theme="true"></script>
-  <script src="/assets/i18n/app.pl.js?v=1777610d" defer></script>
+  <script src="/assets/i18n/app.pl.js?v=20d9cb78" defer></script>
   <script src="/assets/js/i18n-dom.js?v=9e2fb3d6" defer></script>
-  <script type="module" src="/assets/js/md-viewer.js?v=0c9d5660"></script>
+  <script type="module" src="/assets/js/md-viewer.js?v=559610bd"></script>
 </body>
 </html>

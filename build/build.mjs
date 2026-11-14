@@ -19,6 +19,23 @@ const ROOT = join(BUILD, '..');
 const content = {};
 for (const lang of LANGS) content[lang] = (await import(`./content/${lang}.mjs`)).default;
 
+// Pages for single file manager functions. Copy per language in content/features.<lang>.mjs.
+const FEATURES = [
+  { id: 'duplicates', icon: 'alternate' }, { id: 'rename', icon: 'edit' }, { id: 'zipPassword', icon: 'protect' },
+  { id: 'extract', icon: 'extract' }, { id: 'strip', icon: 'metadata' }, { id: 'photosort', icon: 'toImage' },
+  { id: 'compare', icon: 'compare' }, { id: 'search', icon: 'inspector' }, { id: 'treemap', icon: 'organize' },
+  { id: 'checksum', icon: 'numbers' },
+];
+const featureCopy = {};
+for (const lang of LANGS) {
+  const file = join(BUILD, `content/features.${lang}.mjs`);
+  featureCopy[lang] = existsSync(file) ? (await import(`./content/features.${lang}.mjs`)).default : {};
+}
+// A feature page exists once every language has its copy
+const LIVE_FEATURES = FEATURES.filter(f => LANGS.every(l => featureCopy[l][f.id]?.slug));
+const featurePath = (id, lang) => `/${lang}/${featureCopy[lang][id].slug}/`;
+const featurePaths = id => Object.fromEntries(LANGS.map(l => [l, featurePath(id, l)]));
+
 const appStrings = (await import('./content/app-strings.mjs')).default;
 const appDict = {};
 LANGS.filter(l => l !== 'en').forEach((lang, i) => {
@@ -118,6 +135,7 @@ function header(lang, paths, current) {
               <h3>${e(c.cats[cat])}</h3>
               ${TOOLS.filter(t => t.cat === cat).map(t => `<a href="${toolPath(t, lang)}">${e(c.tools[t.id].name)}</a>`).join('')}
             </div>`).join('');
+  const megaLink = key => `<a href="${pagePath(key, lang)}"${current === key ? ' aria-current="page"' : ''}>${e(c.nav[key])}</a>`;
   const navLink = key => `<a href="${pagePath(key, lang)}"${current === key ? ' aria-current="page"' : ''}>${e(c.nav[key])}</a>`;
   return `<a class="s-skip" href="#main">${e(c.nav.skip)}</a>
   <header class="s-header">
@@ -131,10 +149,21 @@ function header(lang, paths, current) {
             <a class="s-mega__all" href="${pagePath('pdfTools', lang)}">${e(c.nav.allPdfTools)} →</a>
           </div>
         </details>
+        <details class="s-menu">
+          <summary>${e(c.nav.fileTools)}<svg class="s-caret" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></summary>
+          <div class="s-mega s-mega--files">
+            <div>
+              <h3>${e(c.nav.groupOpen)}</h3>
+              ${megaLink('inspector')}${megaLink('fileManager')}${megaLink('md')}${megaLink('mbox')}
+            </div>
+            ${[LIVE_FEATURES.slice(0, 5), LIVE_FEATURES.slice(5)].filter(g => g.length).map((group, i) => `<div>
+              <h3>${i ? '&nbsp;' : e(c.nav.groupFolders)}</h3>
+              ${group.map(f => `<a href="${featurePath(f.id, lang)}"${current === f.id ? ' aria-current="page"' : ''}>${e(featureCopy[lang][f.id].name)}</a>`).join('')}
+            </div>`).join('')}
+          </div>
+        </details>
         ${navLink('inspector')}
         ${navLink('fileManager')}
-        ${navLink('md')}
-        ${navLink('mbox')}
       </nav>
       <div class="s-actions">
         <details class="s-lang">
@@ -297,9 +326,35 @@ function homePage(lang) {
       <div class="s-wrap s-hero__inner">
         <h1>${h.h1Html}</h1>
         <p class="s-hero__lede">${e(h.lede)}</p>
-        <nav class="s-chips" aria-label="${e(h.popularTitle)}">
-          ${popular.map(t => `<a class="s-chip" href="${toolPath(t, lang)}">${e(c.tools[t.id].name)}</a>`).join('')}
-        </nav>
+      </div>
+      <div class="s-wrap">
+        <div class="pt s-home">
+          <div class="pt-drop" id="home-drop" data-inspector="${pagePath('inspector', lang)}" data-manager="${pagePath('fileManager', lang)}" data-mbox="${pagePath('mbox', lang)}" data-reading="${e(h.reading)}" data-too-big="${e(h.tooBig)}" data-failed="${e(h.failed)}">
+            ${iconSvg('fileManager', 'pt-drop__icon')}
+            <div class="s-home__cta">
+              <button class="s-btn s-btn--primary pt-drop__btn" type="button" data-home="file">${e(h.chooseFile)}</button>
+              <button class="s-btn s-btn--secondary pt-drop__btn" type="button" data-home="folder">${e(h.openFolder)}</button>
+            </div>
+            <p class="pt-drop__or">${e(h.dropHint)}</p>
+            <p class="pt-drop__error" role="status" hidden></p>
+            <noscript><p class="pt-drop__error">${e(c.toolPage.noJs)}</p></noscript>
+          </div>
+          <div class="s-routes">
+            <a href="${pagePath('inspector', lang)}">${iconSvg('inspector', 's-routes__icon')}<span><strong>${e(h.routeFile[0])}</strong><small>${e(h.routeFile[1])}</small></span></a>
+            <a href="${pagePath('fileManager', lang)}">${iconSvg('fileManager', 's-routes__icon')}<span><strong>${e(h.routeFolder[0])}</strong><small>${e(h.routeFolder[1])}</small></span></a>
+            <a href="${pagePath('pdfTools', lang)}">${iconSvg('edit', 's-routes__icon')}<span><strong>${e(h.routePdf[0])}</strong><small>${e(fill(h.routePdf[1], { n: TOOLS.length }))}</small></span></a>
+          </div>
+          <ul class="s-trust">${c.toolPage.trust.map(x => `<li>${e(x)}</li>`).join('')}</ul>
+          <p class="s-home__install"><button class="s-btn s-btn--link" type="button" data-home="install" hidden>${e(h.install)}</button></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="s-section s-section--tint">
+      <div class="s-wrap">
+        <h2>${e(h.filesTitle)}</h2>
+        <p class="s-section__lede">${e(h.filesLede)}</p>
+        <div class="s-cards">${['inspector', 'fileManager', 'md', 'mbox'].map(k => fileCard(lang, k)).join('')}${LIVE_FEATURES.map(x => featureCard(lang, x)).join('')}</div>
       </div>
     </section>
 
@@ -309,15 +364,10 @@ function homePage(lang) {
           <h2>${e(c.nav.allPdfTools)}</h2>
           <a href="${pagePath('pdfTools', lang)}">${e(fill(h.allTools, { n: TOOLS.length }))} →</a>
         </div>
+        <nav class="s-chips s-chips--left" aria-label="${e(h.popularTitle)}">
+          ${popular.map(t => `<a class="s-chip" href="${toolPath(t, lang)}">${e(c.tools[t.id].name)}</a>`).join('')}
+        </nav>
         ${toolGrid(lang)}
-      </div>
-    </section>
-
-    <section class="s-section s-section--tint">
-      <div class="s-wrap">
-        <h2>${e(h.filesTitle)}</h2>
-        <p class="s-section__lede">${e(h.filesLede)}</p>
-        <div class="s-cards">${['inspector', 'fileManager', 'md', 'mbox'].map(k => fileCard(lang, k)).join('')}</div>
       </div>
     </section>
 
@@ -334,6 +384,7 @@ function homePage(lang) {
     ${faqSection(c, h.faqs)}
   </main>
   ${footer(lang, paths)}
+  <script type="module" src="${assetUrl('assets/js/home.js')}"></script>
 </body>
 </html>
 `;
@@ -428,6 +479,83 @@ function toolPage(lang, tool) {
 `;
 }
 
+function featureCard(lang, f) {
+  const t = featureCopy[lang][f.id];
+  return `<a class="s-card" data-cat="files" href="${featurePath(f.id, lang)}">
+          ${iconSvg(f.icon)}
+          <span class="s-card__title">${e(t.name)}</span>
+          <span class="s-card__desc">${e(t.short)}</span>
+        </a>`;
+}
+
+/** One function of the file manager as its own page: same app, started in that tool. */
+function featurePage(lang, f) {
+  const c = content[lang];
+  const p = featureCopy[lang][f.id];
+  const m = c.fileManagerPage;
+  const paths = featurePaths(f.id);
+  const crumbs = [[c.nav.home, `/${lang}/`], [m.name, pagePath('fileManager', lang)], [p.name]];
+  const others = LIVE_FEATURES.filter(x => x.id !== f.id);
+  return `${head({ lang, title: p.title, desc: p.desc, paths, cspCdn: 'https://cdn.jsdelivr.net', extraCss: ['assets/css/fm.css'], jsonLd: [ldApp(lang, p.name, p.desc, paths[lang], p.features.map(x => x[0])), ldCrumbs(crumbs), ldHowTo(p.how, p.steps), ldFaq(p.faqs)] })}
+<body class="s-page fm-page" data-fm-feature="${f.id}">
+  <div id="fm-landing">
+  ${header(lang, paths, f.id)}
+  <main id="main">
+    <div class="s-wrap">
+      ${breadcrumbs(crumbs)}
+      <div class="s-toolhead">
+        <h1>${e(p.h1)}</h1>
+        <p>${e(p.lede)}</p>
+      </div>
+      <div class="pt fm-hero">
+        <div class="pt-drop">
+          ${iconSvg(f.icon, 'pt-drop__icon')}
+          <div class="fm-hero__cta">
+            <button class="s-btn s-btn--primary pt-drop__btn" type="button" data-fm="open-folder">${e(m.openFolder)}</button>
+            <button class="s-btn s-btn--secondary pt-drop__btn" type="button" data-fm="open-files">${e(m.openFiles)}</button>
+          </div>
+          <p class="pt-drop__or">${e(m.dropHint)}</p>
+          <button class="s-btn s-btn--secondary fm-hero__again" type="button" data-fm="reopen" hidden></button>
+          <button class="fm-hero__demo" type="button" data-fm="demo">${e(m.demo)}</button>
+          <noscript><p class="pt-drop__error">${e(c.toolPage.noJs)}</p></noscript>
+        </div>
+        <ul class="s-trust">${c.toolPage.trust.map(x => `<li>${e(x)}</li>`).join('')}</ul>
+      </div>
+    </div>
+    <section class="s-section">
+      <div class="s-wrap">
+        <div class="s-benefits">
+          ${p.features.map(([h, d]) => `<div><h3>${e(h)}</h3><p>${e(d)}</p></div>`).join('')}
+        </div>
+      </div>
+    </section>
+    ${howToSection(p.how, p.steps)}
+    <section class="s-section">
+      <div class="s-wrap s-prose">
+        <h2>${e(p.aboutTitle)}</h2>
+        ${p.about.map(x => `<p>${e(x)}</p>`).join('')}
+      </div>
+    </section>
+    ${faqSection(c, p.faqs)}
+    <section class="s-section s-section--tint">
+      <div class="s-wrap">
+        <h2>${e(c.nav.moreFileTools)}</h2>
+        <div class="s-cards" style="margin-top:18px">
+          ${fileCard(lang, 'fileManager')}${fileCard(lang, 'inspector')}
+          ${others.map(x => featureCard(lang, x)).join('')}
+        </div>
+      </div>
+    </section>
+  </main>
+  ${footer(lang, paths)}
+  </div>
+  <div class="fm" id="fm-app" hidden></div>
+  <script type="module" src="${assetUrl('assets/js/fm/main.js')}"></script>
+</body>
+</html>
+`;
+}
+
 function fileManagerPage(lang) {
   const c = content[lang];
   const p = c.fileManagerPage;
@@ -458,6 +586,7 @@ function fileManagerPage(lang) {
             <button class="s-btn s-btn--secondary pt-drop__btn" type="button" data-fm="open-files">${e(p.openFiles)}</button>
           </div>
           <p class="pt-drop__or">${e(p.dropHint)}</p>
+          <button class="s-btn s-btn--secondary fm-hero__again" type="button" data-fm="reopen" hidden></button>
           <button class="fm-hero__demo" type="button" data-fm="demo">${e(p.demo)}</button>
           <noscript><p class="pt-drop__error">${e(c.toolPage.noJs)}</p></noscript>
         </div>
@@ -483,6 +612,12 @@ function fileManagerPage(lang) {
         </div>
       </div>
     </section>
+    ${LIVE_FEATURES.length ? `<section class="s-section">
+      <div class="s-wrap">
+        <h2>${e(c.nav.groupFolders)}</h2>
+        <div class="s-cards" style="margin-top:18px">${LIVE_FEATURES.map(x => featureCard(lang, x)).join('')}</div>
+      </div>
+    </section>` : ''}
     ${howToSection(p.how, p.steps)}
     ${faqSection(c, faqs)}
     ${sisterSection(lang, PAGE_SISTERS.fileManager)}
@@ -552,17 +687,24 @@ function inspectorPage(lang) {
 }
 
 /** MD and MBOX viewers: legacy app markup inside the new page frame. */
-function viewerPage(lang, key, { fragment, css, script, bodyClass }) {
+function viewerPage(lang, key, { fragment, css, script, bodyClass, legacyCss = true, windowed = false }) {
   const c = content[lang];
   const p = c[`${key}Page`];
   const paths = pathsFor(key);
   const crumbs = [[c.nav.home, `/${lang}/`], [p.name]];
   const app = translateFragment(readFileSync(join(BUILD, `legacy/${fragment}`), 'utf8'), lang);
-  return `${head({ lang, title: p.title, desc: p.desc, paths, useCsp: false, extraCss: ['assets/css/styles.css', css], jsonLd: [ldApp(lang, p.name, p.desc, paths[lang]), ldCrumbs(crumbs), ldHowTo(p.how, p.steps), ldFaq(p.faqs)] })}
+  return `${head({ lang, title: p.title, desc: p.desc, paths, useCsp: false, extraCss: [...(legacyCss ? ['assets/css/styles.css'] : []), css], jsonLd: [ldApp(lang, p.name, p.desc, paths[lang]), ldCrumbs(crumbs), ldHowTo(p.how, p.steps), ldFaq(p.faqs)] })}
 <body class="s-page ${bodyClass}">
   ${header(lang, paths, key)}
   <main id="main">
-  ${app}
+  ${windowed ? `<div class="s-wrap">
+      ${breadcrumbs(crumbs)}
+      <div class="s-toolhead">
+        <h1>${e(p.h1)}</h1>
+        <p>${e(p.lede)}</p>
+      </div>
+      ${app}
+    </div>` : app}
     <section class="s-section">
       <div class="s-wrap s-prose">
         <h2>${e(p.aboutTitle)}</h2>
@@ -718,6 +860,7 @@ function sitemap() {
   const groups = [
     ...Object.keys(PAGES).map(pathsFor),
     ...TOOLS.map(toolPaths),
+    ...LIVE_FEATURES.map(f => featurePaths(f.id)),
   ];
   const entries = [];
   for (const paths of groups) {
@@ -747,6 +890,7 @@ function listFiles(dir, filter) {
 function serviceWorker() {
   const shell = [
     '/',
+    '/open/',
     '/manifest.webmanifest',
     '/assets/icons/icon.svg',
     ...listFiles('assets/css', () => true),
@@ -798,15 +942,35 @@ for (const lang of LANGS) {
   for (const tool of TOOLS) write(`${lang}/${tool.slugs[lang]}/index.html`, toolPage(lang, tool));
   write(`${lang}/${PAGES.inspector[lang]}/index.html`, inspectorPage(lang));
   write(`${lang}/${PAGES.fileManager[lang]}/index.html`, fileManagerPage(lang));
-  write(`${lang}/${PAGES.md[lang]}/index.html`, viewerPage(lang, 'md', { fragment: 'md-app.html', css: 'assets/css/md-viewer.css', script: 'assets/js/md-viewer.js', bodyClass: 'mdv-page' }));
+  for (const f of LIVE_FEATURES) write(`${lang}/${featureCopy[lang][f.id].slug}/index.html`, featurePage(lang, f));
+  write(`${lang}/${PAGES.md[lang]}/index.html`, viewerPage(lang, 'md', { fragment: 'md-app.html', css: 'assets/css/md-viewer.css', script: 'assets/js/md-viewer.js', bodyClass: 'mdv-page', legacyCss: false, windowed: true }));
   write(`${lang}/${PAGES.mbox[lang]}/index.html`, viewerPage(lang, 'mbox', { fragment: 'mbox-app.html', css: 'assets/css/mbox-viewer.css', script: 'assets/js/mbox/app.js', bodyClass: 'mbx-page' }));
   write(`${lang}/${PAGES.privacy[lang]}/index.html`, legalPage(lang, 'privacy'));
   write(`${lang}/${PAGES.imprint[lang]}/index.html`, legalPage(lang, 'imprint'));
-  pages += TOOLS.length + 7;
+  pages += TOOLS.length + 7 + LIVE_FEATURES.length;
 }
 
 write('index.html', rootPage());
 write('404.html', notFoundPage());
+write('open/index.html', `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="${e(csp([THEME_BOOT]))}">
+  <meta name="robots" content="noindex">
+  <title>Files Online</title>
+  <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <script>${THEME_BOOT}</script>
+  <link rel="stylesheet" href="${assetUrl('assets/css/site.css')}">
+</head>
+<body class="s-page">
+  <main class="s-chooser"><div class="s-chooser__box">${LOGO.replace('<svg', '<svg width="52" height="52"')}<h1>Files Online</h1><p>…</p></div></main>
+  <script type="module" src="${assetUrl('assets/js/open.js')}"></script>
+</body>
+</html>
+`);
 write('sitemap.xml', sitemap());
 write('robots.txt', `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`);
 write('service-worker.js', serviceWorker());

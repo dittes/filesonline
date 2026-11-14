@@ -1,13 +1,14 @@
 // Files Online — Service Worker
 // Cache-first for app shell, network-first for CDN resources.
 
-const CACHE_VERSION = '1c8e7b2747';
+const CACHE_VERSION = '49a53c92da';
 const SHELL_CACHE = `files-online-shell-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `files-online-runtime-${CACHE_VERSION}`;
 
 // Written by build/build.mjs. Pages and vendor libraries are cached the first time they are used.
 const SHELL_FILES = [
   "/",
+  "/open/",
   "/manifest.webmanifest",
   "/assets/icons/icon.svg",
   "/assets/css/fm.css",
@@ -41,17 +42,26 @@ const SHELL_FILES = [
   "/assets/i18n/routes.pl.js",
   "/assets/js/fm/actions.js",
   "/assets/js/fm/archive.js",
+  "/assets/js/fm/compare.js",
   "/assets/js/fm/demo.js",
   "/assets/js/fm/details.js",
   "/assets/js/fm/dialogs.js",
   "/assets/js/fm/dom.js",
+  "/assets/js/fm/editor.js",
   "/assets/js/fm/i18n.js",
   "/assets/js/fm/intake.js",
   "/assets/js/fm/kinds.js",
   "/assets/js/fm/main.js",
+  "/assets/js/fm/photosort.js",
   "/assets/js/fm/preview.js",
+  "/assets/js/fm/search.js",
+  "/assets/js/fm/session.js",
   "/assets/js/fm/store.js",
+  "/assets/js/fm/strip.js",
+  "/assets/js/fm/treemap.js",
+  "/assets/js/fm/zipcrypt.js",
   "/assets/js/handoff.js",
+  "/assets/js/home.js",
   "/assets/js/i18n-dom.js",
   "/assets/js/inspect/app.js",
   "/assets/js/inspect/extractors.js",
@@ -75,12 +85,14 @@ const SHELL_FILES = [
   "/assets/js/mbox/threads.js",
   "/assets/js/mbox/worker.js",
   "/assets/js/md-viewer.js",
+  "/assets/js/open.js",
   "/assets/js/pdf/lib.js",
   "/assets/js/pdf/main.js",
   "/assets/js/pdf/ops.js",
   "/assets/js/pdf/pages.js",
   "/assets/js/pdf/tools.js",
   "/assets/js/pdf/ui.js",
+  "/assets/js/route.js",
   "/assets/js/site.js",
   "/assets/js/theme.js",
   "/assets/js/ui.js",

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' blob: https://cdn.jsdelivr.net 'sha256-2umU0MxQJqQrUkhC2ma0avyIwaZeSqNXdBh3CvB6PCc='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self' data: blob:; connect-src 'self' blob: data: https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <title>Co zajmuje miejsce na dysku: mapa folderu – bez wysyłania plików</title>
+  <meta name="description" content="Zobacz, co zajmuje miejsce w folderze: mapa prostokątów według rozmiaru, największe pliki i podział na typy. Czyta tylko nazwy i rozmiary, bez wysyłania plików.">
+  
+  <link rel="canonical" href="https://files-online.com/pl/co-zajmuje-miejsce-na-dysku/">
+  <link rel="alternate" hreflang="en" href="https://files-online.com/en/folder-size-viewer/">
+  <link rel="alternate" hreflang="de" href="https://files-online.com/de/ordnergroesse-anzeigen/">
+  <link rel="alternate" hreflang="pl" href="https://files-online.com/pl/co-zajmuje-miejsce-na-dysku/">
+  <link rel="alternate" hreflang="cs" href="https://files-online.com/cs/co-zabira-misto-ve-slozce/">
+  <link rel="alternate" hreflang="x-default" href="https://files-online.com/en/folder-size-viewer/">
+  <meta name="theme-color" content="#ffffff">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Files Online">
+  <meta property="og:url" content="https://files-online.com/pl/co-zajmuje-miejsce-na-dysku/">
+  <meta property="og:title" content="Co zajmuje miejsce na dysku: mapa folderu – bez wysyłania plików">
+  <meta property="og:description" content="Zobacz, co zajmuje miejsce w folderze: mapa prostokątów według rozmiaru, największe pliki i podział na typy. Czyta tylko nazwy i rozmiary, bez wysyłania plików.">
+  <meta property="og:locale" content="pl_PL">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="og:locale:alternate" content="de_DE">
+  <meta property="og:locale:alternate" content="cs_CZ">
+  <meta property="og:image" content="https://files-online.com/assets/icons/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <script>(function(){try{var t=localStorage.getItem('fo-theme')==='dark'?'dark':'light';document.documentElement.setAttribute('data-theme',t)}catch(e){}})();</script>
+  <link rel="preload" href="/assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/css/fm.css?v=902907d9">
+  <link rel="stylesheet" href="/assets/css/site.css?v=e28198ae">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":["SoftwareApplication","WebApplication"],"name":"Mapa zajętości folderu","url":"https://files-online.com/pl/co-zajmuje-miejsce-na-dysku/","description":"Zobacz, co zajmuje miejsce w folderze: mapa prostokątów według rozmiaru, największe pliki i podział na typy. Czyta tylko nazwy i rozmiary, bez wysyłania plików.","inLanguage":"pl","applicationCategory":"UtilitiesApplication","operatingSystem":"Windows, macOS, Linux, Android, iOS","browserRequirements":"Requires a modern web browser with JavaScript enabled","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"publisher":{"@id":"https://files-online.com/#org"},"featureList":["Mapa prostokątów","Największe pliki i typy","Szybkie wczytywanie"]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Strona główna","item":"https://files-online.com/pl/"},{"@type":"ListItem","position":2,"name":"Menedżer plików","item":"https://files-online.com/pl/menedzer-plikow/"},{"@type":"ListItem","position":3,"name":"Mapa zajętości folderu"}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","name":"Jak sprawdzić, co zajmuje miejsce","step":[{"@type":"HowToStep","position":1,"text":"Kliknij „Otwórz folder” albo upuść folder na tę stronę. Menedżer plików otworzy się i od razu pokaże mapę zajętości."},{"@type":"HowToStep","position":2,"text":"Znajdź największe prostokąty i kliknij folder, żeby zajrzeć głębiej. Pomocne są też lista największych plików i podział na typy."},{"@type":"HowToStep","position":3,"text":"Zdecyduj, co przenieść lub usunąć. Narzędzie niczego nie zmienia na dysku, więc czyszczenie robisz samodzielnie w swoim systemie."}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Czy narzędzie przeskanuje cały dysk?","acceptedAnswer":{"@type":"Answer","text":"Nie. Przeglądarka na to nie pozwala. Wybierasz folder, a narzędzie pokazuje jego zawartość."}},{"@type":"Question","name":"Czy narzędzie czyta zawartość plików?","acceptedAnswer":{"@type":"Answer","text":"Nie. Czyta tylko nazwy i rozmiary, dlatego nawet duże foldery ładują się szybko."}},{"@type":"Question","name":"Czy mogę usunąć pliki z poziomu mapy?","acceptedAnswer":{"@type":"Answer","text":"Nie. Narzędzie służy do oglądania. Zdecydowane zmiany wprowadzasz samodzielnie w swoim systemie."}},{"@type":"Question","name":"Czy dane o moich plikach są wysyłane na serwer?","acceptedAnswer":{"@type":"Answer","text":"Nie. Mapa jest budowana w przeglądarce i nic nie jest wysyłane."}}]}</script>
+</head>
+<body class="s-page fm-page" data-fm-feature="treemap">
+  <div id="fm-landing">
+  <a class="s-skip" href="#main">Przejdź do treści</a>
+  <header class="s-header">
+    <div class="s-wrap s-header__row">
+      <a class="s-logo" href="/pl/"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect width="32" height="32" rx="7" fill="#1B4FD8"/><path d="M10 6.5h8.200l5 5v13A1.500 1.500 0 0 1 21.700 26H10a1.500 1.500 0 0 1-1.500-1.500V8A1.500 1.500 0 0 1 10 6.500z" fill="#fff"/><path d="M18.200 6.500V10a1.500 1.500 0 0 0 1.500 1.500h3.500" fill="none" stroke="#1B4FD8" stroke-width="1.100" stroke-linejoin="round"/><rect x="11.300" y="15" width="9" height="1.700" rx=".85" fill="#1B4FD8"/><rect x="11.300" y="18.400" width="9" height="1.700" rx=".85" fill="#1B4FD8"/><rect x="11.300" y="21.800" width="5.500" height="1.700" rx=".85" fill="#1B4FD8"/></svg><span>Files Online</span></a>
+      <nav class="s-nav" aria-label="Główna nawigacja">
+        <details class="s-menu">
+          <summary>Narzędzia PDF<svg class="s-caret" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></summary>
+          <div class="s-mega">
+            <div>
+              <h3>Porządkowanie stron</h3>
+              <a href="/pl/polacz-pdf/">Połącz PDF</a><a href="/pl/podziel-pdf/">Podziel PDF</a><a href="/pl/wyodrebnij-strony-pdf/">Wyodrębnij strony PDF</a><a href="/pl/usun-strony-pdf/">Usuń strony PDF</a><a href="/pl/uporzadkuj-pdf/">Uporządkuj PDF</a><a href="/pl/obroc-pdf/">Obróć PDF</a><a href="/pl/przytnij-pdf/">Przytnij PDF</a><a href="/pl/usun-puste-strony-pdf/">Usuń puste strony</a><a href="/pl/polacz-skany-przodu-i-tylu-pdf/">Połącz skany przodu i tyłu</a>
+            </div><div>
+              <h3>Optymalizacja</h3>
+              <a href="/pl/kompresuj-pdf/">Kompresuj PDF</a><a href="/pl/ocr-pdf/">OCR PDF</a><a href="/pl/splaszcz-pdf/">Spłaszcz PDF</a>
+            </div><div>
+              <h3>Konwersja</h3>
+              <a href="/pl/pdf-na-word/">PDF na Word</a><a href="/pl/pdf-na-excel/">PDF na Excel</a><a href="/pl/pdf-na-jpg/">PDF na JPG</a><a href="/pl/pdf-na-png/">PDF na PNG</a><a href="/pl/pdf-na-tekst/">PDF na tekst</a><a href="/pl/jpg-na-pdf/">JPG na PDF</a><a href="/pl/png-na-pdf/">PNG na PDF</a><a href="/pl/wyodrebnij-obrazy-z-pdf/">Wyodrębnij obrazy z PDF</a>
+            </div><div>
+              <h3>Edycja i podpis</h3>
+              <a href="/pl/edytuj-pdf/">Edytuj PDF</a><a href="/pl/podpisz-pdf/">Podpisz PDF</a><a href="/pl/wypelnij-formularz-pdf/">Wypełnij formularz PDF</a><a href="/pl/znak-wodny-pdf/">Dodaj znak wodny</a><a href="/pl/numeracja-stron-pdf/">Dodaj numery stron</a><a href="/pl/porownaj-pdf/">Porównaj PDF</a>
+            </div><div>
+              <h3>Bezpieczeństwo i prywatność</h3>
+              <a href="/pl/zabezpiecz-pdf/">Zabezpiecz PDF</a><a href="/pl/odblokuj-pdf/">Odblokuj PDF</a><a href="/pl/zaczernij-pdf/">Zaczernij PDF</a><a href="/pl/edytuj-metadane-pdf/">Edytuj metadane PDF</a>
+            </div>
+            <a class="s-mega__all" href="/pl/narzedzia-pdf/">Wszystkie narzędzia PDF →</a>
+          </div>
+        </details>
+        <details class="s-menu">
+          <summary>Narzędzia plików<svg class="s-caret" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></summary>
+          <div class="s-mega s-mega--files">
+            <div>
+              <h3>Otwieranie i podgląd</h3>
+              <a href="/pl/metadane-pliku/">Inspektor plików</a><a href="/pl/menedzer-plikow/">Menedżer plików</a><a href="/pl/otworz-plik-md/">Przeglądarka MD</a><a href="/pl/otworz-plik-mbox/">Przeglądarka MBOX</a>
+            </div>
+            <div>
+              <h3>Foldery i pliki</h3>
+              <a href="/pl/znajdz-duplikaty-plikow/">Szukanie duplikatów</a><a href="/pl/masowa-zmiana-nazw-plikow/">Zmiana nazw hurtowo</a><a href="/pl/zip-z-haslem/">ZIP z hasłem</a><a href="/pl/rozpakuj-rar-zip-7z-online/">Rozpakuj archiwa</a><a href="/pl/usun-exif-ze-zdjec/">Usuwanie metadanych</a>
+            </div><div>
+              <h3>&nbsp;</h3>
+              <a href="/pl/sortuj-zdjecia-wedlug-daty/">Sortowanie zdjęć po dacie</a><a href="/pl/porownaj-foldery/">Porównanie folderów</a><a href="/pl/szukaj-tekstu-w-plikach/">Szukanie tekstu w plikach</a><a href="/pl/co-zajmuje-miejsce-na-dysku/" aria-current="page">Mapa zajętości folderu</a><a href="/pl/suma-kontrolna-pliku/">Sumy kontrolne</a>
+            </div>
+          </div>
+        </details>
+        <a href="/pl/metadane-pliku/">Inspektor plików</a>
+        <a href="/pl/menedzer-plikow/">Menedżer plików</a>
+      </nav>
+      <div class="s-actions">
+        <details class="s-lang">
+          <summary aria-label="Język">pl</summary>
+          <ul>
+            <li><a href="/en/folder-size-viewer/" hreflang="en" lang="en" data-set-lang="en">English</a></li><li><a href="/de/ordnergroesse-anzeigen/" hreflang="de" lang="de" data-set-lang="de">Deutsch</a></li><li><a href="/pl/co-zajmuje-miejsce-na-dysku/" hreflang="pl" lang="pl" data-set-lang="pl" aria-current="true">Polski</a></li><li><a href="/cs/co-zabira-misto-ve-slozce/" hreflang="cs" lang="cs" data-set-lang="cs">Čeština</a></li>
+          </ul>
+        </details>
+        <button class="s-icon-btn" type="button" data-action="toggle-theme" aria-label="Przełącz między trybem jasnym i ciemnym" title="Przełącz między trybem jasnym i ciemnym">
+          <svg class="icon-moon" viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><path d="M13.5 9.5A5.5 5.5 0 016.5 2.5a5.5 5.5 0 107 7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          <svg class="icon-sun" viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M12.6 3.4l-1.4 1.4M4.8 11.2l-1.4 1.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <button class="s-icon-btn s-burger" type="button" aria-label="Menu" aria-expanded="false"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+      </div>
+    </div>
+  </header>
+  <main id="main">
+    <div class="s-wrap">
+      <ol class="s-crumbs"><li><a href="/pl/">Strona główna</a></li><li><a href="/pl/menedzer-plikow/">Menedżer plików</a></li><li><span aria-current="page">Mapa zajętości folderu</span></li></ol>
+      <div class="s-toolhead">
+        <h1>Zobacz, co zajmuje miejsce w folderze</h1>
+        <p>Wybierz folder, a narzędzie narysuje mapę, w której każdy podfolder i plik jest prostokątem proporcjonalnym do rozmiaru. Od razu widać, co zajmuje najwięcej.</p>
+      </div>
+      <div class="pt fm-hero">
+        <div class="pt-drop">
+          <svg class="pt-drop__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h7v8H3z M14 3h7v8h-7z M3 15h7v6H3z M14 15h7v6h-7z"/></svg>
+          <div class="fm-hero__cta">
+            <button class="s-btn s-btn--primary pt-drop__btn" type="button" data-fm="open-folder">Otwórz folder</button>
+            <button class="s-btn s-btn--secondary pt-drop__btn" type="button" data-fm="open-files">Otwórz pliki</button>
+          </div>
+          <p class="pt-drop__or">albo upuść tutaj pliki i foldery</p>
+          <button class="s-btn s-btn--secondary fm-hero__again" type="button" data-fm="reopen" hidden></button>
+          <button class="fm-hero__demo" type="button" data-fm="demo">Wypróbuj na przykładowych plikach</button>
+          <noscript><p class="pt-drop__error">To narzędzie wymaga JavaScriptu, bo plik jest przetwarzany w Twojej przeglądarce.</p></noscript>
+        </div>
+        <ul class="s-trust"><li>Bez przesyłania</li><li>Za darmo</li><li>Bez konta</li><li>Po załadowaniu działa offline</li></ul>
+      </div>
+    </div>
+    <section class="s-section">
+      <div class="s-wrap">
+        <div class="s-benefits">
+          <div><h3>Mapa prostokątów</h3><p>Każdy podfolder i plik to prostokąt o polu zależnym od rozmiaru, a pliki mają kolor według typu. Kliknij folder, żeby wejść do środka.</p></div><div><h3>Największe pliki i typy</h3><p>Obok mapy dostajesz listę największych plików i podział według typów, na przykład obrazy, wideo i dokumenty.</p></div><div><h3>Szybkie wczytywanie</h3><p>Narzędzie czyta tylko nazwy i rozmiary, bez zawartości, więc nawet duże foldery ładują się szybko.</p></div>
+        </div>
+      </div>
+    </section>
+    <section class="s-section s-section--tint" id="how">
+    <div class="s-wrap">
+      <h2>Jak sprawdzić, co zajmuje miejsce</h2>
+      <ol class="s-steps"><li><p>Kliknij „Otwórz folder” albo upuść folder na tę stronę. Menedżer plików otworzy się i od razu pokaże mapę zajętości.</p></li><li><p>Znajdź największe prostokąty i kliknij folder, żeby zajrzeć głębiej. Pomocne są też lista największych plików i podział na typy.</p></li><li><p>Zdecyduj, co przenieść lub usunąć. Narzędzie niczego nie zmienia na dysku, więc czyszczenie robisz samodzielnie w swoim systemie.</p></li></ol>
+    </div>
+  </section>
+    <section class="s-section">
+      <div class="s-wrap s-prose">
+        <h2>Dlaczego trzeba wybrać folder</h2>
+        <p>Przeglądarka nie pozwala skanować całego dysku ani systemu. Widzi tylko foldery i pliki, które sam wybierzesz. Dlatego zacznij od folderu, który cię interesuje, na przykład Pobrane, Zdjęcia albo katalogu projektu.</p><p>Mapa pomaga zwykle znaleźć jedną rzecz: kilka bardzo dużych plików, które zajmują więcej niż reszta folderu razem wzięta. To często stare wideo, obrazy dysków albo archiwa, o których dawno zapomniano.</p>
+      </div>
+    </section>
+    <section class="s-section" id="faq">
+    <div class="s-wrap">
+      <h2>Najczęstsze pytania</h2>
+      <div class="s-faq">
+        <details open><summary>Czy narzędzie przeskanuje cały dysk?</summary><p>Nie. Przeglądarka na to nie pozwala. Wybierasz folder, a narzędzie pokazuje jego zawartość.</p></details>
+        <details><summary>Czy narzędzie czyta zawartość plików?</summary><p>Nie. Czyta tylko nazwy i rozmiary, dlatego nawet duże foldery ładują się szybko.</p></details>
+        <details><summary>Czy mogę usunąć pliki z poziomu mapy?</summary><p>Nie. Narzędzie służy do oglądania. Zdecydowane zmiany wprowadzasz samodzielnie w swoim systemie.</p></details>
+        <details><summary>Czy dane o moich plikach są wysyłane na serwer?</summary><p>Nie. Mapa jest budowana w przeglądarce i nic nie jest wysyłane.</p></details>
+      </div>
+    </div>
+  </section>
+    <section class="s-section s-section--tint">
+      <div class="s-wrap">
+        <h2>Więcej narzędzi plików</h2>
+        <div class="s-cards" style="margin-top:18px">
+          <a class="s-card" data-cat="files" href="/pl/menedzer-plikow/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h6l2 2.5h10V20H3z"/><path d="M3 12h18"/></svg>
+          <span class="s-card__title">Menedżer plików</span>
+          <span class="s-card__desc">Przeglądaj, podglądaj, pakuj, rozpakowuj i zmieniaj nazwy całych folderów.</span>
+        </a><a class="s-card" data-cat="files" href="/pl/metadane-pliku/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><circle cx="11" cy="14" r="2.6"/><path d="M13 16l2.4 2.4"/></svg>
+          <span class="s-card__title">Inspektor plików</span>
+          <span class="s-card__desc">Zobacz wszystko, co kryje plik: tekst, metadane, sumy kontrolne i osadzone pliki.</span>
+        </a>
+          <a class="s-card" data-cat="files" href="/pl/znajdz-duplikaty-plikow/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h8v11H3z M13 10h8v11h-8z"/><path d="M6 17.5v3h4M18 6.5v-3h-4"/></svg>
+          <span class="s-card__title">Szukanie duplikatów</span>
+          <span class="s-card__desc">Znajdź identyczne pliki po zawartości i zobacz, ile miejsca zajmują niepotrzebne kopie.</span>
+        </a><a class="s-card" data-cat="files" href="/pl/masowa-zmiana-nazw-plikow/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><path d="M9 18l.6-2.6 5-5 2 2-5 5z"/></svg>
+          <span class="s-card__title">Zmiana nazw hurtowo</span>
+          <span class="s-card__desc">Zmień nazwy wielu plików naraz regułami i zobacz każdą nową nazwę, zanim cokolwiek zastosujesz.</span>
+        </a><a class="s-card" data-cat="files" href="/pl/zip-z-haslem/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 11h12v10H6z"/><path d="M8.5 11V7a3.5 3.5 0 0 1 7 0v4"/><path d="M12 15v2.5"/></svg>
+          <span class="s-card__title">ZIP z hasłem</span>
+          <span class="s-card__desc">Spakuj pliki i foldery do ZIP i zaszyfruj je hasłem AES-256 w przeglądarce.</span>
+        </a><a class="s-card" data-cat="files" href="/pl/rozpakuj-rar-zip-7z-online/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><path d="M10 11h4v5h-4z"/><path d="M12 19v2"/></svg>
+          <span class="s-card__title">Rozpakuj archiwa</span>
+          <span class="s-card__desc">Rozpakuj ZIP, RAR, 7Z, TAR i inne archiwa w przeglądarce, także ZIP chroniony hasłem.</span>
+        </a><a class="s-card" data-cat="files" href="/pl/usun-exif-ze-zdjec/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h8.5L20 11.5 12 20l-8-8z"/><circle cx="8.5" cy="8.5" r="1.3"/></svg>
+          <span class="s-card__title">Usuwanie metadanych</span>
+          <span class="s-card__desc">Usuń z JPG, PNG, WebP i PDF dane EXIF, lokalizację GPS i właściwości dokumentu bez utraty jakości.</span>
+        </a><a class="s-card" data-cat="files" href="/pl/sortuj-zdjecia-wedlug-daty/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><circle cx="10" cy="11.5" r="1.3"/><path d="M6 18l3.5-3 2.5 2 2.5-3 3.5 4"/></svg>
+          <span class="s-card__title">Sortowanie zdjęć po dacie</span>
+          <span class="s-card__desc">Posortuj zdjęcia do folderów według daty wykonania odczytanej z EXIF i w razie potrzeby zmień ich nazwy.</span>
+        </a><a class="s-card" data-cat="files" href="/pl/porownaj-foldery/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h7v16H3z M14 4h7v16h-7z"/><path d="M5.5 9h2M5.5 12.5h2M16.5 9h2M16.5 12.5h2" /><path d="M12 2v20" stroke-dasharray="2 2"/></svg>
+          <span class="s-card__title">Porównanie folderów</span>
+          <span class="s-card__desc">Porównaj dwa foldery i zobacz, które pliki są tylko w jednym, różnią się albo są identyczne.</span>
+        </a><a class="s-card" data-cat="files" href="/pl/szukaj-tekstu-w-plikach/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><circle cx="11" cy="14" r="2.6"/><path d="M13 16l2.4 2.4"/></svg>
+          <span class="s-card__title">Szukanie tekstu w plikach</span>
+          <span class="s-card__desc">Przeszukaj zawartość wielu plików naraz: PDF, Word, Excel, PowerPoint, tekst, kod i e-maile.</span>
+        </a><a class="s-card" data-cat="files" href="/pl/suma-kontrolna-pliku/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><path d="M10.5 14l1.5-1v5.5M10.5 18.5h3"/></svg>
+          <span class="s-card__title">Sumy kontrolne</span>
+          <span class="s-card__desc">Policz SHA-256, SHA-1, SHA-512 i MD5 plików i sprawdź, czy pobrany plik zgadza się z oczekiwaną sumą.</span>
+        </a>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="s-footer">
+    <div class="s-wrap s-footer__row">
+      <span class="s-footer__brand"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect width="32" height="32" rx="7" fill="#1B4FD8"/><path d="M10 6.5h8.200l5 5v13A1.500 1.500 0 0 1 21.700 26H10a1.500 1.500 0 0 1-1.500-1.500V8A1.500 1.500 0 0 1 10 6.500z" fill="#fff"/><path d="M18.200 6.500V10a1.500 1.500 0 0 0 1.500 1.500h3.500" fill="none" stroke="#1B4FD8" stroke-width="1.100" stroke-linejoin="round"/><rect x="11.300" y="15" width="9" height="1.700" rx=".85" fill="#1B4FD8"/><rect x="11.300" y="18.400" width="9" height="1.700" rx=".85" fill="#1B4FD8"/><rect x="11.300" y="21.800" width="5.500" height="1.700" rx=".85" fill="#1B4FD8"/></svg><span>Działa w przeglądarce. Bez przesyłania, bez konta, bez śledzenia.</span></span>
+      <nav class="s-footer__links" aria-label="Legal">
+        <a href="/pl/prywatnosc/">Prywatność</a>
+        <a href="/pl/nota-prawna/">Nota prawna</a>
+      </nav>
+    </div>
+  </footer>
+  <script src="/assets/js/site.js?v=21b41bad" defer></script>
+  </div>
+  <div class="fm" id="fm-app" hidden></div>
+  <script type="module" src="/assets/js/fm/main.js?v=e4367d0c"></script>
+</body>
+</html>

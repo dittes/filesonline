@@ -43,15 +43,30 @@ async function walkHandle(handle, dir, out) {
   }
 }
 
+/** Read everything below a folder handle. The list carries the handle as `.handle`. */
+export async function readFolder(handle) {
+  const out = [];
+  await walkHandle(handle, handle.name, out);
+  out.handle = handle;
+  return out;
+}
+
 export async function pickFolder() {
   if ('showDirectoryPicker' in window) {
     let handle;
     try { handle = await window.showDirectoryPicker(); } catch { return []; }
-    const out = [];
-    await walkHandle(handle, handle.name, out);
-    return out;
+    return readFolder(handle);
   }
   return inputPick({ folder: true });
+}
+
+/** Reopen a remembered folder. The browser asks for permission first; null when refused. */
+export async function reopenFolder(handle) {
+  try {
+    const state = await handle.requestPermission({ mode: 'read' });
+    if (state !== 'granted') return null;
+    return await readFolder(handle);
+  } catch { return null; }
 }
 
 function readEntries(reader) {

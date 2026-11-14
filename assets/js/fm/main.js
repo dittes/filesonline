@@ -9,6 +9,7 @@ import { KINDS, KIND_LABEL, KIND_COLOR, iconHtml, isArchive } from './kinds.js';
 import { fromDrop, fromPaste, canPickFolder } from './intake.js';
 import { thumb, hasThumb, forgetThumbs } from './preview.js';
 import * as A from './actions.js';
+import * as session from './session.js';
 import * as dialogs from './dialogs.js';
 import { createDetails } from './details.js';
 import { handoffIdFromUrl, takeHandoff } from '../handoff.js';
@@ -191,8 +192,13 @@ function renderBar() {
   const toolsMenu = e => menu([
     ...(here.length || tools.length ? [{ heading: t('For the selection') }, ...here, ...tools.slice(0, 5), '-'] : []),
     { heading: t('Workspace') },
+    { label: t('Search inside files'), ico: 'search', run: A.searchInside },
     { label: t('Find duplicates'), ico: 'duplicate', run: A.findDuplicates },
     { label: t('Rename many files'), ico: 'rename', run: () => (S.selection.size > 1 ? A.rename() : A.renameAll()) },
+    { label: t('Compare two folders'), ico: 'layers', run: A.compareFolders },
+    { label: t('What takes up the space'), ico: 'grid', run: A.showTreemap },
+    { label: t('Sort photos by date'), ico: 'sort', run: () => A.photoSort() },
+    { label: t('Remove metadata'), ico: 'shield', run: () => A.stripMetadata() },
     { label: t('Convert images'), ico: 'image', run: A.convertImages },
     { label: t('Checksums'), ico: 'hash', run: A.checksums, disabled: !has },
     { label: t('Export file list'), ico: 'table', run: A.exportList },
@@ -575,6 +581,11 @@ function openPalette() {
     { label: t('New folder'), ico: 'folderPlus', run: A.newFolder, group: g.ws },
     { label: t('Create a ZIP from everything here'), ico: 'zip', run: () => A.zip([]), group: g.ws },
     { label: t('Find duplicates'), ico: 'duplicate', run: A.findDuplicates, group: g.ws },
+    { label: t('Search inside files'), ico: 'search', run: A.searchInside, group: g.ws },
+    { label: t('Compare two folders'), ico: 'layers', run: A.compareFolders, group: g.ws },
+    { label: t('What takes up the space'), ico: 'grid', run: A.showTreemap, group: g.ws },
+    { label: t('Sort photos by date'), ico: 'sort', run: () => A.photoSort(), group: g.ws },
+    { label: t('Remove metadata'), ico: 'shield', run: () => A.stripMetadata(), group: g.ws },
     { label: t('Rename many files'), ico: 'rename', run: A.renameAll, group: g.ws },
     { label: t('Convert images'), ico: 'image', run: A.convertImages, group: g.ws },
     { label: t('Export file list'), ico: 'table', run: A.exportList, group: g.ws },
@@ -625,7 +636,27 @@ function bindKeys() {
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 
+// A page made for one tool starts that tool as soon as there are files
+const FEATURE_RUN = {
+  duplicates: () => A.findDuplicates(),
+  rename: () => A.renameAll(),
+  zipPassword: () => A.zip([]),
+  extract: () => { const list = [...S.items.values()].filter(isArchive); if (list.length) A.extractArchives(list); },
+  strip: () => A.stripMetadata(),
+  photosort: () => A.photoSort(),
+  compare: () => A.compareFolders(),
+  search: () => A.searchInside(),
+  treemap: () => A.showTreemap(),
+  checksum: () => { S.selection = new Set([...S.items.values()].slice(0, 500).map(it => it.id)); emit('selection'); A.checksums(); },
+};
+let feature = FEATURE_RUN[document.body.dataset.fmFeature];
+
 function render(topics) {
+  if (feature && !app.hidden && S.items.size) {
+    const run = feature;
+    feature = null;
+    setTimeout(() => { if (!document.querySelector('dialog[open]')) run(); }, 450);
+  }
   const structural = topics.has('items') || topics.has('nav') || topics.has('view');
   if (topics.has('items')) {
     for (const key of [...S.selection]) {
@@ -654,6 +685,7 @@ async function boot() {
     routes = mod.default; pages = mod.pages || {};
   } catch { /* tools stay unlinked */ }
   A.configure(routes, pages);
+  A.setHooks({ reveal });
   loadPrefs();
   buildShell();
   bindList();
@@ -668,16 +700,27 @@ async function boot() {
     if (!canPickFolder) { b.hidden = true; return; }
     b.addEventListener('click', () => start(A.addFolderFromPicker));
   });
+  session.last().then(saved => {
+    const again = landing.querySelector('[data-fm="reopen"]');
+    if (!saved || !again) return;
+    again.textContent = t('Open “{name}” again', { name: saved.name });
+    again.hidden = false;
+    again.addEventListener('click', () => start(A.reopenLast));
+  });
   landing.querySelectorAll('[data-fm="demo"]').forEach(b => b.addEventListener('click', async () => {
     const { demoFiles } = await import('./demo.js');
     A.intake(await demoFiles());
     openApp();
   }));
 
+  // Files handed over: opened on the start page (plain files), or results from another tool
+  const opened = new URLSearchParams(location.search).get('src') === 'open';
   const id = handoffIdFromUrl();
+  if (opened) history.replaceState(null, '', location.pathname);
   if (id) {
     const files = await takeHandoff(id);
-    if (files.length) { openApp(); A.addResults(files.map(file => ({ file, dir: file.handoffDir || '' }))); }
+    const list = files.map(file => ({ file, dir: file.handoffDir || '' }));
+    if (list.length) { openApp(); if (opened) A.intake(list); else A.addResults(list); }
   }
   window.FilesOnlineManager = { S, A, openApp, closeApp, emit };
 }

@@ -66,7 +66,10 @@ export function createDetails(host, { reveal, openQuickLook, close }) {
         files.length ? section(t('Workspace tools'), actionList([
           { label: t('Download everything as ZIP'), ico: 'zip', run: () => A.zip([]) },
           A.canSaveToFolder && { label: t('Save to a folder on this device'), ico: 'save', run: A.saveToFolder },
+          { label: t('Search inside files'), ico: 'search', run: A.searchInside },
           { label: t('Find duplicates'), ico: 'duplicate', run: A.findDuplicates },
+          { label: t('What takes up the space'), ico: 'grid', run: A.showTreemap },
+          { label: t('Compare two folders'), ico: 'layers', run: A.compareFolders },
           { label: t('Rename many files'), ico: 'rename', run: A.renameAll },
           { label: t('Export file list'), ico: 'table', run: A.exportList },
           { label: t('All PDF and file tools'), ico: 'wand', run: A.openToolPalette },

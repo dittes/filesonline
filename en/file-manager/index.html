@@ -30,8 +30,8 @@
   <link rel="manifest" href="/manifest.webmanifest">
   <script>(function(){try{var t=localStorage.getItem('fo-theme')==='dark'?'dark':'light';document.documentElement.setAttribute('data-theme',t)}catch(e){}})();</script>
   <link rel="preload" href="/assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="/assets/css/fm.css?v=42bbbb6c">
-  <link rel="stylesheet" href="/assets/css/site.css?v=1bf1a7b0">
+  <link rel="stylesheet" href="/assets/css/fm.css?v=902907d9">
+  <link rel="stylesheet" href="/assets/css/site.css?v=e28198ae">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":["SoftwareApplication","WebApplication"],"name":"File Manager","url":"https://files-online.com/en/file-manager/","description":"Open a folder in your browser to browse, preview, zip, unzip, batch rename, find duplicates and send files straight to 30 PDF tools. Nothing is uploaded and no install is needed.","inLanguage":"en","applicationCategory":"UtilitiesApplication","operatingSystem":"Windows, macOS, Linux, Android, iOS","browserRequirements":"Requires a modern web browser with JavaScript enabled","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"publisher":{"@id":"https://files-online.com/#org"},"featureList":["Browse and search","Preview almost anything","Zip and unzip","Rename in bulk","Find duplicates","PDF work without leaving","Convert and resize images","Checksums and file lists","Keyboard and command palette"]}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://files-online.com/en/"},{"@type":"ListItem","position":2,"name":"File Manager"}]}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Are my files uploaded?","acceptedAnswer":{"@type":"Answer","text":"No. All file operations happen inside your browser. There is no server that could receive your files."}},{"@type":"Question","name":"Does renaming or removing change my real files?","acceptedAnswer":{"@type":"Answer","text":"No. The file manager works on a copy of the file list, the workspace. Files on your disk only change when you download results or save them into a folder yourself."}},{"@type":"Question","name":"How do files get to the PDF tools?","acceptedAnswer":{"@type":"Answer","text":"They are placed in your browser's own storage for a moment and picked up by the tool in the new tab. No server is involved, and the copy is removed as soon as the tool has it."}},{"@type":"Question","name":"Which archive formats can I extract?","acceptedAnswer":{"@type":"Answer","text":"ZIP, TAR and GZ are unpacked with code that ships with this site. RAR and 7Z need a WebAssembly library that is fetched from a public CDN the first time you unpack one."}},{"@type":"Question","name":"Can it access my whole computer?","acceptedAnswer":{"@type":"Answer","text":"No. It only sees the files and folders you explicitly choose, and that access ends when you close the tab."}},{"@type":"Question","name":"Which browser works best?","acceptedAnswer":{"@type":"Answer","text":"Chrome and Edge offer the most, including saving into a folder. Firefox and Safari handle everything else, and results are downloaded instead."}}]}</script>
@@ -65,10 +65,24 @@
             <a class="s-mega__all" href="/en/pdf-tools/">All PDF tools →</a>
           </div>
         </details>
+        <details class="s-menu">
+          <summary>File tools<svg class="s-caret" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></summary>
+          <div class="s-mega s-mega--files">
+            <div>
+              <h3>Open and view</h3>
+              <a href="/en/file-metadata-viewer/">File Inspector</a><a href="/en/file-manager/" aria-current="page">File Manager</a><a href="/en/open-md-file/">MD Viewer</a><a href="/en/open-mbox-file/">MBOX Viewer</a>
+            </div>
+            <div>
+              <h3>Folders and files</h3>
+              <a href="/en/find-duplicate-files/">Find duplicate files</a><a href="/en/batch-rename-files/">Batch rename files</a><a href="/en/password-protect-zip/">Password-protect a ZIP</a><a href="/en/extract-archives-online/">Extract archives</a><a href="/en/remove-exif-metadata/">Remove EXIF metadata</a>
+            </div><div>
+              <h3>&nbsp;</h3>
+              <a href="/en/sort-photos-by-date/">Sort photos by date</a><a href="/en/compare-two-folders/">Compare two folders</a><a href="/en/search-text-in-files/">Search text in files</a><a href="/en/folder-size-viewer/">Folder size map</a><a href="/en/checksum-calculator/">Checksum calculator</a>
+            </div>
+          </div>
+        </details>
         <a href="/en/file-metadata-viewer/">File Inspector</a>
         <a href="/en/file-manager/" aria-current="page">File Manager</a>
-        <a href="/en/open-md-file/">MD Viewer</a>
-        <a href="/en/open-mbox-file/">MBOX Viewer</a>
       </nav>
       <div class="s-actions">
         <details class="s-lang">
@@ -100,6 +114,7 @@
             <button class="s-btn s-btn--secondary pt-drop__btn" type="button" data-fm="open-files">Open files</button>
           </div>
           <p class="pt-drop__or">or drop files and folders here</p>
+          <button class="s-btn s-btn--secondary fm-hero__again" type="button" data-fm="reopen" hidden></button>
           <button class="fm-hero__demo" type="button" data-fm="demo">Try it with sample files</button>
           <noscript><p class="pt-drop__error">This tool needs JavaScript, because your file is processed in your browser.</p></noscript>
         </div>
@@ -123,6 +138,52 @@
           <a href="/en/file-metadata-viewer/"><strong>File Inspector</strong><span>See everything inside any file: text, metadata, checksums and embedded files.</span></a><a href="/en/open-md-file/"><strong>MD Viewer</strong><span>Open, edit and convert Markdown files with a live preview.</span></a><a href="/en/open-mbox-file/"><strong>MBOX Viewer</strong><span>Read and search email archives from Gmail, Thunderbird and Apple Mail.</span></a>
           <a href="/en/pdf-tools/"><strong>All PDF tools →</strong><span>All 30 PDF tools at a glance.</span></a>
         </div>
+      </div>
+    </section>
+    <section class="s-section">
+      <div class="s-wrap">
+        <h2>Folders and files</h2>
+        <div class="s-cards" style="margin-top:18px"><a class="s-card" data-cat="files" href="/en/find-duplicate-files/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h8v11H3z M13 10h8v11h-8z"/><path d="M6 17.5v3h4M18 6.5v-3h-4"/></svg>
+          <span class="s-card__title">Find duplicate files</span>
+          <span class="s-card__desc">Finds identical files by content, shows the wasted space and removes the extra copies from a clean set.</span>
+        </a><a class="s-card" data-cat="files" href="/en/batch-rename-files/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><path d="M9 18l.6-2.6 5-5 2 2-5 5z"/></svg>
+          <span class="s-card__title">Batch rename files</span>
+          <span class="s-card__desc">Rename many files at once with find and replace, numbering, dates and letter case, with a live preview.</span>
+        </a><a class="s-card" data-cat="files" href="/en/password-protect-zip/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 11h12v10H6z"/><path d="M8.5 11V7a3.5 3.5 0 0 1 7 0v4"/><path d="M12 15v2.5"/></svg>
+          <span class="s-card__title">Password-protect a ZIP</span>
+          <span class="s-card__desc">Create a ZIP from files and folders and protect it with an AES-256 password, right in your browser.</span>
+        </a><a class="s-card" data-cat="files" href="/en/extract-archives-online/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><path d="M10 11h4v5h-4z"/><path d="M12 19v2"/></svg>
+          <span class="s-card__title">Extract archives</span>
+          <span class="s-card__desc">Open ZIP, RAR, 7Z, TAR, GZ and more in your browser, preview the files and download what you need.</span>
+        </a><a class="s-card" data-cat="files" href="/en/remove-exif-metadata/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h8.5L20 11.5 12 20l-8-8z"/><circle cx="8.5" cy="8.5" r="1.3"/></svg>
+          <span class="s-card__title">Remove EXIF metadata</span>
+          <span class="s-card__desc">Remove location, camera data and document properties from photos and PDFs without losing quality.</span>
+        </a><a class="s-card" data-cat="files" href="/en/sort-photos-by-date/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><circle cx="10" cy="11.5" r="1.3"/><path d="M6 18l3.5-3 2.5 2 2.5-3 3.5 4"/></svg>
+          <span class="s-card__title">Sort photos by date</span>
+          <span class="s-card__desc">Sort photos into folders by year, month or day taken, and rename them with the date, with a preview first.</span>
+        </a><a class="s-card" data-cat="files" href="/en/compare-two-folders/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h7v16H3z M14 4h7v16h-7z"/><path d="M5.5 9h2M5.5 12.5h2M16.5 9h2M16.5 12.5h2" /><path d="M12 2v20" stroke-dasharray="2 2"/></svg>
+          <span class="s-card__title">Compare two folders</span>
+          <span class="s-card__desc">See which files are only in one folder, which differ and which match, for example to check a backup.</span>
+        </a><a class="s-card" data-cat="files" href="/en/search-text-in-files/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><circle cx="11" cy="14" r="2.6"/><path d="M13 16l2.4 2.4"/></svg>
+          <span class="s-card__title">Search text in files</span>
+          <span class="s-card__desc">Search the contents of many files at once, including PDF, Word, Excel, PowerPoint and e-mails.</span>
+        </a><a class="s-card" data-cat="files" href="/en/folder-size-viewer/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h7v8H3z M14 3h7v8h-7z M3 15h7v6H3z M14 15h7v6h-7z"/></svg>
+          <span class="s-card__title">Folder size map</span>
+          <span class="s-card__desc">See which folders and files take up the most space, as a map you can click through.</span>
+        </a><a class="s-card" data-cat="files" href="/en/checksum-calculator/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><path d="M10.5 14l1.5-1v5.5M10.5 18.5h3"/></svg>
+          <span class="s-card__title">Checksum calculator</span>
+          <span class="s-card__desc">Calculate SHA-256, SHA-1, SHA-512 and MD5 hashes and check a file against the checksum you were given.</span>
+        </a></div>
       </div>
     </section>
     <section class="s-section s-section--tint" id="how">
@@ -164,6 +225,6 @@
   <script src="/assets/js/site.js?v=21b41bad" defer></script>
   </div>
   <div class="fm" id="fm-app" hidden></div>
-  <script type="module" src="/assets/js/fm/main.js?v=f0581f62"></script>
+  <script type="module" src="/assets/js/fm/main.js?v=e4367d0c"></script>
 </body>
 </html>

@@ -2,6 +2,7 @@
 
 export default {
   nav: {
+    fileTools: 'Nástroje pro soubory', groupOpen: 'Otevření a náhled', groupFolders: 'Složky a soubory', moreFileTools: 'Další nástroje pro soubory',
     main: 'Hlavní navigace', skip: 'Přejít na obsah', menu: 'Nabídka', language: 'Jazyk',
     toggleTheme: 'Přepnout světlý a tmavý režim', home: 'Domů',
     pdfTools: 'PDF nástroje', allPdfTools: 'Všechny PDF nástroje',
@@ -68,18 +69,27 @@ export default {
   },
 
   home: {
-    title: 'Files Online – PDF nástroje a správce souborů zdarma, bez nahrávání',
-    desc: 'Komprimujte, spojujte, rozdělujte, převádějte, upravujte a podepisujte PDF zdarma. Soubory zůstávají v prohlížeči a nikdy se nenahrávají. Bez účtu.',
+    title: 'Files Online – otevřete, prozkoumejte a upravte soubory a složky, bez nahrávání',
+    desc: 'Přetáhněte soubor a uvidíte vše, co obsahuje, nebo otevřete složku k procházení, zipování, přejmenování a převodu. K tomu 30 nástrojů PDF. Vše běží v prohlížeči, nic se nenahrává.',
     short: 'Bezplatné nástroje pro PDF a soubory, které běží v prohlížeči. Nic se nenahrává.',
     eyebrow: 'PDF nástroje · Správce souborů · Prohlížeče',
-    h1Html: 'Všechny PDF nástroje, které potřebujete, <span class="s-mark">bez nahrávání.</span>',
-    lede: 'Komprimujte, spojujte, rozdělujte, převádějte, upravujte a podepisujte dokumenty přímo v prohlížeči. Vaše soubory zůstávají od začátku do konce ve vašem zařízení.',
+    h1Html: 'Otevřete, prozkoumejte a upravte jakýkoli soubor, <span class="s-mark">bez nahrávání.</span>',
+    lede: 'Přetáhněte soubor a uvidíte, co v něm opravdu je, nebo otevřete celou složku k procházení, zipování, přejmenování a převodu. Vše probíhá ve vašem prohlížeči a zůstává ve vašem zařízení.',
+    chooseFile: 'Vybrat soubor', openFolder: 'Otevřít složku',
+    dropHint: 'nebo sem přetáhněte soubor či složku',
+    reading: 'Otevírání…',
+    tooBig: 'To je na jedno předání příliš. Otevřete správce souborů a přidejte to tam.',
+    failed: 'To se nepovedlo. Otevřete nástroj z nabídky a vyberte soubor tam.',
+    routeFile: ['Soubor se otevře v Inspektoru souborů', 'Skutečný typ, metadata, text, kontrolní součty a skrytá data. Poštovní schránky se otevřou v prohlížeči MBOX.'],
+    install: 'Nainstalovat jako aplikaci',
+    routeFolder: ['Složka se otevře ve Správci souborů', 'Procházení, náhledy, zipování, přejmenování a hledání duplicit.'],
+    routePdf: ['Pracujete s PDF?', 'Přejděte rovnou k jednomu z {n} nástrojů PDF.'],
     ctaPdf: 'Zobrazit všechny PDF nástroje', ctaFiles: 'Otevřít správce souborů',
     popularTitle: 'Nejpoužívanější PDF nástroje',
     popularLede: 'Vyberte nástroj a přetáhněte soubor. Nic se neinstaluje a nezakládá se žádný účet.',
     allTools: 'Všechny PDF nástroje ({n})',
-    filesTitle: 'Nejen PDF',
-    filesLede: 'Celé složky, poznámky v Markdownu i roky archivované pošty, stejně soukromě.',
+    filesTitle: 'Pro každý soubor a složku',
+    filesLede: 'Nahlédněte do jednoho souboru, ukliďte celou složku, čtěte poznámky v Markdownu nebo roky archivované pošty, vždy stejně soukromě.',
     privacyTitle: 'Soukromé díky tomu, jak je to postavené',
     privacyText: 'Většina online nástrojů chce, abyste jim svěřili své dokumenty. My ty vaše vůbec nedostáváme: neexistuje server, který by soubory zpracovával. PDF nástroje navíc prostřednictvím bezpečnostní politiky nařizují prohlížeči blokovat každý pokus o odeslání dat jinam.',
     privacyLink: 'Přečíst zásady ochrany soukromí',
@@ -197,6 +207,8 @@ export default {
   },
 
   mdPage: {
+    h1: 'Otevřít soubor MD online',
+    lede: 'Otevírejte, čtěte a upravujte soubory Markdown v jednom okně. Export do PDF nebo HTML, vše ve vašem prohlížeči, bez nahrávání.',
     name: 'Prohlížeč MD',
     title: 'Otevřít soubor MD online – Bezplatný prohlížeč a editor Markdownu',
     desc: 'Otevírejte, prohlížejte, upravujte a převádějte soubory .md online. Živý náhled, Markdown na PDF a HTML i HTML na Markdown. Zdarma a bez nahrávání.',
@@ -207,7 +219,7 @@ export default {
     ],
     how: 'Jak otevřít soubor MD',
     steps: [
-      'Klikněte na „Vybrat soubor MD“ nebo přetáhněte soubor .md na stránku. Můžete také vložit text nebo začít s prázdným dokumentem.',
+      'Klikněte na „Vybrat soubor“ nebo přetáhněte soubor .md na stránku. Můžete také vložit text nebo začít s prázdným dokumentem.',
       'Čtěte naformátovaný náhled, nebo text upravujte a sledujte, jak se náhled mění při psaní.',
       'Uložte soubor Markdown nebo ho exportujte jako PDF, HTML či prostý text.',
     ],

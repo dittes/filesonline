@@ -2,6 +2,7 @@
 
 export default {
   nav: {
+    fileTools: 'Datei-Tools', groupOpen: 'Öffnen und ansehen', groupFolders: 'Ordner und Dateien', moreFileTools: 'Weitere Datei-Tools',
     main: 'Hauptnavigation', skip: 'Zum Inhalt springen', menu: 'Menü', language: 'Sprache',
     toggleTheme: 'Zwischen hell und dunkel wechseln', home: 'Startseite',
     pdfTools: 'PDF-Tools', allPdfTools: 'Alle PDF-Tools',
@@ -68,18 +69,27 @@ export default {
   },
 
   home: {
-    title: 'Files Online – Kostenlose PDF-Tools & Dateimanager, ohne Upload',
-    desc: 'PDFs kostenlos komprimieren, zusammenfügen, teilen, umwandeln, bearbeiten und unterschreiben. Deine Dateien bleiben im Browser und werden nie hochgeladen.',
+    title: 'Files Online – Dateien und Ordner öffnen, prüfen und bearbeiten, ohne Upload',
+    desc: 'Zieh eine Datei hierher und sieh alles, was in ihr steckt, oder öffne einen Ordner zum Durchsuchen, Zippen, Umbenennen und Umwandeln. Dazu 30 PDF-Tools. Alles läuft im Browser, nichts wird hochgeladen.',
     short: 'Kostenlose PDF- und Datei-Tools, die in deinem Browser laufen. Nichts wird hochgeladen.',
     eyebrow: 'PDF-Tools · Dateimanager · Viewer',
-    h1Html: 'Alle PDF-Tools, die du brauchst, <span class="s-mark">ganz ohne Upload.</span>',
-    lede: 'Dokumente direkt im Browser komprimieren, zusammenfügen, teilen, umwandeln, bearbeiten und unterschreiben. Deine Dateien bleiben von Anfang bis Ende auf deinem Gerät.',
+    h1Html: 'Jede Datei öffnen, prüfen und bearbeiten, <span class="s-mark">ganz ohne Upload.</span>',
+    lede: 'Zieh eine Datei hierher und sieh, was wirklich in ihr steckt, oder öffne einen ganzen Ordner zum Durchsuchen, Zippen, Umbenennen und Umwandeln. Alles passiert in deinem Browser und bleibt auf deinem Gerät.',
+    chooseFile: 'Datei auswählen', openFolder: 'Ordner öffnen',
+    dropHint: 'oder eine Datei oder einen Ordner hierher ziehen',
+    reading: 'Wird geöffnet …',
+    tooBig: 'Das ist zu viel für eine Übergabe. Öffne den Dateimanager und füge es dort hinzu.',
+    failed: 'Das hat nicht geklappt. Öffne das Tool über das Menü und wähle die Datei dort aus.',
+    routeFile: ['Eine Datei öffnet sich im Datei-Inspektor', 'Echter Typ, Metadaten, Text, Prüfsummen und versteckte Daten. Postfächer öffnen sich im MBOX-Viewer.'],
+    install: 'Als App installieren',
+    routeFolder: ['Ein Ordner öffnet sich im Dateimanager', 'Durchsuchen, ansehen, zippen, umbenennen und Duplikate finden.'],
+    routePdf: ['Du arbeitest an einem PDF?', 'Direkt zu einem der {n} PDF-Tools.'],
     ctaPdf: 'Alle PDF-Tools ansehen', ctaFiles: 'Dateimanager öffnen',
     popularTitle: 'Die meistgenutzten PDF-Tools',
     popularLede: 'Tool wählen und Datei ablegen. Du musst nichts installieren und kein Konto anlegen.',
     allTools: 'Alle {n} PDF-Tools',
-    filesTitle: 'Mehr als nur PDFs',
-    filesLede: 'Ganze Ordner, Markdown-Notizen und jahrelang archivierte E-Mails, genauso privat.',
+    filesTitle: 'Für jede Datei und jeden Ordner',
+    filesLede: 'In eine einzelne Datei hineinsehen, einen ganzen Ordner aufräumen, Markdown-Notizen oder jahrelang archivierte E-Mails lesen, immer genauso privat.',
     privacyTitle: 'Privat, weil es so gebaut ist',
     privacyText: 'Die meisten Online-Tools verlangen, dass du ihnen deine Dokumente anvertraust. Wir bekommen deine gar nicht erst: Es gibt keinen Server, der Dateien verarbeitet. Die PDF-Tools weisen deinen Browser sogar über eine Sicherheitsrichtlinie an, jeden Versuch zu blockieren, Daten anderswohin zu senden.',
     privacyLink: 'Datenschutzerklärung lesen',
@@ -197,6 +207,8 @@ export default {
   },
 
   mdPage: {
+    h1: 'MD-Datei online öffnen',
+    lede: 'Öffne, lies und bearbeite Markdown-Dateien in einem Fenster. Export als PDF oder HTML, alles in deinem Browser, ohne Upload.',
     name: 'MD-Viewer',
     title: 'MD-Datei online öffnen – Kostenloser Markdown-Viewer & Editor',
     desc: 'MD-Dateien online öffnen, ansehen, bearbeiten und umwandeln. Live-Vorschau, Markdown in PDF und HTML, HTML in Markdown. Kostenlos und ohne Upload.',
@@ -207,7 +219,7 @@ export default {
     ],
     how: 'So öffnest du eine MD-Datei',
     steps: [
-      'Klicke auf „MD-Datei auswählen“ oder ziehe deine .md-Datei auf die Seite. Du kannst auch Text einfügen oder mit einem leeren Dokument beginnen.',
+      'Klicke auf „Datei auswählen“ oder ziehe deine .md-Datei auf die Seite. Du kannst auch Text einfügen oder mit einem leeren Dokument beginnen.',
       'Lies die formatierte Vorschau oder bearbeite den Text und sieh, wie sich die Vorschau beim Tippen ändert.',
       'Speichere die Markdown-Datei oder exportiere sie als PDF, HTML oder reinen Text.',
     ],

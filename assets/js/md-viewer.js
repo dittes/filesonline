@@ -85,6 +85,8 @@ async function ensureTurndown() {
 // ─── State ────────────────────────────────────────────────────────────────────
 
 const state = {
+  /** true once the person starts typing in an empty window */
+  writing: false,
   fileName: 'untitled.md',
   /** @type {FileSystemFileHandle|null} */
   fileHandle: null,
@@ -101,6 +103,7 @@ const editor = $('#mdv-editor');
 const preview = $('#mdv-preview');
 const rawCode = $('#mdv-raw-code');
 const panes = $('#mdv-panes');
+const win = $('#editor');
 const tocBox = $('#mdv-toc');
 const tocList = $('#mdv-toc-list');
 const fileNameEl = $('#mdv-filename');
@@ -117,6 +120,12 @@ const EMPTY_STATE_HTML = `
     <p>Nothing to preview yet.</p>
     <p>Open a <code>.md</code> file, paste Markdown, or try the sample.</p>
   </div>`;
+
+/** Show the empty state in place of the panes until there is content or the person starts writing. */
+function updateEmpty() {
+  const empty = !editor.value.trim() && !state.writing;
+  if (win) win.dataset.empty = empty ? 'true' : 'false';
+}
 
 async function render() {
   const md = editor.value;
@@ -203,6 +212,7 @@ function updateStats() {
   const text = editor.value;
   const words = text.trim() ? text.trim().split(/\s+/).length : 0;
   const lines = text ? text.split('\n').length : 0;
+  updateEmpty();
   $('#mdv-stat-words').textContent = `${words.toLocaleString()} word${words !== 1 ? 's' : ''}`;
   $('#mdv-stat-chars').textContent = `${text.length.toLocaleString()} characters`;
   $('#mdv-stat-lines').textContent = `${lines.toLocaleString()} line${lines !== 1 ? 's' : ''}`;
@@ -231,9 +241,11 @@ function setContent(md, name, handle = null) {
   editor.value = md;
   state.fileName = name;
   state.fileHandle = handle;
+  state.writing = false;
   setDirty(false);
   render();
-  document.getElementById('editor').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  updateEmpty();
+  if (win && md) win.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 /**
@@ -564,20 +576,20 @@ function closePasteModal() {
 // ─── Drag & drop ──────────────────────────────────────────────────────────────
 
 function setupDragDrop() {
-  const dropzone = $('#mdv-dropzone');
+  const dropzone = win;
 
   ['dragenter', 'dragover'].forEach(evt => {
     document.addEventListener(evt, e => {
       if (!e.dataTransfer || ![...e.dataTransfer.types].includes('Files')) return;
       e.preventDefault();
-      dropzone.classList.add('drag-over');
+      if (dropzone) dropzone.classList.add('is-over');
     });
   });
 
   ['dragleave', 'drop'].forEach(evt => {
     document.addEventListener(evt, e => {
       if (evt === 'dragleave' && e.relatedTarget) return;
-      dropzone.classList.remove('drag-over');
+      if (dropzone) dropzone.classList.remove('is-over');
     });
   });
 
@@ -606,6 +618,7 @@ function setView(view) {
   panes.dataset.view = view;
   document.querySelectorAll('[data-mdv-view]').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.mdvView === view);
+    btn.setAttribute('aria-pressed', btn.dataset.mdvView === view ? 'true' : 'false');
   });
   if (view === 'raw') rawCode.textContent = state.lastHtml;
 }
@@ -615,6 +628,7 @@ function setView(view) {
 function bindEvents() {
   // Editor input
   editor.addEventListener('input', () => {
+    state.writing = true;
     setDirty(true);
     renderDebounced();
   });
@@ -624,10 +638,29 @@ function bindEvents() {
     const el = $(sel);
     if (el) el.addEventListener('click', e => { e.stopPropagation(); openViaPicker(); });
   });
-  const dropzone = $('#mdv-dropzone');
-  dropzone.addEventListener('click', () => openViaPicker());
-  dropzone.addEventListener('keydown', e => {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openViaPicker(); }
+  const writeBtn = $('#mdv-write-btn');
+  if (writeBtn) writeBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    state.writing = true;
+    updateEmpty();
+    editor.focus();
+  });
+
+  // Menus (<details>): close after choosing an item, on outside click and on Escape
+  const menus = [...document.querySelectorAll('.mdv-menu')];
+  menus.forEach(m => {
+    m.addEventListener('toggle', () => {
+      if (m.open) menus.forEach(o => { if (o !== m) o.open = false; });
+    });
+    m.querySelector('.mdv-menu__list').addEventListener('click', e => {
+      if (e.target.closest('button')) m.open = false;
+    });
+  });
+  document.addEventListener('click', e => {
+    menus.forEach(m => { if (!m.contains(e.target)) m.open = false; });
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') menus.forEach(m => { m.open = false; });
   });
 
   // Fallback file inputs
@@ -668,7 +701,10 @@ function bindEvents() {
   });
 
   // Paste modal
-  $('#mdv-paste-btn').addEventListener('click', e => { e.stopPropagation(); openPasteModal(); });
+  ['#mdv-paste-btn', '#mdv-paste-menu-btn'].forEach(sel => {
+    const el = $(sel);
+    if (el) el.addEventListener('click', e => { e.stopPropagation(); openPasteModal(); });
+  });
   $('#mdv-paste-md-btn').addEventListener('click', () => {
     const text = pasteTextarea.value;
     if (!text.trim()) { showToast('Paste some content first.', 'info'); return; }
@@ -713,7 +749,7 @@ function bindEvents() {
 
   // Modal close (buttons + overlay click)
   pasteModal.addEventListener('click', e => {
-    if (e.target === pasteModal || e.target.closest('.modal-close')) closePasteModal();
+    if (e.target === pasteModal || e.target.closest('.mdv-modal-close')) closePasteModal();
   });
 
   // Sample
@@ -729,12 +765,12 @@ function bindEvents() {
       const action = btn.dataset.mdvAction;
       if (action === 'pdf') {
         if (!editor.value.trim()) {
-          document.getElementById('open').scrollIntoView({ behavior: 'smooth' });
+          if (win) win.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
           showToast('Open a Markdown file first, then export as PDF.', 'info');
         } else exportPdf();
       } else if (action === 'html') {
         if (!editor.value.trim()) {
-          document.getElementById('open').scrollIntoView({ behavior: 'smooth' });
+          if (win) win.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
           showToast('Open a Markdown file first, then export as HTML.', 'info');
         } else exportHtml(false);
       } else if (action === 'html2md') {
@@ -772,7 +808,7 @@ function init() {
   initTheme();
   bindEvents();
   setupDragDrop();
-  setView('split');
+  setView(window.matchMedia('(max-width: 759px)').matches ? 'editor' : 'split');
   updateStats();
   console.info('MD Viewer Online: ready');
   // A file handed over by the file manager

@@ -30,8 +30,8 @@
   <link rel="manifest" href="/manifest.webmanifest">
   <script>(function(){try{var t=localStorage.getItem('fo-theme')==='dark'?'dark':'light';document.documentElement.setAttribute('data-theme',t)}catch(e){}})();</script>
   <link rel="preload" href="/assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="/assets/css/fm.css?v=42bbbb6c">
-  <link rel="stylesheet" href="/assets/css/site.css?v=1bf1a7b0">
+  <link rel="stylesheet" href="/assets/css/fm.css?v=902907d9">
+  <link rel="stylesheet" href="/assets/css/site.css?v=e28198ae">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":["SoftwareApplication","WebApplication"],"name":"Dateimanager","url":"https://files-online.com/de/dateimanager/","description":"Öffne einen Ordner im Browser: Dateien ansehen, zippen, entpacken, gesammelt umbenennen, Duplikate finden und direkt an 30 PDF-Tools weitergeben. Kein Upload, keine Installation.","inLanguage":"de","applicationCategory":"UtilitiesApplication","operatingSystem":"Windows, macOS, Linux, Android, iOS","browserRequirements":"Requires a modern web browser with JavaScript enabled","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"publisher":{"@id":"https://files-online.com/#org"},"featureList":["Durchsuchen und finden","Fast alles ansehen","Zippen und entpacken","Gesammelt umbenennen","Duplikate finden","PDF-Arbeit ohne Umweg","Bilder umwandeln und verkleinern","Prüfsummen und Dateilisten","Tastatur und Befehlspalette"]}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Startseite","item":"https://files-online.com/de/"},{"@type":"ListItem","position":2,"name":"Dateimanager"}]}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Werden meine Dateien hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Alle Dateioperationen finden in deinem Browser statt. Es gibt keinen Server, der deine Dateien empfangen könnte."}},{"@type":"Question","name":"Ändert Umbenennen oder Entfernen meine echten Dateien?","acceptedAnswer":{"@type":"Answer","text":"Nein. Der Dateimanager arbeitet mit einer Kopie der Dateiliste, dem Arbeitsbereich. Dateien auf deiner Festplatte ändern sich erst, wenn du Ergebnisse herunterlädst oder selbst in einen Ordner speicherst."}},{"@type":"Question","name":"Wie kommen die Dateien zu den PDF-Tools?","acceptedAnswer":{"@type":"Answer","text":"Sie werden kurz im Speicher deines Browsers abgelegt und vom Tool im neuen Tab abgeholt. Ein Server ist nicht beteiligt, und die Kopie wird gelöscht, sobald das Tool sie hat."}},{"@type":"Question","name":"Welche Archivformate kann ich entpacken?","acceptedAnswer":{"@type":"Answer","text":"ZIP, TAR und GZ werden mit Code entpackt, der zu dieser Seite gehört. Für RAR und 7Z wird beim ersten Entpacken eine WebAssembly-Bibliothek von einem öffentlichen CDN geladen."}},{"@type":"Question","name":"Kann das Tool auf meinen ganzen Computer zugreifen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Es sieht nur die Dateien und Ordner, die du ausdrücklich auswählst, und dieser Zugriff endet, wenn du den Tab schließt."}},{"@type":"Question","name":"Welcher Browser funktioniert am besten?","acceptedAnswer":{"@type":"Answer","text":"Chrome und Edge bieten am meisten, auch das Speichern in einen Ordner. Firefox und Safari können alles andere, Ergebnisse werden dort heruntergeladen."}}]}</script>
@@ -65,10 +65,24 @@
             <a class="s-mega__all" href="/de/pdf-tools/">Alle PDF-Tools →</a>
           </div>
         </details>
+        <details class="s-menu">
+          <summary>Datei-Tools<svg class="s-caret" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></summary>
+          <div class="s-mega s-mega--files">
+            <div>
+              <h3>Öffnen und ansehen</h3>
+              <a href="/de/datei-metadaten-anzeigen/">Datei-Inspektor</a><a href="/de/dateimanager/" aria-current="page">Dateimanager</a><a href="/de/md-datei-oeffnen/">MD-Viewer</a><a href="/de/mbox-datei-oeffnen/">MBOX-Viewer</a>
+            </div>
+            <div>
+              <h3>Ordner und Dateien</h3>
+              <a href="/de/doppelte-dateien-finden/">Doppelte Dateien finden</a><a href="/de/dateien-umbenennen/">Dateien umbenennen</a><a href="/de/zip-mit-passwort/">ZIP mit Passwort</a><a href="/de/zip-rar-7z-entpacken/">Archive entpacken</a><a href="/de/exif-daten-entfernen/">EXIF-Daten entfernen</a>
+            </div><div>
+              <h3>&nbsp;</h3>
+              <a href="/de/fotos-nach-datum-sortieren/">Fotos nach Datum sortieren</a><a href="/de/ordner-vergleichen/">Ordner vergleichen</a><a href="/de/text-in-dateien-suchen/">Text in Dateien suchen</a><a href="/de/ordnergroesse-anzeigen/">Ordnergröße anzeigen</a><a href="/de/pruefsumme-berechnen/">Prüfsumme berechnen</a>
+            </div>
+          </div>
+        </details>
         <a href="/de/datei-metadaten-anzeigen/">Datei-Inspektor</a>
         <a href="/de/dateimanager/" aria-current="page">Dateimanager</a>
-        <a href="/de/md-datei-oeffnen/">MD-Viewer</a>
-        <a href="/de/mbox-datei-oeffnen/">MBOX-Viewer</a>
       </nav>
       <div class="s-actions">
         <details class="s-lang">
@@ -100,6 +114,7 @@
             <button class="s-btn s-btn--secondary pt-drop__btn" type="button" data-fm="open-files">Dateien öffnen</button>
           </div>
           <p class="pt-drop__or">oder Dateien und Ordner hierher ziehen</p>
+          <button class="s-btn s-btn--secondary fm-hero__again" type="button" data-fm="reopen" hidden></button>
           <button class="fm-hero__demo" type="button" data-fm="demo">Mit Beispieldateien ausprobieren</button>
           <noscript><p class="pt-drop__error">Dieses Tool braucht JavaScript, weil deine Datei in deinem Browser verarbeitet wird.</p></noscript>
         </div>
@@ -123,6 +138,52 @@
           <a href="/de/datei-metadaten-anzeigen/"><strong>Datei-Inspektor</strong><span>Sieh alles, was in einer Datei steckt: Text, Metadaten, Prüfsummen und eingebettete Dateien.</span></a><a href="/de/md-datei-oeffnen/"><strong>MD-Viewer</strong><span>Markdown-Dateien öffnen, bearbeiten und umwandeln, mit Live-Vorschau.</span></a><a href="/de/mbox-datei-oeffnen/"><strong>MBOX-Viewer</strong><span>E-Mail-Archive aus Gmail, Thunderbird und Apple Mail lesen und durchsuchen.</span></a>
           <a href="/de/pdf-tools/"><strong>Alle PDF-Tools →</strong><span>Alle 30 PDF-Tools auf einen Blick.</span></a>
         </div>
+      </div>
+    </section>
+    <section class="s-section">
+      <div class="s-wrap">
+        <h2>Ordner und Dateien</h2>
+        <div class="s-cards" style="margin-top:18px"><a class="s-card" data-cat="files" href="/de/doppelte-dateien-finden/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h8v11H3z M13 10h8v11h-8z"/><path d="M6 17.5v3h4M18 6.5v-3h-4"/></svg>
+          <span class="s-card__title">Doppelte Dateien finden</span>
+          <span class="s-card__desc">Findet identische Dateien am Inhalt und zeigt, wie viel Platz die überflüssigen Kopien belegen.</span>
+        </a><a class="s-card" data-cat="files" href="/de/dateien-umbenennen/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><path d="M9 18l.6-2.6 5-5 2 2-5 5z"/></svg>
+          <span class="s-card__title">Dateien umbenennen</span>
+          <span class="s-card__desc">Viele Dateien auf einmal umbenennen: ersetzen, nummerieren, Datum voranstellen, mit Live-Vorschau.</span>
+        </a><a class="s-card" data-cat="files" href="/de/zip-mit-passwort/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 11h12v10H6z"/><path d="M8.5 11V7a3.5 3.5 0 0 1 7 0v4"/><path d="M12 15v2.5"/></svg>
+          <span class="s-card__title">ZIP mit Passwort</span>
+          <span class="s-card__desc">Erstelle eine ZIP-Datei aus Dateien oder Ordnern und schütze sie mit einem Passwort (AES-256).</span>
+        </a><a class="s-card" data-cat="files" href="/de/zip-rar-7z-entpacken/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><path d="M10 11h4v5h-4z"/><path d="M12 19v2"/></svg>
+          <span class="s-card__title">Archive entpacken</span>
+          <span class="s-card__desc">Entpacke ZIP, RAR, 7Z, TAR und weitere Archive im Browser, auch ZIPs mit Passwort.</span>
+        </a><a class="s-card" data-cat="files" href="/de/exif-daten-entfernen/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h8.5L20 11.5 12 20l-8-8z"/><circle cx="8.5" cy="8.5" r="1.3"/></svg>
+          <span class="s-card__title">EXIF-Daten entfernen</span>
+          <span class="s-card__desc">Entfernt EXIF, GPS und weitere Metadaten aus Fotos und PDFs, ohne die Bildqualität zu verändern.</span>
+        </a><a class="s-card" data-cat="files" href="/de/fotos-nach-datum-sortieren/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><circle cx="10" cy="11.5" r="1.3"/><path d="M6 18l3.5-3 2.5 2 2.5-3 3.5 4"/></svg>
+          <span class="s-card__title">Fotos nach Datum sortieren</span>
+          <span class="s-card__desc">Sortiert Fotos nach Aufnahmedatum in Ordner nach Jahr, Monat oder Tag und benennt sie auf Wunsch um.</span>
+        </a><a class="s-card" data-cat="files" href="/de/ordner-vergleichen/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h7v16H3z M14 4h7v16h-7z"/><path d="M5.5 9h2M5.5 12.5h2M16.5 9h2M16.5 12.5h2" /><path d="M12 2v20" stroke-dasharray="2 2"/></svg>
+          <span class="s-card__title">Ordner vergleichen</span>
+          <span class="s-card__desc">Vergleiche zwei Ordner und sieh, welche Dateien fehlen oder abweichen, etwa bei einem Backup.</span>
+        </a><a class="s-card" data-cat="files" href="/de/text-in-dateien-suchen/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><circle cx="11" cy="14" r="2.6"/><path d="M13 16l2.4 2.4"/></svg>
+          <span class="s-card__title">Text in Dateien suchen</span>
+          <span class="s-card__desc">Durchsuche den Inhalt vieler Dateien auf einmal, auch PDF, Word, Excel und PowerPoint.</span>
+        </a><a class="s-card" data-cat="files" href="/de/ordnergroesse-anzeigen/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h7v8H3z M14 3h7v8h-7z M3 15h7v6H3z M14 15h7v6h-7z"/></svg>
+          <span class="s-card__title">Ordnergröße anzeigen</span>
+          <span class="s-card__desc">Zeigt als Karte, welche Ordner und Dateien am meisten Speicherplatz belegen.</span>
+        </a><a class="s-card" data-cat="files" href="/de/pruefsumme-berechnen/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><path d="M10.5 14l1.5-1v5.5M10.5 18.5h3"/></svg>
+          <span class="s-card__title">Prüfsumme berechnen</span>
+          <span class="s-card__desc">Berechne SHA-256, SHA-1, SHA-512 und MD5 und prüfe, ob eine heruntergeladene Datei unverändert ist.</span>
+        </a></div>
       </div>
     </section>
     <section class="s-section s-section--tint" id="how">
@@ -164,6 +225,6 @@
   <script src="/assets/js/site.js?v=21b41bad" defer></script>
   </div>
   <div class="fm" id="fm-app" hidden></div>
-  <script type="module" src="/assets/js/fm/main.js?v=f0581f62"></script>
+  <script type="module" src="/assets/js/fm/main.js?v=e4367d0c"></script>
 </body>
 </html>

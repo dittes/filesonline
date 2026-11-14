@@ -2,6 +2,7 @@
 
 export default {
   nav: {
+    fileTools: 'File tools', groupOpen: 'Open and view', groupFolders: 'Folders and files', moreFileTools: 'More file tools',
     main: 'Main navigation', skip: 'Skip to content', menu: 'Menu', language: 'Language',
     toggleTheme: 'Switch between light and dark', home: 'Home',
     pdfTools: 'PDF tools', allPdfTools: 'All PDF tools',
@@ -68,18 +69,27 @@ export default {
   },
 
   home: {
-    title: 'Files Online – Free PDF Tools & File Manager, No Upload',
-    desc: 'Compress, merge, split, convert, edit and sign PDFs for free. Your files stay in your browser and are never uploaded. No account needed.',
+    title: 'Files Online – Open, Inspect and Edit Files and Folders, No Upload',
+    desc: 'Drop a file to see everything inside it, or open a folder to browse, zip, rename and convert. Plus 30 PDF tools. Everything runs in your browser and nothing is uploaded.',
     short: 'Free PDF and file tools that run in your browser. Nothing is uploaded.',
     eyebrow: 'PDF tools · File manager · Viewers',
-    h1Html: 'Every PDF tool you need, <span class="s-mark">without the upload.</span>',
-    lede: 'Compress, merge, split, convert, edit and sign documents right in your browser. Your files stay on your device from start to finish.',
+    h1Html: 'Open, inspect and edit any file, <span class="s-mark">without the upload.</span>',
+    lede: 'Drop a file to see what is really inside it, or open a whole folder to browse, zip, rename and convert. Everything happens in your browser and stays on your device.',
+    chooseFile: 'Choose a file', openFolder: 'Open a folder',
+    dropHint: 'or drop a file or a folder here',
+    reading: 'Opening…',
+    tooBig: 'That is too much to hand over at once. Open the file manager and add it there.',
+    failed: 'That did not work. Open the tool from the menu and choose the file there.',
+    routeFile: ['A file opens in the File Inspector', 'Real type, metadata, text, checksums and hidden data. Mailboxes open in the MBOX viewer.'],
+    install: 'Install as an app',
+    routeFolder: ['A folder opens in the File Manager', 'Browse, preview, zip, rename and find duplicates.'],
+    routePdf: ['Working on a PDF?', 'Go straight to one of {n} PDF tools.'],
     ctaPdf: 'See all PDF tools', ctaFiles: 'Open the file manager',
     popularTitle: 'Most used PDF tools',
     popularLede: 'Pick a tool and drop your file. There is nothing to install and no account to create.',
     allTools: 'All {n} PDF tools',
-    filesTitle: 'More than PDFs',
-    filesLede: 'Whole folders, Markdown notes and years of archived email, handled the same private way.',
+    filesTitle: 'For every file and folder',
+    filesLede: 'Look inside a single file, tidy a whole folder, read Markdown notes or years of archived email, always in the same private way.',
     privacyTitle: 'Private because of how it is built',
     privacyText: 'Most online tools ask you to trust them with your documents. We never receive yours in the first place: there is no server that processes files. The PDF tools even tell your browser, through a security policy, to block any attempt to send data elsewhere.',
     privacyLink: 'Read the privacy policy',
@@ -197,6 +207,8 @@ export default {
   },
 
   mdPage: {
+    h1: 'Open MD File Online',
+    lede: 'Open, read and edit Markdown files in one window. Export to PDF or HTML, all in your browser, with no upload.',
     name: 'MD Viewer',
     title: 'Open MD File Online – Free Markdown Viewer & Editor',
     desc: 'Open, view, edit and convert .md Markdown files online. Live preview, Markdown to PDF and HTML, and HTML to Markdown. Free, with no upload.',
@@ -207,7 +219,7 @@ export default {
     ],
     how: 'How to open an MD file',
     steps: [
-      'Click “Choose MD File” or drop your .md file onto the page. You can also paste text or start with an empty document.',
+      'Click “Choose file” or drop your .md file onto the page. You can also paste text or start with an empty document.',
       'Read the formatted preview, or edit the text and watch the preview update as you type.',
       'Save the Markdown file, or export it as PDF, HTML or plain text.',
     ],

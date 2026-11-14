@@ -1,14 +1,17 @@
 {
   "name": "Files Online",
   "short_name": "Files Online",
-  "description": "Browser-based file manager, ZIP tool, and file viewer. No upload. No server.",
+  "description": "Open, inspect and edit files and folders in your browser: file inspector, file manager and PDF tools. No upload.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#F9F9F8",
   "theme_color": "#1B4FD8",
   "orientation": "any",
-  "categories": ["utilities", "productivity"],
+  "categories": [
+    "utilities",
+    "productivity"
+  ],
   "icons": [
     {
       "src": "/assets/icons/icon-192.png",
@@ -31,12 +34,89 @@
   ],
   "shortcuts": [
     {
-      "name": "Open Files",
+      "name": "Open a file",
       "short_name": "Open",
-      "description": "Open files to work with",
-      "url": "/#workspace",
-      "icons": [{ "src": "/assets/icons/icon-192.png", "sizes": "192x192" }]
+      "url": "/",
+      "icons": [
+        {
+          "src": "/assets/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ],
-  "screenshots": []
+  "file_handlers": [
+    {
+      "action": "/open/",
+      "accept": {
+        "application/pdf": [
+          ".pdf"
+        ],
+        "application/zip": [
+          ".zip"
+        ],
+        "application/x-7z-compressed": [
+          ".7z"
+        ],
+        "application/vnd.rar": [
+          ".rar"
+        ],
+        "application/x-tar": [
+          ".tar"
+        ],
+        "application/gzip": [
+          ".gz",
+          ".tgz"
+        ],
+        "application/mbox": [
+          ".mbox"
+        ],
+        "message/rfc822": [
+          ".eml"
+        ],
+        "text/markdown": [
+          ".md",
+          ".markdown"
+        ],
+        "text/plain": [
+          ".txt",
+          ".log"
+        ],
+        "text/csv": [
+          ".csv"
+        ],
+        "application/json": [
+          ".json"
+        ],
+        "image/jpeg": [
+          ".jpg",
+          ".jpeg"
+        ],
+        "image/png": [
+          ".png"
+        ],
+        "image/webp": [
+          ".webp"
+        ],
+        "image/gif": [
+          ".gif"
+        ],
+        "image/heic": [
+          ".heic"
+        ],
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [
+          ".docx"
+        ],
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [
+          ".xlsx"
+        ],
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation": [
+          ".pptx"
+        ]
+      }
+    }
+  ],
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
 }

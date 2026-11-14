@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' blob: https://cdn.jsdelivr.net 'sha256-2umU0MxQJqQrUkhC2ma0avyIwaZeSqNXdBh3CvB6PCc='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self' data: blob:; connect-src 'self' blob: data: https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <title>EXIF-Daten entfernen aus Fotos und PDFs, ohne Upload</title>
+  <meta name="description" content="EXIF-Daten, GPS-Standort und Metadaten aus JPG, PNG, WebP und PDF entfernen. Verlustfrei, viele Dateien auf einmal, im Browser und ohne Upload.">
+  
+  <link rel="canonical" href="https://files-online.com/de/exif-daten-entfernen/">
+  <link rel="alternate" hreflang="en" href="https://files-online.com/en/remove-exif-metadata/">
+  <link rel="alternate" hreflang="de" href="https://files-online.com/de/exif-daten-entfernen/">
+  <link rel="alternate" hreflang="pl" href="https://files-online.com/pl/usun-exif-ze-zdjec/">
+  <link rel="alternate" hreflang="cs" href="https://files-online.com/cs/odstranit-exif-z-fotek/">
+  <link rel="alternate" hreflang="x-default" href="https://files-online.com/en/remove-exif-metadata/">
+  <meta name="theme-color" content="#ffffff">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Files Online">
+  <meta property="og:url" content="https://files-online.com/de/exif-daten-entfernen/">
+  <meta property="og:title" content="EXIF-Daten entfernen aus Fotos und PDFs, ohne Upload">
+  <meta property="og:description" content="EXIF-Daten, GPS-Standort und Metadaten aus JPG, PNG, WebP und PDF entfernen. Verlustfrei, viele Dateien auf einmal, im Browser und ohne Upload.">
+  <meta property="og:locale" content="de_DE">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="og:locale:alternate" content="pl_PL">
+  <meta property="og:locale:alternate" content="cs_CZ">
+  <meta property="og:image" content="https://files-online.com/assets/icons/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <script>(function(){try{var t=localStorage.getItem('fo-theme')==='dark'?'dark':'light';document.documentElement.setAttribute('data-theme',t)}catch(e){}})();</script>
+  <link rel="preload" href="/assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/css/fm.css?v=902907d9">
+  <link rel="stylesheet" href="/assets/css/site.css?v=e28198ae">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":["SoftwareApplication","WebApplication"],"name":"EXIF-Daten entfernen","url":"https://files-online.com/de/exif-daten-entfernen/","description":"EXIF-Daten, GPS-Standort und Metadaten aus JPG, PNG, WebP und PDF entfernen. Verlustfrei, viele Dateien auf einmal, im Browser und ohne Upload.","inLanguage":"de","applicationCategory":"UtilitiesApplication","operatingSystem":"Windows, macOS, Linux, Android, iOS","browserRequirements":"Requires a modern web browser with JavaScript enabled","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"publisher":{"@id":"https://files-online.com/#org"},"featureList":["Fotos und PDFs","Verlustfrei","Viele Dateien auf einmal"]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Startseite","item":"https://files-online.com/de/"},{"@type":"ListItem","position":2,"name":"Dateimanager","item":"https://files-online.com/de/dateimanager/"},{"@type":"ListItem","position":3,"name":"EXIF-Daten entfernen"}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","name":"So entfernst du EXIF-Daten","step":[{"@type":"HowToStep","position":1,"text":"Klicke auf „Ordner öffnen“ oder „Dateien öffnen“, oder ziehe Fotos und PDFs auf diese Seite. Der Dateimanager startet das Tool."},{"@type":"HowToStep","position":2,"text":"Wähle, ob saubere Kopien („-clean“) angelegt werden oder die Dateien im Arbeitsbereich ersetzt werden, und starte."},{"@type":"HowToStep","position":3,"text":"Lade die bereinigten Dateien einzeln oder als ZIP herunter. In Chrome und Edge kannst du sie auch direkt in einen Ordner speichern."}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Wird das Foto schlechter?","acceptedAnswer":{"@type":"Answer","text":"Nein. Das Bild wird nicht neu kodiert, nur die Zusatzangaben werden entfernt. Farbprofile bleiben, und ein gedrehtes Foto bleibt gedreht."}},{"@type":"Question","name":"Welche Dateitypen werden unterstützt?","acceptedAnswer":{"@type":"Answer","text":"JPG, PNG und WebP für Fotos, dazu PDF. Bei PDFs werden die Dokumenteigenschaften wie Autor, Titel, Software und Datum entfernt."}},{"@type":"Question","name":"Wird auch der Standort entfernt?","acceptedAnswer":{"@type":"Answer","text":"Ja, die GPS-Angaben gehören zu den EXIF-Daten und werden mit entfernt."}},{"@type":"Question","name":"Werden Wasserzeichen oder sichtbarer Text entfernt?","acceptedAnswer":{"@type":"Answer","text":"Nein. Es geht nur um versteckte Metadaten, nicht um sichtbare Inhalte im Bild oder auf der PDF-Seite."}}]}</script>
+</head>
+<body class="s-page fm-page" data-fm-feature="strip">
+  <div id="fm-landing">
+  <a class="s-skip" href="#main">Zum Inhalt springen</a>
+  <header class="s-header">
+    <div class="s-wrap s-header__row">
+      <a class="s-logo" href="/de/"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect width="32" height="32" rx="7" fill="#1B4FD8"/><path d="M10 6.5h8.200l5 5v13A1.500 1.500 0 0 1 21.700 26H10a1.500 1.500 0 0 1-1.500-1.500V8A1.500 1.500 0 0 1 10 6.500z" fill="#fff"/><path d="M18.200 6.500V10a1.500 1.500 0 0 0 1.500 1.500h3.500" fill="none" stroke="#1B4FD8" stroke-width="1.100" stroke-linejoin="round"/><rect x="11.300" y="15" width="9" height="1.700" rx=".85" fill="#1B4FD8"/><rect x="11.300" y="18.400" width="9" height="1.700" rx=".85" fill="#1B4FD8"/><rect x="11.300" y="21.800" width="5.500" height="1.700" rx=".85" fill="#1B4FD8"/></svg><span>Files Online</span></a>
+      <nav class="s-nav" aria-label="Hauptnavigation">
+        <details class="s-menu">
+          <summary>PDF-Tools<svg class="s-caret" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></summary>
+          <div class="s-mega">
+            <div>
+              <h3>Seiten organisieren</h3>
+              <a href="/de/pdf-zusammenfuegen/">PDF zusammenfügen</a><a href="/de/pdf-teilen/">PDF teilen</a><a href="/de/pdf-seiten-extrahieren/">PDF-Seiten extrahieren</a><a href="/de/pdf-seiten-loeschen/">PDF-Seiten löschen</a><a href="/de/pdf-sortieren/">PDF sortieren</a><a href="/de/pdf-drehen/">PDF drehen</a><a href="/de/pdf-zuschneiden/">PDF zuschneiden</a><a href="/de/leere-seiten-aus-pdf-entfernen/">Leere Seiten entfernen</a><a href="/de/pdf-vorder-und-rueckseiten-zusammenfuegen/">Vorder- und Rückseiten zusammenfügen</a>
+            </div><div>
+              <h3>Optimieren</h3>
+              <a href="/de/pdf-verkleinern/">PDF verkleinern</a><a href="/de/pdf-ocr/">PDF OCR</a><a href="/de/pdf-reduzieren/">PDF reduzieren</a>
+            </div><div>
+              <h3>Umwandeln</h3>
+              <a href="/de/pdf-in-word/">PDF in Word</a><a href="/de/pdf-in-excel/">PDF in Excel</a><a href="/de/pdf-in-jpg/">PDF in JPG</a><a href="/de/pdf-in-png/">PDF in PNG</a><a href="/de/pdf-in-text/">PDF in Text</a><a href="/de/jpg-in-pdf/">JPG in PDF</a><a href="/de/png-in-pdf/">PNG in PDF</a><a href="/de/bilder-aus-pdf-extrahieren/">Bilder aus PDF extrahieren</a>
+            </div><div>
+              <h3>Bearbeiten &amp; unterschreiben</h3>
+              <a href="/de/pdf-bearbeiten/">PDF bearbeiten</a><a href="/de/pdf-unterschreiben/">PDF unterschreiben</a><a href="/de/pdf-formular-ausfuellen/">PDF-Formular ausfüllen</a><a href="/de/pdf-wasserzeichen/">PDF-Wasserzeichen</a><a href="/de/pdf-seitenzahlen/">PDF-Seitenzahlen</a><a href="/de/pdf-vergleichen/">PDF vergleichen</a>
+            </div><div>
+              <h3>Sicherheit &amp; Datenschutz</h3>
+              <a href="/de/pdf-verschluesseln/">PDF verschlüsseln</a><a href="/de/pdf-entsperren/">PDF entsperren</a><a href="/de/pdf-schwaerzen/">PDF schwärzen</a><a href="/de/pdf-metadaten-bearbeiten/">PDF-Metadaten bearbeiten</a>
+            </div>
+            <a class="s-mega__all" href="/de/pdf-tools/">Alle PDF-Tools →</a>
+          </div>
+        </details>
+        <details class="s-menu">
+          <summary>Datei-Tools<svg class="s-caret" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></summary>
+          <div class="s-mega s-mega--files">
+            <div>
+              <h3>Öffnen und ansehen</h3>
+              <a href="/de/datei-metadaten-anzeigen/">Datei-Inspektor</a><a href="/de/dateimanager/">Dateimanager</a><a href="/de/md-datei-oeffnen/">MD-Viewer</a><a href="/de/mbox-datei-oeffnen/">MBOX-Viewer</a>
+            </div>
+            <div>
+              <h3>Ordner und Dateien</h3>
+              <a href="/de/doppelte-dateien-finden/">Doppelte Dateien finden</a><a href="/de/dateien-umbenennen/">Dateien umbenennen</a><a href="/de/zip-mit-passwort/">ZIP mit Passwort</a><a href="/de/zip-rar-7z-entpacken/">Archive entpacken</a><a href="/de/exif-daten-entfernen/" aria-current="page">EXIF-Daten entfernen</a>
+            </div><div>
+              <h3>&nbsp;</h3>
+              <a href="/de/fotos-nach-datum-sortieren/">Fotos nach Datum sortieren</a><a href="/de/ordner-vergleichen/">Ordner vergleichen</a><a href="/de/text-in-dateien-suchen/">Text in Dateien suchen</a><a href="/de/ordnergroesse-anzeigen/">Ordnergröße anzeigen</a><a href="/de/pruefsumme-berechnen/">Prüfsumme berechnen</a>
+            </div>
+          </div>
+        </details>
+        <a href="/de/datei-metadaten-anzeigen/">Datei-Inspektor</a>
+        <a href="/de/dateimanager/">Dateimanager</a>
+      </nav>
+      <div class="s-actions">
+        <details class="s-lang">
+          <summary aria-label="Sprache">de</summary>
+          <ul>
+            <li><a href="/en/remove-exif-metadata/" hreflang="en" lang="en" data-set-lang="en">English</a></li><li><a href="/de/exif-daten-entfernen/" hreflang="de" lang="de" data-set-lang="de" aria-current="true">Deutsch</a></li><li><a href="/pl/usun-exif-ze-zdjec/" hreflang="pl" lang="pl" data-set-lang="pl">Polski</a></li><li><a href="/cs/odstranit-exif-z-fotek/" hreflang="cs" lang="cs" data-set-lang="cs">Čeština</a></li>
+          </ul>
+        </details>
+        <button class="s-icon-btn" type="button" data-action="toggle-theme" aria-label="Zwischen hell und dunkel wechseln" title="Zwischen hell und dunkel wechseln">
+          <svg class="icon-moon" viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><path d="M13.5 9.5A5.5 5.5 0 016.5 2.5a5.5 5.5 0 107 7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          <svg class="icon-sun" viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M12.6 3.4l-1.4 1.4M4.8 11.2l-1.4 1.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <button class="s-icon-btn s-burger" type="button" aria-label="Menü" aria-expanded="false"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+      </div>
+    </div>
+  </header>
+  <main id="main">
+    <div class="s-wrap">
+      <ol class="s-crumbs"><li><a href="/de/">Startseite</a></li><li><a href="/de/dateimanager/">Dateimanager</a></li><li><span aria-current="page">EXIF-Daten entfernen</span></li></ol>
+      <div class="s-toolhead">
+        <h1>EXIF-Daten und Metadaten entfernen</h1>
+        <p>Entferne Kamera, Aufnahmeort und andere versteckte Angaben aus Fotos und PDFs, bevor du sie weitergibst. Die Bildqualität bleibt unverändert.</p>
+      </div>
+      <div class="pt fm-hero">
+        <div class="pt-drop">
+          <svg class="pt-drop__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h8.5L20 11.5 12 20l-8-8z"/><circle cx="8.5" cy="8.5" r="1.3"/></svg>
+          <div class="fm-hero__cta">
+            <button class="s-btn s-btn--primary pt-drop__btn" type="button" data-fm="open-folder">Ordner öffnen</button>
+            <button class="s-btn s-btn--secondary pt-drop__btn" type="button" data-fm="open-files">Dateien öffnen</button>
+          </div>
+          <p class="pt-drop__or">oder Dateien und Ordner hierher ziehen</p>
+          <button class="s-btn s-btn--secondary fm-hero__again" type="button" data-fm="reopen" hidden></button>
+          <button class="fm-hero__demo" type="button" data-fm="demo">Mit Beispieldateien ausprobieren</button>
+          <noscript><p class="pt-drop__error">Dieses Tool braucht JavaScript, weil deine Datei in deinem Browser verarbeitet wird.</p></noscript>
+        </div>
+        <ul class="s-trust"><li>Kein Upload</li><li>Kostenlos</li><li>Kein Konto</li><li>Einmal geladen, auch offline nutzbar</li></ul>
+      </div>
+    </div>
+    <section class="s-section">
+      <div class="s-wrap">
+        <div class="s-benefits">
+          <div><h3>Fotos und PDFs</h3><p>Bei JPG, PNG und WebP verschwinden EXIF (Kamera, Objektiv, Datum, GPS-Standort), XMP, IPTC und Kommentare. Bei PDFs die Dokumenteigenschaften wie Autor, Titel, Programm und Datum.</p></div><div><h3>Verlustfrei</h3><p>Die Bilddaten werden nicht neu kodiert, die Qualität bleibt also gleich. Farbprofile bleiben erhalten, damit die Farben stimmen, und die Drehung eines Fotos auch.</p></div><div><h3>Viele Dateien auf einmal</h3><p>Du kannst saubere Kopien mit der Endung „-clean“ anlegen oder die Dateien im Arbeitsbereich ersetzen.</p></div>
+        </div>
+      </div>
+    </section>
+    <section class="s-section s-section--tint" id="how">
+    <div class="s-wrap">
+      <h2>So entfernst du EXIF-Daten</h2>
+      <ol class="s-steps"><li><p>Klicke auf „Ordner öffnen“ oder „Dateien öffnen“, oder ziehe Fotos und PDFs auf diese Seite. Der Dateimanager startet das Tool.</p></li><li><p>Wähle, ob saubere Kopien („-clean“) angelegt werden oder die Dateien im Arbeitsbereich ersetzt werden, und starte.</p></li><li><p>Lade die bereinigten Dateien einzeln oder als ZIP herunter. In Chrome und Edge kannst du sie auch direkt in einen Ordner speichern.</p></li></ol>
+    </div>
+  </section>
+    <section class="s-section">
+      <div class="s-wrap s-prose">
+        <h2>Was in deinen Fotos steckt</h2>
+        <p>Ein Foto vom Smartphone enthält meist mehr als das Bild: Gerätemodell, Aufnahmezeit und oft die GPS-Koordinaten, an denen du standest. Wer das Foto weitergibt, gibt diese Angaben mit. Auch PDFs tragen Autor, Titel und das Programm, mit dem sie erstellt wurden.</p><p>Das Tool schneidet diese Angaben aus der Datei heraus, ohne das Bild neu zu berechnen. Deshalb gibt es keinen Qualitätsverlust. Sichtbare Inhalte entfernt es nicht: Ein Wasserzeichen oder Text auf der Seite bleibt, wie er ist. Dafür gibt es andere Werkzeuge, etwa zum Schwärzen im PDF.</p>
+      </div>
+    </section>
+    <section class="s-section" id="faq">
+    <div class="s-wrap">
+      <h2>Häufige Fragen</h2>
+      <div class="s-faq">
+        <details open><summary>Wird das Foto schlechter?</summary><p>Nein. Das Bild wird nicht neu kodiert, nur die Zusatzangaben werden entfernt. Farbprofile bleiben, und ein gedrehtes Foto bleibt gedreht.</p></details>
+        <details><summary>Welche Dateitypen werden unterstützt?</summary><p>JPG, PNG und WebP für Fotos, dazu PDF. Bei PDFs werden die Dokumenteigenschaften wie Autor, Titel, Software und Datum entfernt.</p></details>
+        <details><summary>Wird auch der Standort entfernt?</summary><p>Ja, die GPS-Angaben gehören zu den EXIF-Daten und werden mit entfernt.</p></details>
+        <details><summary>Werden Wasserzeichen oder sichtbarer Text entfernt?</summary><p>Nein. Es geht nur um versteckte Metadaten, nicht um sichtbare Inhalte im Bild oder auf der PDF-Seite.</p></details>
+      </div>
+    </div>
+  </section>
+    <section class="s-section s-section--tint">
+      <div class="s-wrap">
+        <h2>Weitere Datei-Tools</h2>
+        <div class="s-cards" style="margin-top:18px">
+          <a class="s-card" data-cat="files" href="/de/dateimanager/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h6l2 2.5h10V20H3z"/><path d="M3 12h18"/></svg>
+          <span class="s-card__title">Dateimanager</span>
+          <span class="s-card__desc">Ganze Ordner durchsuchen, ansehen, zippen, entpacken und umbenennen.</span>
+        </a><a class="s-card" data-cat="files" href="/de/datei-metadaten-anzeigen/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><circle cx="11" cy="14" r="2.6"/><path d="M13 16l2.4 2.4"/></svg>
+          <span class="s-card__title">Datei-Inspektor</span>
+          <span class="s-card__desc">Sieh alles, was in einer Datei steckt: Text, Metadaten, Prüfsummen und eingebettete Dateien.</span>
+        </a>
+          <a class="s-card" data-cat="files" href="/de/doppelte-dateien-finden/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h8v11H3z M13 10h8v11h-8z"/><path d="M6 17.5v3h4M18 6.5v-3h-4"/></svg>
+          <span class="s-card__title">Doppelte Dateien finden</span>
+          <span class="s-card__desc">Findet identische Dateien am Inhalt und zeigt, wie viel Platz die überflüssigen Kopien belegen.</span>
+        </a><a class="s-card" data-cat="files" href="/de/dateien-umbenennen/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><path d="M9 18l.6-2.6 5-5 2 2-5 5z"/></svg>
+          <span class="s-card__title">Dateien umbenennen</span>
+          <span class="s-card__desc">Viele Dateien auf einmal umbenennen: ersetzen, nummerieren, Datum voranstellen, mit Live-Vorschau.</span>
+        </a><a class="s-card" data-cat="files" href="/de/zip-mit-passwort/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 11h12v10H6z"/><path d="M8.5 11V7a3.5 3.5 0 0 1 7 0v4"/><path d="M12 15v2.5"/></svg>
+          <span class="s-card__title">ZIP mit Passwort</span>
+          <span class="s-card__desc">Erstelle eine ZIP-Datei aus Dateien oder Ordnern und schütze sie mit einem Passwort (AES-256).</span>
+        </a><a class="s-card" data-cat="files" href="/de/zip-rar-7z-entpacken/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><path d="M10 11h4v5h-4z"/><path d="M12 19v2"/></svg>
+          <span class="s-card__title">Archive entpacken</span>
+          <span class="s-card__desc">Entpacke ZIP, RAR, 7Z, TAR und weitere Archive im Browser, auch ZIPs mit Passwort.</span>
+        </a><a class="s-card" data-cat="files" href="/de/fotos-nach-datum-sortieren/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><circle cx="10" cy="11.5" r="1.3"/><path d="M6 18l3.5-3 2.5 2 2.5-3 3.5 4"/></svg>
+          <span class="s-card__title">Fotos nach Datum sortieren</span>
+          <span class="s-card__desc">Sortiert Fotos nach Aufnahmedatum in Ordner nach Jahr, Monat oder Tag und benennt sie auf Wunsch um.</span>
+        </a><a class="s-card" data-cat="files" href="/de/ordner-vergleichen/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h7v16H3z M14 4h7v16h-7z"/><path d="M5.5 9h2M5.5 12.5h2M16.5 9h2M16.5 12.5h2" /><path d="M12 2v20" stroke-dasharray="2 2"/></svg>
+          <span class="s-card__title">Ordner vergleichen</span>
+          <span class="s-card__desc">Vergleiche zwei Ordner und sieh, welche Dateien fehlen oder abweichen, etwa bei einem Backup.</span>
+        </a><a class="s-card" data-cat="files" href="/de/text-in-dateien-suchen/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><circle cx="11" cy="14" r="2.6"/><path d="M13 16l2.4 2.4"/></svg>
+          <span class="s-card__title">Text in Dateien suchen</span>
+          <span class="s-card__desc">Durchsuche den Inhalt vieler Dateien auf einmal, auch PDF, Word, Excel und PowerPoint.</span>
+        </a><a class="s-card" data-cat="files" href="/de/ordnergroesse-anzeigen/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h7v8H3z M14 3h7v8h-7z M3 15h7v6H3z M14 15h7v6h-7z"/></svg>
+          <span class="s-card__title">Ordnergröße anzeigen</span>
+          <span class="s-card__desc">Zeigt als Karte, welche Ordner und Dateien am meisten Speicherplatz belegen.</span>
+        </a><a class="s-card" data-cat="files" href="/de/pruefsumme-berechnen/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><path d="M10.5 14l1.5-1v5.5M10.5 18.5h3"/></svg>
+          <span class="s-card__title">Prüfsumme berechnen</span>
+          <span class="s-card__desc">Berechne SHA-256, SHA-1, SHA-512 und MD5 und prüfe, ob eine heruntergeladene Datei unverändert ist.</span>
+        </a>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="s-footer">
+    <div class="s-wrap s-footer__row">
+      <span class="s-footer__brand"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect width="32" height="32" rx="7" fill="#1B4FD8"/><path d="M10 6.5h8.200l5 5v13A1.500 1.500 0 0 1 21.700 26H10a1.500 1.500 0 0 1-1.500-1.500V8A1.500 1.500 0 0 1 10 6.500z" fill="#fff"/><path d="M18.200 6.500V10a1.500 1.500 0 0 0 1.500 1.500h3.500" fill="none" stroke="#1B4FD8" stroke-width="1.100" stroke-linejoin="round"/><rect x="11.300" y="15" width="9" height="1.700" rx=".85" fill="#1B4FD8"/><rect x="11.300" y="18.400" width="9" height="1.700" rx=".85" fill="#1B4FD8"/><rect x="11.300" y="21.800" width="5.500" height="1.700" rx=".85" fill="#1B4FD8"/></svg><span>Läuft in deinem Browser. Kein Upload, kein Konto, kein Tracking.</span></span>
+      <nav class="s-footer__links" aria-label="Legal">
+        <a href="/de/datenschutz/">Datenschutz</a>
+        <a href="/de/impressum/">Impressum</a>
+      </nav>
+    </div>
+  </footer>
+  <script src="/assets/js/site.js?v=21b41bad" defer></script>
+  </div>
+  <div class="fm" id="fm-app" hidden></div>
+  <script type="module" src="/assets/js/fm/main.js?v=e4367d0c"></script>
+</body>
+</html>

@@ -4,9 +4,10 @@
 
 import { el, btn, dialog, prompt, confirm, task, toast, download, UserError, pause } from './dom.js';
 import { t, fmtBytes, fmtNum, collator } from './i18n.js';
-import { S, emit, addFiles, expand, remove, renameItem, renameFolder, createFolder, navigate, isFolderKey, joinPath, parentOf, leafOf, uniqueName, cleanDir } from './store.js';
-import { splitName, isPdf, isArchive } from './kinds.js';
-import { pickFiles, pickFolder } from './intake.js';
+import { S, emit, addFiles, expand, remove, renameItem, replaceFile, renameFolder, createFolder, navigate, isFolderKey, joinPath, parentOf, leafOf, uniqueName, cleanDir } from './store.js';
+import { splitName, isPdf, isArchive, isTextLike } from './kinds.js';
+import { pickFiles, pickFolder, reopenFolder } from './intake.js';
+import * as session from './session.js';
 import * as dialogs from './dialogs.js';
 import { sendTo } from '../handoff.js';
 
@@ -14,9 +15,15 @@ let routes = {};
 let pages = {};
 export function configure(r, p) { routes = r || {}; pages = p || {}; }
 
+/** Things the shell provides: jumping to a file in the list. */
+let hooks = { reveal: () => {} };
+export function setHooks(h) { hooks = { ...hooks, ...h }; }
+
 const pathOf = item => joinPath(item.dir, item.name);
 const stemOf = name => splitName(name)[0];
 const isPdfImage = item => /^(jpg|jpeg|png|webp|gif|bmp|avif|heic|heif|tif|tiff)$/.test(item.ext);
+const isStrippable = item => /^(jpg|jpeg|png|webp|pdf)$/.test(item.ext);
+const isEditable = item => isTextLike(item) && item.size <= 2e6 && !/^(rtf|eml)$/.test(item.ext);
 const isConvertible = item => /^(jpg|jpeg|png|webp|gif|bmp|avif|svg|ico)$/.test(item.ext);
 const allOf = (files, test) => files.length > 0 && files.every(test);
 const bytesOf = async file => new Uint8Array(await file.arrayBuffer());
@@ -36,7 +43,20 @@ export function intake(list, { made = false, into = S.cwd } = {}) {
 export async function addFromPicker() { intake(await pickFiles()); }
 export async function addFolderFromPicker() {
   const list = await task(t('Reading the folder…'), () => pickFolder());
-  if (list) intake(list);
+  if (!list) return;
+  intake(list);
+  if (list.handle) session.remember(list.handle);
+}
+
+/** Open the folder remembered from an earlier visit. Resolves true when it worked. */
+export async function reopenLast() {
+  const saved = await session.last();
+  if (!saved) return false;
+  const list = await task(t('Reading the folder…'), () => reopenFolder(saved.handle));
+  if (list === undefined) return false;
+  if (!list) { toast(t('The browser did not allow access to that folder.'), { kind: 'error' }); return false; }
+  intake(list);
+  return true;
 }
 
 /** Put results into the workspace, select them and say so. */
@@ -142,6 +162,7 @@ export async function zip(keys = [...S.selection]) {
 
   const name = el('input.fm-input', { type: 'text', value: `${zipName(keys, files)}.zip`, spellcheck: false });
   const level = el('select.fm-input', [[6, t('Normal')], [1, t('Fast, larger file')], [9, t('Smallest file, slower')], [0, t('No compression')]].map(([v, label]) => el('option', { value: v }, label)));
+  const password = el('input.fm-input', { type: 'password', autocomplete: 'new-password' });
   const total = files.reduce((sum, it) => sum + it.size, 0);
   const d = dialog({
     title: t('Create ZIP'), size: 's',
@@ -149,6 +170,8 @@ export async function zip(keys = [...S.selection]) {
       el('p.fm-dialog__text', t('Files: {n} · {size}', { n: fmtNum(files.length), size: fmtBytes(total) })),
       el('label.fm-field', el('span.fm-field__label', t('File name')), name),
       el('label.fm-field', el('span.fm-field__label', t('Compression')), level),
+      el('label.fm-field', el('span.fm-field__label', t('Password (optional)')), password,
+        el('span.fm-field__hint', t('With a password the ZIP is encrypted with AES-256. Apps like 7-Zip, WinZip and Keka open it; the built-in Windows and macOS tools may not.'))),
       total > 1.5e9 ? el('p.fm-field__hint', t('This is a lot of data. The ZIP is built in memory, so it may be too much for this browser.')) : null),
     footer: [btn(t('Cancel'), () => d.close(false)), btn(t('Create and download'), () => d.close(true), { variant: 'primary' })],
   });
@@ -160,8 +183,14 @@ export async function zip(keys = [...S.selection]) {
   const base = baseFor(files.length ? files : [{ dir: S.cwd }]);
   const fileName = (name.value.trim() || 'files-online.zip').replace(/(\.zip)?$/i, '.zip');
   const blob = await task(t('Creating ZIP…'), async (progress, signal) => {
+    const entries = files.map(it => ({ path: relative(pathOf(it), base), file: it.file, modified: it.modified }));
+    if (password.value) {
+      const crypt = await import('./zipcrypt.js');
+      crypt.setT?.(t);
+      return crypt.makeEncryptedZip(entries, password.value, { level: +level.value, onProgress: progress, signal });
+    }
     const { makeZip } = await import('./archive.js');
-    return makeZip(files.map(it => ({ path: relative(pathOf(it), base), file: it.file, modified: it.modified })), {
+    return makeZip(entries, {
       level: +level.value, onProgress: progress, signal,
       folders: emptyFolders.map(f => relative(f, base)).filter(Boolean),
     });
@@ -223,15 +252,42 @@ export async function saveToFolder() {
 
 // ─── Archives ─────────────────────────────────────────────────────────────────
 
+/** Ask for the password of an encrypted ZIP until it fits or the person gives up. */
+async function unlockZip(item) {
+  const crypt = await import('./zipcrypt.js');
+  crypt.setT?.(t);
+  if (!/^(zip|cbz|jar)$/.test(item.ext) || !await crypt.isEncryptedZip(item.file).catch(() => false)) return undefined;
+  let label = t('Password for “{name}”', { name: item.name });
+  for (;;) {
+    const password = await prompt({ title: t('This ZIP is protected'), label, value: '', action: t('Unlock'), type: 'password' });
+    if (password === null) return null;
+    try {
+      return await crypt.extractEncryptedZip(item.file, password, {});
+    } catch (err) {
+      if (err?.code !== 'PASSWORD') throw err;
+      label = t('That password is not correct. Try again.');
+    }
+  }
+}
+
 export async function extractArchives(items = targets().filter(isArchive)) {
   if (!items.length) return;
+  const locked = new Map();
+  for (const it of items) {
+    let entries;
+    try { entries = await unlockZip(it); } catch (err) { console.error(err); toast(err?.userMessage || t('This archive could not be unpacked. It may be damaged, encrypted or too large for this browser.'), { kind: 'error' }); return; }
+    if (entries === null) return;
+    if (entries) locked.set(it.id, entries);
+  }
   const added = await task(t('Extracting…'), async (progress) => {
     const { extract } = await import('./archive.js');
     const out = [];
     for (let i = 0; i < items.length; i++) {
       const it = items[i];
       progress(i / items.length, t('Extracting {name}…', { name: it.name }));
-      const entries = await extract(it.file, { onProgress: f => progress((i + f) / items.length) });
+      const entries = locked.has(it.id)
+        ? await locked.get(it.id)
+        : await extract(it.file, { onProgress: f => progress((i + f) / items.length) });
       if (!entries.length) throw new UserError(t('This archive is empty.'));
       const siblings = new Set([...S.folders].filter(f => parentOf(f) === it.dir).map(f => leafOf(f).toLowerCase()));
       const folder = joinPath(it.dir, uniqueName(stemOf(it.name).replace(/\.tar$/i, '') || 'archive', siblings));
@@ -362,6 +418,9 @@ export function suggestions(items) {
   if (allOf(items, isConvertible)) here.push({ label: t('Convert or resize'), ico: 'image', run: () => dialogs.convertDialog(items, addResults) });
 
   if (allOf(items, isArchive)) here.push({ label: t('Extract here'), ico: 'unzip', run: () => extractArchives(items) });
+  if (allOf(items, isStrippable)) here.push({ label: t('Remove metadata'), ico: 'shield', run: () => stripMetadata(items) });
+  if (n > 1 && allOf(items, it => it.kind === 'image')) here.push({ label: t('Sort by date taken'), ico: 'sort', run: () => photoSort(items) });
+  if (n === 1 && isEditable(items[0])) here.push({ label: t('Edit the text'), ico: 'rename', run: () => editText(items[0]) });
 
   if (n === 1 && /^(md|markdown)$/.test(items[0].ext)) tools.push(pageEntry('md', items, { ico: 'md' }));
   if (n === 1 && items[0].ext === 'mbox') tools.push(pageEntry('mbox', items, { ico: 'mail' }));
@@ -425,3 +484,57 @@ export const convertImages = () => {
   if (!list.length) return toast(t('There are no images here to convert.'));
   dialogs.convertDialog(list, addResults);
 };
+
+// ─── Larger tools, each in its own module and loaded when first used ──────────
+
+const under = dir => allFiles().filter(it => !dir || it.dir === dir || it.dir.startsWith(`${dir}/`));
+/** The selection when it holds several files, otherwise everything below the current folder. */
+const wide = () => {
+  const selected = targets();
+  return selected.length > 1 ? selected : under(S.cwd);
+};
+
+export async function searchInside() {
+  const list = wide();
+  if (!list.length) return toast(t('Add some files first.'));
+  (await import('./search.js')).contentSearchDialog(list, { reveal: hooks.reveal });
+}
+
+export async function compareFolders() {
+  if (S.folders.size < 2 && !(S.folders.size && allFiles().some(it => !it.dir))) return toast(t('Open at least two folders to compare them.'));
+  const preselect = [...S.selection].filter(isFolderKey).map(k => k.slice(4)).slice(0, 2);
+  (await import('./compare.js')).compareFoldersDialog({ reveal: hooks.reveal, preselect });
+}
+
+export async function showTreemap() {
+  if (!S.items.size) return toast(t('Add some files first.'));
+  (await import('./treemap.js')).treemapDialog({ reveal: hooks.reveal, navigate, start: S.cwd });
+}
+
+export async function stripMetadata(items = wide().filter(isStrippable)) {
+  if (!items.length) return toast(t('There are no photos or PDFs here to clean.'));
+  (await import('./strip.js')).stripDialog(items, ({ results, replace }) => {
+    if (!results.length) return;
+    if (replace) {
+      results.forEach(r => replaceFile(r.item.id, r.file));
+      toast(t('Cleaned: {n}', { n: fmtNum(results.length) }), { kind: 'success' });
+    } else {
+      addResults(results.map(r => {
+        const [stem, ext] = splitName(r.item.name);
+        return { file: r.file, name: `${stem}-clean${ext}`, dir: r.item.dir };
+      }));
+    }
+  });
+}
+
+export async function photoSort(items = wide().filter(it => it.kind === 'image')) {
+  if (!items.length) return toast(t('There are no photos here to sort.'));
+  (await import('./photosort.js')).photoSortDialog(items);
+}
+
+export async function editText(item) {
+  (await import('./editor.js')).editDialog(item, file => {
+    replaceFile(item.id, file);
+    toast(t('Saved in the workspace: {name}', { name: item.name }), { kind: 'success' });
+  });
+}

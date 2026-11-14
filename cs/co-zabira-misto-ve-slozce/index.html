@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' blob: https://cdn.jsdelivr.net 'sha256-2umU0MxQJqQrUkhC2ma0avyIwaZeSqNXdBh3CvB6PCc='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self' data: blob:; connect-src 'self' blob: data: https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <title>Co zabírá místo ve složce: mapa velikosti, bez nahrávání</title>
+  <meta name="description" content="Zjistěte, co zabírá místo ve složce: mapa velikosti podsložek a souborů, největší soubory a přehled podle typu. Čte jen názvy a velikosti, bez nahrávání.">
+  
+  <link rel="canonical" href="https://files-online.com/cs/co-zabira-misto-ve-slozce/">
+  <link rel="alternate" hreflang="en" href="https://files-online.com/en/folder-size-viewer/">
+  <link rel="alternate" hreflang="de" href="https://files-online.com/de/ordnergroesse-anzeigen/">
+  <link rel="alternate" hreflang="pl" href="https://files-online.com/pl/co-zajmuje-miejsce-na-dysku/">
+  <link rel="alternate" hreflang="cs" href="https://files-online.com/cs/co-zabira-misto-ve-slozce/">
+  <link rel="alternate" hreflang="x-default" href="https://files-online.com/en/folder-size-viewer/">
+  <meta name="theme-color" content="#ffffff">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Files Online">
+  <meta property="og:url" content="https://files-online.com/cs/co-zabira-misto-ve-slozce/">
+  <meta property="og:title" content="Co zabírá místo ve složce: mapa velikosti, bez nahrávání">
+  <meta property="og:description" content="Zjistěte, co zabírá místo ve složce: mapa velikosti podsložek a souborů, největší soubory a přehled podle typu. Čte jen názvy a velikosti, bez nahrávání.">
+  <meta property="og:locale" content="cs_CZ">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="og:locale:alternate" content="de_DE">
+  <meta property="og:locale:alternate" content="pl_PL">
+  <meta property="og:image" content="https://files-online.com/assets/icons/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <script>(function(){try{var t=localStorage.getItem('fo-theme')==='dark'?'dark':'light';document.documentElement.setAttribute('data-theme',t)}catch(e){}})();</script>
+  <link rel="preload" href="/assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/css/fm.css?v=902907d9">
+  <link rel="stylesheet" href="/assets/css/site.css?v=e28198ae">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":["SoftwareApplication","WebApplication"],"name":"Co zabírá místo","url":"https://files-online.com/cs/co-zabira-misto-ve-slozce/","description":"Zjistěte, co zabírá místo ve složce: mapa velikosti podsložek a souborů, největší soubory a přehled podle typu. Čte jen názvy a velikosti, bez nahrávání.","inLanguage":"cs","applicationCategory":"UtilitiesApplication","operatingSystem":"Windows, macOS, Linux, Android, iOS","browserRequirements":"Requires a modern web browser with JavaScript enabled","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"publisher":{"@id":"https://files-online.com/#org"},"featureList":["Mapa velikosti","Největší soubory","Přehled podle typu"]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Domů","item":"https://files-online.com/cs/"},{"@type":"ListItem","position":2,"name":"Správce souborů","item":"https://files-online.com/cs/spravce-souboru/"},{"@type":"ListItem","position":3,"name":"Co zabírá místo"}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","name":"Jak zjistit, co zabírá místo","step":[{"@type":"HowToStep","position":1,"text":"Klikněte na „Otevřít složku“ nebo „Otevřít soubory“, případně sem přetáhněte složku."},{"@type":"HowToStep","position":2,"text":"Ve správci souborů se otevře mapa velikosti. Klikáním na obdélníky vstupujte do podsložek."},{"@type":"HowToStep","position":3,"text":"Podívejte se na seznam největších souborů a na rozpis podle typu, abyste věděli, kde začít s úklidem."}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Může nástroj prohledat celý disk?","acceptedAnswer":{"@type":"Answer","text":"Ne. Prohlížeč to neumožňuje, takže vyberete složku, kterou chcete zkontrolovat."}},{"@type":"Question","name":"Čte nástroj obsah souborů?","acceptedAnswer":{"@type":"Answer","text":"Ne, čtou se jen názvy a velikosti, proto se i velké složky načtou rychle."}},{"@type":"Question","name":"Jak se pohybuji mezi složkami?","acceptedAnswer":{"@type":"Answer","text":"Kliknutím na složku v mapě do ní vstoupíte."}},{"@type":"Question","name":"Smaže něco nástroj sám?","acceptedAnswer":{"@type":"Answer","text":"Ne. Slouží jen k přehledu, na disku se nic nemění."}}]}</script>
+</head>
+<body class="s-page fm-page" data-fm-feature="treemap">
+  <div id="fm-landing">
+  <a class="s-skip" href="#main">Přejít na obsah</a>
+  <header class="s-header">
+    <div class="s-wrap s-header__row">
+      <a class="s-logo" href="/cs/"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect width="32" height="32" rx="7" fill="#1B4FD8"/><path d="M10 6.5h8.200l5 5v13A1.500 1.500 0 0 1 21.700 26H10a1.500 1.500 0 0 1-1.500-1.500V8A1.500 1.500 0 0 1 10 6.500z" fill="#fff"/><path d="M18.200 6.500V10a1.500 1.500 0 0 0 1.500 1.500h3.500" fill="none" stroke="#1B4FD8" stroke-width="1.100" stroke-linejoin="round"/><rect x="11.300" y="15" width="9" height="1.700" rx=".85" fill="#1B4FD8"/><rect x="11.300" y="18.400" width="9" height="1.700" rx=".85" fill="#1B4FD8"/><rect x="11.300" y="21.800" width="5.500" height="1.700" rx=".85" fill="#1B4FD8"/></svg><span>Files Online</span></a>
+      <nav class="s-nav" aria-label="Hlavní navigace">
+        <details class="s-menu">
+          <summary>PDF nástroje<svg class="s-caret" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></summary>
+          <div class="s-mega">
+            <div>
+              <h3>Uspořádání stránek</h3>
+              <a href="/cs/spojit-pdf/">Spojit PDF</a><a href="/cs/rozdelit-pdf/">Rozdělit PDF</a><a href="/cs/extrahovat-stranky-pdf/">Extrahovat stránky PDF</a><a href="/cs/odstranit-stranky-pdf/">Odstranit stránky PDF</a><a href="/cs/usporadat-pdf/">Uspořádat PDF</a><a href="/cs/otocit-pdf/">Otočit PDF</a><a href="/cs/oriznout-pdf/">Oříznout PDF</a><a href="/cs/odstranit-prazdne-stranky-pdf/">Odstranit prázdné stránky</a><a href="/cs/spojit-licni-a-rubove-strany-pdf/">Spojit líc a rub skenu</a>
+            </div><div>
+              <h3>Optimalizace</h3>
+              <a href="/cs/komprimovat-pdf/">Komprimovat PDF</a><a href="/cs/ocr-pdf/">OCR PDF</a><a href="/cs/zplostit-pdf/">Zploštit PDF</a>
+            </div><div>
+              <h3>Převod</h3>
+              <a href="/cs/pdf-na-word/">PDF na Word</a><a href="/cs/pdf-na-excel/">PDF na Excel</a><a href="/cs/pdf-na-jpg/">PDF na JPG</a><a href="/cs/pdf-na-png/">PDF na PNG</a><a href="/cs/pdf-na-text/">PDF na text</a><a href="/cs/jpg-na-pdf/">JPG na PDF</a><a href="/cs/png-na-pdf/">PNG na PDF</a><a href="/cs/extrahovat-obrazky-z-pdf/">Extrahovat obrázky z PDF</a>
+            </div><div>
+              <h3>Úpravy a podpis</h3>
+              <a href="/cs/upravit-pdf/">Upravit PDF</a><a href="/cs/podepsat-pdf/">Podepsat PDF</a><a href="/cs/vyplnit-pdf-formular/">Vyplnit PDF formulář</a><a href="/cs/vodoznak-pdf/">Přidat vodoznak</a><a href="/cs/cislovani-stran-pdf/">Přidat čísla stránek</a><a href="/cs/porovnat-pdf/">Porovnat PDF</a>
+            </div><div>
+              <h3>Zabezpečení a soukromí</h3>
+              <a href="/cs/zaheslovat-pdf/">Zaheslovat PDF</a><a href="/cs/odemknout-pdf/">Odemknout PDF</a><a href="/cs/zacernit-pdf/">Začernit PDF</a><a href="/cs/upravit-metadata-pdf/">Upravit metadata PDF</a>
+            </div>
+            <a class="s-mega__all" href="/cs/pdf-nastroje/">Všechny PDF nástroje →</a>
+          </div>
+        </details>
+        <details class="s-menu">
+          <summary>Nástroje pro soubory<svg class="s-caret" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></summary>
+          <div class="s-mega s-mega--files">
+            <div>
+              <h3>Otevření a náhled</h3>
+              <a href="/cs/metadata-souboru/">Inspektor souborů</a><a href="/cs/spravce-souboru/">Správce souborů</a><a href="/cs/otevrit-soubor-md/">Prohlížeč MD</a><a href="/cs/otevrit-soubor-mbox/">Prohlížeč MBOX</a>
+            </div>
+            <div>
+              <h3>Složky a soubory</h3>
+              <a href="/cs/najit-duplicitni-soubory/">Duplicitní soubory</a><a href="/cs/hromadne-prejmenovani-souboru/">Hromadné přejmenování</a><a href="/cs/zaheslovane-zip-online/">ZIP s heslem</a><a href="/cs/rozbalit-archiv-online/">Rozbalit archiv</a><a href="/cs/odstranit-exif-z-fotek/">Odstranit EXIF a metadata</a>
+            </div><div>
+              <h3>&nbsp;</h3>
+              <a href="/cs/trideni-fotek-podle-data/">Třídění fotek podle data</a><a href="/cs/porovnani-slozek-online/">Porovnání složek</a><a href="/cs/hledani-textu-v-souborech/">Hledání v souborech</a><a href="/cs/co-zabira-misto-ve-slozce/" aria-current="page">Co zabírá místo</a><a href="/cs/kontrolni-soucet-souboru/">Kontrolní součty</a>
+            </div>
+          </div>
+        </details>
+        <a href="/cs/metadata-souboru/">Inspektor souborů</a>
+        <a href="/cs/spravce-souboru/">Správce souborů</a>
+      </nav>
+      <div class="s-actions">
+        <details class="s-lang">
+          <summary aria-label="Jazyk">cs</summary>
+          <ul>
+            <li><a href="/en/folder-size-viewer/" hreflang="en" lang="en" data-set-lang="en">English</a></li><li><a href="/de/ordnergroesse-anzeigen/" hreflang="de" lang="de" data-set-lang="de">Deutsch</a></li><li><a href="/pl/co-zajmuje-miejsce-na-dysku/" hreflang="pl" lang="pl" data-set-lang="pl">Polski</a></li><li><a href="/cs/co-zabira-misto-ve-slozce/" hreflang="cs" lang="cs" data-set-lang="cs" aria-current="true">Čeština</a></li>
+          </ul>
+        </details>
+        <button class="s-icon-btn" type="button" data-action="toggle-theme" aria-label="Přepnout světlý a tmavý režim" title="Přepnout světlý a tmavý režim">
+          <svg class="icon-moon" viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><path d="M13.5 9.5A5.5 5.5 0 016.5 2.5a5.5 5.5 0 107 7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          <svg class="icon-sun" viewBox="0 0 16 16" fill="none" aria-hidden="true" width="16" height="16"><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M12.6 3.4l-1.4 1.4M4.8 11.2l-1.4 1.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <button class="s-icon-btn s-burger" type="button" aria-label="Nabídka" aria-expanded="false"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+      </div>
+    </div>
+  </header>
+  <main id="main">
+    <div class="s-wrap">
+      <ol class="s-crumbs"><li><a href="/cs/">Domů</a></li><li><a href="/cs/spravce-souboru/">Správce souborů</a></li><li><span aria-current="page">Co zabírá místo</span></li></ol>
+      <div class="s-toolhead">
+        <h1>Zjistěte, co zabírá místo ve složce</h1>
+        <p>Mapa velikosti ukáže podsložky a soubory jako obdélníky podle jejich velikosti. Čtou se jen názvy a velikosti, takže i velké složky se načtou rychle.</p>
+      </div>
+      <div class="pt fm-hero">
+        <div class="pt-drop">
+          <svg class="pt-drop__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h7v8H3z M14 3h7v8h-7z M3 15h7v6H3z M14 15h7v6h-7z"/></svg>
+          <div class="fm-hero__cta">
+            <button class="s-btn s-btn--primary pt-drop__btn" type="button" data-fm="open-folder">Otevřít složku</button>
+            <button class="s-btn s-btn--secondary pt-drop__btn" type="button" data-fm="open-files">Otevřít soubory</button>
+          </div>
+          <p class="pt-drop__or">nebo sem přetáhněte soubory a složky</p>
+          <button class="s-btn s-btn--secondary fm-hero__again" type="button" data-fm="reopen" hidden></button>
+          <button class="fm-hero__demo" type="button" data-fm="demo">Vyzkoušet s ukázkovými soubory</button>
+          <noscript><p class="pt-drop__error">Tento nástroj potřebuje JavaScript, protože se soubor zpracovává ve vašem prohlížeči.</p></noscript>
+        </div>
+        <ul class="s-trust"><li>Bez nahrávání</li><li>Zdarma</li><li>Bez účtu</li><li>Po načtení funguje offline</li></ul>
+      </div>
+    </div>
+    <section class="s-section">
+      <div class="s-wrap">
+        <div class="s-benefits">
+          <div><h3>Mapa velikosti</h3><p>Každá podsložka i soubor je obdélník úměrný počtu bajtů a soubory jsou barevně odlišené podle typu. Kliknutím na složku do ní vstoupíte.</p></div><div><h3>Největší soubory</h3><p>Vedle mapy najdete seznam největších souborů, takže hned vidíte, co stojí za smazání.</p></div><div><h3>Přehled podle typu</h3><p>Rozpis podle typů, například obrázky, video nebo dokumenty, ukáže, co zabírá nejvíc.</p></div>
+        </div>
+      </div>
+    </section>
+    <section class="s-section s-section--tint" id="how">
+    <div class="s-wrap">
+      <h2>Jak zjistit, co zabírá místo</h2>
+      <ol class="s-steps"><li><p>Klikněte na „Otevřít složku“ nebo „Otevřít soubory“, případně sem přetáhněte složku.</p></li><li><p>Ve správci souborů se otevře mapa velikosti. Klikáním na obdélníky vstupujte do podsložek.</p></li><li><p>Podívejte se na seznam největších souborů a na rozpis podle typu, abyste věděli, kde začít s úklidem.</p></li></ol>
+    </div>
+  </section>
+    <section class="s-section">
+      <div class="s-wrap s-prose">
+        <h2>Proč mapa velikosti</h2>
+        <p>Seznam složek řazený podle velikosti často nestačí, protože nejde vidět, kolik zabírá jedna hluboko zanořená složka. Mapa velikosti ukáže všechno najednou a velké kusy jsou okamžitě vidět.</p><p>Prohlížeč neumí skenovat celý disk, proto složku, kterou chcete zkontrolovat, vybíráte sami. Nástroj čte jen názvy a velikosti souborů, obsah se nenačítá, a proto je rychlý i u velkých složek.</p>
+      </div>
+    </section>
+    <section class="s-section" id="faq">
+    <div class="s-wrap">
+      <h2>Časté dotazy</h2>
+      <div class="s-faq">
+        <details open><summary>Může nástroj prohledat celý disk?</summary><p>Ne. Prohlížeč to neumožňuje, takže vyberete složku, kterou chcete zkontrolovat.</p></details>
+        <details><summary>Čte nástroj obsah souborů?</summary><p>Ne, čtou se jen názvy a velikosti, proto se i velké složky načtou rychle.</p></details>
+        <details><summary>Jak se pohybuji mezi složkami?</summary><p>Kliknutím na složku v mapě do ní vstoupíte.</p></details>
+        <details><summary>Smaže něco nástroj sám?</summary><p>Ne. Slouží jen k přehledu, na disku se nic nemění.</p></details>
+      </div>
+    </div>
+  </section>
+    <section class="s-section s-section--tint">
+      <div class="s-wrap">
+        <h2>Další nástroje pro soubory</h2>
+        <div class="s-cards" style="margin-top:18px">
+          <a class="s-card" data-cat="files" href="/cs/spravce-souboru/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h6l2 2.5h10V20H3z"/><path d="M3 12h18"/></svg>
+          <span class="s-card__title">Správce souborů</span>
+          <span class="s-card__desc">Procházejte, prohlížejte, balte, rozbalujte a přejmenovávejte celé složky.</span>
+        </a><a class="s-card" data-cat="files" href="/cs/metadata-souboru/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><circle cx="11" cy="14" r="2.6"/><path d="M13 16l2.4 2.4"/></svg>
+          <span class="s-card__title">Inspektor souborů</span>
+          <span class="s-card__desc">Podívejte se na vše v souboru: text, metadata, kontrolní součty a vložené soubory.</span>
+        </a>
+          <a class="s-card" data-cat="files" href="/cs/najit-duplicitni-soubory/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h8v11H3z M13 10h8v11h-8z"/><path d="M6 17.5v3h4M18 6.5v-3h-4"/></svg>
+          <span class="s-card__title">Duplicitní soubory</span>
+          <span class="s-card__desc">Najde identické soubory podle obsahu a ukáže, kolik místa zbytečně zabírají kopie.</span>
+        </a><a class="s-card" data-cat="files" href="/cs/hromadne-prejmenovani-souboru/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><path d="M9 18l.6-2.6 5-5 2 2-5 5z"/></svg>
+          <span class="s-card__title">Hromadné přejmenování</span>
+          <span class="s-card__desc">Přejmenuje najednou mnoho souborů podle pravidel a před použitím ukáže náhled všech nových názvů.</span>
+        </a><a class="s-card" data-cat="files" href="/cs/zaheslovane-zip-online/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 11h12v10H6z"/><path d="M8.5 11V7a3.5 3.5 0 0 1 7 0v4"/><path d="M12 15v2.5"/></svg>
+          <span class="s-card__title">ZIP s heslem</span>
+          <span class="s-card__desc">Vytvoří ZIP ze souborů a složek a na přání ho zašifruje heslem pomocí AES-256.</span>
+        </a><a class="s-card" data-cat="files" href="/cs/rozbalit-archiv-online/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><path d="M10 11h4v5h-4z"/><path d="M12 19v2"/></svg>
+          <span class="s-card__title">Rozbalit archiv</span>
+          <span class="s-card__desc">Rozbalí ZIP, RAR, 7Z, TAR a další archivy přímo v prohlížeči, i s heslem u ZIP.</span>
+        </a><a class="s-card" data-cat="files" href="/cs/odstranit-exif-z-fotek/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h8.5L20 11.5 12 20l-8-8z"/><circle cx="8.5" cy="8.5" r="1.3"/></svg>
+          <span class="s-card__title">Odstranit EXIF a metadata</span>
+          <span class="s-card__desc">Smaže z fotek a PDF polohu GPS, údaje o fotoaparátu a autora bez ztráty kvality obrázku.</span>
+        </a><a class="s-card" data-cat="files" href="/cs/trideni-fotek-podle-data/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><circle cx="10" cy="11.5" r="1.3"/><path d="M6 18l3.5-3 2.5 2 2.5-3 3.5 4"/></svg>
+          <span class="s-card__title">Třídění fotek podle data</span>
+          <span class="s-card__desc">Roztřídí fotky do složek podle data pořízení a na přání je přejmenuje podle data a času.</span>
+        </a><a class="s-card" data-cat="files" href="/cs/porovnani-slozek-online/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h7v16H3z M14 4h7v16h-7z"/><path d="M5.5 9h2M5.5 12.5h2M16.5 9h2M16.5 12.5h2" /><path d="M12 2v20" stroke-dasharray="2 2"/></svg>
+          <span class="s-card__title">Porovnání složek</span>
+          <span class="s-card__desc">Porovná dvě složky a ukáže chybějící, odlišné a shodné soubory, třeba při kontrole zálohy.</span>
+        </a><a class="s-card" data-cat="files" href="/cs/hledani-textu-v-souborech/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><circle cx="11" cy="14" r="2.6"/><path d="M13 16l2.4 2.4"/></svg>
+          <span class="s-card__title">Hledání v souborech</span>
+          <span class="s-card__desc">Prohledá obsah mnoha souborů najednou: text, kód, PDF, Word, Excel, PowerPoint i e-maily.</span>
+        </a><a class="s-card" data-cat="files" href="/cs/kontrolni-soucet-souboru/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><path d="M10.5 14l1.5-1v5.5M10.5 18.5h3"/></svg>
+          <span class="s-card__title">Kontrolní součty</span>
+          <span class="s-card__desc">Spočítá SHA-256, SHA-1, SHA-512 a MD5 souborů a ověří, zda se shodují s očekávaným součtem.</span>
+        </a>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="s-footer">
+    <div class="s-wrap s-footer__row">
+      <span class="s-footer__brand"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect width="32" height="32" rx="7" fill="#1B4FD8"/><path d="M10 6.5h8.200l5 5v13A1.500 1.500 0 0 1 21.700 26H10a1.500 1.500 0 0 1-1.500-1.500V8A1.500 1.500 0 0 1 10 6.500z" fill="#fff"/><path d="M18.200 6.500V10a1.500 1.500 0 0 0 1.500 1.500h3.500" fill="none" stroke="#1B4FD8" stroke-width="1.100" stroke-linejoin="round"/><rect x="11.300" y="15" width="9" height="1.700" rx=".85" fill="#1B4FD8"/><rect x="11.300" y="18.400" width="9" height="1.700" rx=".85" fill="#1B4FD8"/><rect x="11.300" y="21.800" width="5.500" height="1.700" rx=".85" fill="#1B4FD8"/></svg><span>Běží ve vašem prohlížeči. Bez nahrávání, bez účtu, bez sledování.</span></span>
+      <nav class="s-footer__links" aria-label="Legal">
+        <a href="/cs/soukromi/">Soukromí</a>
+        <a href="/cs/tiraz/">Tiráž</a>
+      </nav>
+    </div>
+  </footer>
+  <script src="/assets/js/site.js?v=21b41bad" defer></script>
+  </div>
+  <div class="fm" id="fm-app" hidden></div>
+  <script type="module" src="/assets/js/fm/main.js?v=e4367d0c"></script>
+</body>
+</html>

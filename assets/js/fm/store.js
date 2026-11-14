@@ -168,6 +168,17 @@ export function renameItem(id, name) {
   emit('items');
 }
 
+/** Put new content behind an existing entry (after editing or cleaning it). */
+export function replaceFile(id, file) {
+  const item = S.items.get(id);
+  if (!item) return;
+  item.file = file;
+  item.size = file.size;
+  item.modified = file.lastModified || Date.now();
+  item.made = true;
+  emit('items');
+}
+
 /** Rename many files at once. Names that would collide get a number. */
 export function renameMany(pairs) {
   const moving = new Set(pairs.map(([id]) => id));

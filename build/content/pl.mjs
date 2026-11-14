@@ -2,6 +2,7 @@
 
 export default {
   nav: {
+    fileTools: 'Narzędzia plików', groupOpen: 'Otwieranie i podgląd', groupFolders: 'Foldery i pliki', moreFileTools: 'Więcej narzędzi plików',
     main: 'Główna nawigacja', skip: 'Przejdź do treści', menu: 'Menu', language: 'Język',
     toggleTheme: 'Przełącz między trybem jasnym i ciemnym', home: 'Strona główna',
     pdfTools: 'Narzędzia PDF', allPdfTools: 'Wszystkie narzędzia PDF',
@@ -68,18 +69,27 @@ export default {
   },
 
   home: {
-    title: 'Files Online – Darmowe narzędzia PDF i menedżer plików, bez przesyłania',
-    desc: 'Kompresuj, łącz, dziel, konwertuj, edytuj i podpisuj pliki PDF za darmo. Twoje pliki zostają w przeglądarce i nigdy nie są przesyłane. Bez konta.',
+    title: 'Files Online – otwieraj, sprawdzaj i edytuj pliki i foldery, bez wysyłania',
+    desc: 'Upuść plik, aby zobaczyć wszystko, co zawiera, albo otwórz folder, by przeglądać, pakować, zmieniać nazwy i konwertować. Do tego 30 narzędzi PDF. Wszystko działa w przeglądarce, nic nie jest wysyłane.',
     short: 'Darmowe narzędzia do PDF i plików działające w przeglądarce. Nic nie jest przesyłane.',
     eyebrow: 'Narzędzia PDF · Menedżer plików · Przeglądarki',
-    h1Html: 'Wszystkie potrzebne narzędzia PDF, <span class="s-mark">bez przesyłania plików.</span>',
-    lede: 'Kompresuj, łącz, dziel, konwertuj, edytuj i podpisuj dokumenty bezpośrednio w przeglądarce. Twoje pliki od początku do końca zostają na Twoim urządzeniu.',
+    h1Html: 'Otwórz, sprawdź i edytuj dowolny plik, <span class="s-mark">bez wysyłania.</span>',
+    lede: 'Upuść plik, aby zobaczyć, co naprawdę zawiera, albo otwórz cały folder, by przeglądać, pakować, zmieniać nazwy i konwertować. Wszystko dzieje się w przeglądarce i zostaje na twoim urządzeniu.',
+    chooseFile: 'Wybierz plik', openFolder: 'Otwórz folder',
+    dropHint: 'albo upuść tutaj plik lub folder',
+    reading: 'Otwieranie…',
+    tooBig: 'To za dużo na jedno przekazanie. Otwórz menedżer plików i dodaj to tam.',
+    failed: 'To się nie udało. Otwórz narzędzie z menu i wybierz plik tam.',
+    routeFile: ['Plik otwiera się w Inspektorze plików', 'Prawdziwy typ, metadane, tekst, sumy kontrolne i ukryte dane. Skrzynki pocztowe otwierają się w przeglądarce MBOX.'],
+    install: 'Zainstaluj jako aplikację',
+    routeFolder: ['Folder otwiera się w Menedżerze plików', 'Przeglądaj, podglądaj, pakuj, zmieniaj nazwy i szukaj duplikatów.'],
+    routePdf: ['Pracujesz nad plikiem PDF?', 'Przejdź prosto do jednego z {n} narzędzi PDF.'],
     ctaPdf: 'Zobacz wszystkie narzędzia PDF', ctaFiles: 'Otwórz menedżer plików',
     popularTitle: 'Najczęściej używane narzędzia PDF',
     popularLede: 'Wybierz narzędzie i upuść plik. Nie trzeba nic instalować ani zakładać konta.',
     allTools: 'Wszystkie narzędzia PDF ({n})',
-    filesTitle: 'Nie tylko PDF',
-    filesLede: 'Całe foldery, notatki Markdown i lata zarchiwizowanej poczty, tak samo prywatnie.',
+    filesTitle: 'Dla każdego pliku i folderu',
+    filesLede: 'Zajrzyj do pojedynczego pliku, uporządkuj cały folder, czytaj notatki Markdown albo lata zarchiwizowanej poczty, zawsze tak samo prywatnie.',
     privacyTitle: 'Prywatne dzięki samej konstrukcji',
     privacyText: 'Większość narzędzi online prosi, by powierzyć im swoje dokumenty. My Twoich w ogóle nie dostajemy: nie ma serwera, który przetwarza pliki. Narzędzia PDF dodatkowo nakazują przeglądarce, przez politykę bezpieczeństwa, blokować każdą próbę wysłania danych gdzie indziej.',
     privacyLink: 'Przeczytaj politykę prywatności',
@@ -197,6 +207,8 @@ export default {
   },
 
   mdPage: {
+    h1: 'Otwórz plik MD online',
+    lede: 'Otwieraj, czytaj i edytuj pliki Markdown w jednym oknie. Eksport do PDF lub HTML, wszystko w przeglądarce, bez wysyłania plików.',
     name: 'Przeglądarka MD',
     title: 'Otwórz plik MD online – Darmowa przeglądarka i edytor Markdown',
     desc: 'Otwieraj, przeglądaj, edytuj i konwertuj pliki .md online. Podgląd na żywo, Markdown na PDF i HTML oraz HTML na Markdown. Za darmo i bez przesyłania.',
@@ -207,7 +219,7 @@ export default {
     ],
     how: 'Jak otworzyć plik MD',
     steps: [
-      'Kliknij „Wybierz plik MD” lub upuść plik .md na stronę. Możesz też wkleić tekst albo zacząć od pustego dokumentu.',
+      'Kliknij „Wybierz plik” lub upuść plik .md na stronę. Możesz też wkleić tekst albo zacząć od pustego dokumentu.',
       'Czytaj sformatowany podgląd lub edytuj tekst i obserwuj, jak podgląd zmienia się podczas pisania.',
       'Zapisz plik Markdown albo wyeksportuj go jako PDF, HTML lub zwykły tekst.',
     ],

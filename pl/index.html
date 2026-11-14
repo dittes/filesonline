@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'sha256-2umU0MxQJqQrUkhC2ma0avyIwaZeSqNXdBh3CvB6PCc='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self' data: blob:; connect-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
-  <title>Files Online – Darmowe narzędzia PDF i menedżer plików, bez przesyłania</title>
-  <meta name="description" content="Kompresuj, łącz, dziel, konwertuj, edytuj i podpisuj pliki PDF za darmo. Twoje pliki zostają w przeglądarce i nigdy nie są przesyłane. Bez konta.">
+  <title>Files Online – otwieraj, sprawdzaj i edytuj pliki i foldery, bez wysyłania</title>
+  <meta name="description" content="Upuść plik, aby zobaczyć wszystko, co zawiera, albo otwórz folder, by przeglądać, pakować, zmieniać nazwy i konwertować. Do tego 30 narzędzi PDF. Wszystko działa w przeglądarce, nic nie jest wysyłane.">
   
   <link rel="canonical" href="https://files-online.com/pl/">
   <link rel="alternate" hreflang="en" href="https://files-online.com/en/">
@@ -17,8 +17,8 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Files Online">
   <meta property="og:url" content="https://files-online.com/pl/">
-  <meta property="og:title" content="Files Online – Darmowe narzędzia PDF i menedżer plików, bez przesyłania">
-  <meta property="og:description" content="Kompresuj, łącz, dziel, konwertuj, edytuj i podpisuj pliki PDF za darmo. Twoje pliki zostają w przeglądarce i nigdy nie są przesyłane. Bez konta.">
+  <meta property="og:title" content="Files Online – otwieraj, sprawdzaj i edytuj pliki i foldery, bez wysyłania">
+  <meta property="og:description" content="Upuść plik, aby zobaczyć wszystko, co zawiera, albo otwórz folder, by przeglądać, pakować, zmieniać nazwy i konwertować. Do tego 30 narzędzi PDF. Wszystko działa w przeglądarce, nic nie jest wysyłane.">
   <meta property="og:locale" content="pl_PL">
   <meta property="og:locale:alternate" content="en_US">
   <meta property="og:locale:alternate" content="de_DE">
@@ -31,9 +31,9 @@
   <script>(function(){try{var t=localStorage.getItem('fo-theme')==='dark'?'dark':'light';document.documentElement.setAttribute('data-theme',t)}catch(e){}})();</script>
   <link rel="preload" href="/assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   
-  <link rel="stylesheet" href="/assets/css/site.css?v=1bf1a7b0">
+  <link rel="stylesheet" href="/assets/css/site.css?v=e28198ae">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","@id":"https://files-online.com/#org","name":"Files Online","url":"https://files-online.com/","logo":"https://files-online.com/assets/icons/icon-512.png"}</script>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":["SoftwareApplication","WebApplication"],"name":"Files Online","url":"https://files-online.com/pl/","description":"Kompresuj, łącz, dziel, konwertuj, edytuj i podpisuj pliki PDF za darmo. Twoje pliki zostają w przeglądarce i nigdy nie są przesyłane. Bez konta.","inLanguage":"pl","applicationCategory":"UtilitiesApplication","operatingSystem":"Windows, macOS, Linux, Android, iOS","browserRequirements":"Requires a modern web browser with JavaScript enabled","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"publisher":{"@id":"https://files-online.com/#org"}}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":["SoftwareApplication","WebApplication"],"name":"Files Online","url":"https://files-online.com/pl/","description":"Upuść plik, aby zobaczyć wszystko, co zawiera, albo otwórz folder, by przeglądać, pakować, zmieniać nazwy i konwertować. Do tego 30 narzędzi PDF. Wszystko działa w przeglądarce, nic nie jest wysyłane.","inLanguage":"pl","applicationCategory":"UtilitiesApplication","operatingSystem":"Windows, macOS, Linux, Android, iOS","browserRequirements":"Requires a modern web browser with JavaScript enabled","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"publisher":{"@id":"https://files-online.com/#org"}}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Czy moje pliki trafiają na serwer?","acceptedAnswer":{"@type":"Answer","text":"Nie. Każde narzędzie działa w przeglądarce dzięki JavaScriptowi i WebAssembly. Pliki są odczytywane z Twojego urządzenia, przetwarzane w pamięci i zapisywane z powrotem na urządzeniu."}},{"@type":"Question","name":"Ile to kosztuje?","acceptedAnswer":{"@type":"Answer","text":"Nic. Nie ma konta, subskrypcji ani limitu korzystania z narzędzi."}},{"@type":"Question","name":"Jakie przeglądarki i urządzenia są obsługiwane?","acceptedAnswer":{"@type":"Answer","text":"Aktualne wersje Chrome, Edge, Firefoxa i Safari na Windows, macOS, Linuksie, Androidzie i iOS. Bardzo duże pliki najlepiej obsługiwać na komputerze."}},{"@type":"Question","name":"Czy mogę korzystać offline?","acceptedAnswer":{"@type":"Answer","text":"Tak. Załadowane narzędzie działa dalej bez internetu. Możesz też zainstalować Files Online jako aplikację z poziomu przeglądarki."}}]}</script>
 </head>
 <body class="s-page">
@@ -64,10 +64,24 @@
             <a class="s-mega__all" href="/pl/narzedzia-pdf/">Wszystkie narzędzia PDF →</a>
           </div>
         </details>
+        <details class="s-menu">
+          <summary>Narzędzia plików<svg class="s-caret" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></summary>
+          <div class="s-mega s-mega--files">
+            <div>
+              <h3>Otwieranie i podgląd</h3>
+              <a href="/pl/metadane-pliku/">Inspektor plików</a><a href="/pl/menedzer-plikow/">Menedżer plików</a><a href="/pl/otworz-plik-md/">Przeglądarka MD</a><a href="/pl/otworz-plik-mbox/">Przeglądarka MBOX</a>
+            </div>
+            <div>
+              <h3>Foldery i pliki</h3>
+              <a href="/pl/znajdz-duplikaty-plikow/">Szukanie duplikatów</a><a href="/pl/masowa-zmiana-nazw-plikow/">Zmiana nazw hurtowo</a><a href="/pl/zip-z-haslem/">ZIP z hasłem</a><a href="/pl/rozpakuj-rar-zip-7z-online/">Rozpakuj archiwa</a><a href="/pl/usun-exif-ze-zdjec/">Usuwanie metadanych</a>
+            </div><div>
+              <h3>&nbsp;</h3>
+              <a href="/pl/sortuj-zdjecia-wedlug-daty/">Sortowanie zdjęć po dacie</a><a href="/pl/porownaj-foldery/">Porównanie folderów</a><a href="/pl/szukaj-tekstu-w-plikach/">Szukanie tekstu w plikach</a><a href="/pl/co-zajmuje-miejsce-na-dysku/">Mapa zajętości folderu</a><a href="/pl/suma-kontrolna-pliku/">Sumy kontrolne</a>
+            </div>
+          </div>
+        </details>
         <a href="/pl/metadane-pliku/">Inspektor plików</a>
         <a href="/pl/menedzer-plikow/">Menedżer plików</a>
-        <a href="/pl/otworz-plik-md/">Przeglądarka MD</a>
-        <a href="/pl/otworz-plik-mbox/">Przeglądarka MBOX</a>
       </nav>
       <div class="s-actions">
         <details class="s-lang">
@@ -87,11 +101,93 @@
   <main id="main">
     <section class="s-hero">
       <div class="s-wrap s-hero__inner">
-        <h1>Wszystkie potrzebne narzędzia PDF, <span class="s-mark">bez przesyłania plików.</span></h1>
-        <p class="s-hero__lede">Kompresuj, łącz, dziel, konwertuj, edytuj i podpisuj dokumenty bezpośrednio w przeglądarce. Twoje pliki od początku do końca zostają na Twoim urządzeniu.</p>
-        <nav class="s-chips" aria-label="Najczęściej używane narzędzia PDF">
-          <a class="s-chip" href="/pl/polacz-pdf/">Połącz PDF</a><a class="s-chip" href="/pl/podziel-pdf/">Podziel PDF</a><a class="s-chip" href="/pl/kompresuj-pdf/">Kompresuj PDF</a><a class="s-chip" href="/pl/ocr-pdf/">OCR PDF</a><a class="s-chip" href="/pl/pdf-na-word/">PDF na Word</a><a class="s-chip" href="/pl/pdf-na-jpg/">PDF na JPG</a><a class="s-chip" href="/pl/jpg-na-pdf/">JPG na PDF</a><a class="s-chip" href="/pl/edytuj-pdf/">Edytuj PDF</a><a class="s-chip" href="/pl/podpisz-pdf/">Podpisz PDF</a><a class="s-chip" href="/pl/porownaj-pdf/">Porównaj PDF</a><a class="s-chip" href="/pl/zabezpiecz-pdf/">Zabezpiecz PDF</a>
-        </nav>
+        <h1>Otwórz, sprawdź i edytuj dowolny plik, <span class="s-mark">bez wysyłania.</span></h1>
+        <p class="s-hero__lede">Upuść plik, aby zobaczyć, co naprawdę zawiera, albo otwórz cały folder, by przeglądać, pakować, zmieniać nazwy i konwertować. Wszystko dzieje się w przeglądarce i zostaje na twoim urządzeniu.</p>
+      </div>
+      <div class="s-wrap">
+        <div class="pt s-home">
+          <div class="pt-drop" id="home-drop" data-inspector="/pl/metadane-pliku/" data-manager="/pl/menedzer-plikow/" data-mbox="/pl/otworz-plik-mbox/" data-reading="Otwieranie…" data-too-big="To za dużo na jedno przekazanie. Otwórz menedżer plików i dodaj to tam." data-failed="To się nie udało. Otwórz narzędzie z menu i wybierz plik tam.">
+            <svg class="pt-drop__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h6l2 2.5h10V20H3z"/><path d="M3 12h18"/></svg>
+            <div class="s-home__cta">
+              <button class="s-btn s-btn--primary pt-drop__btn" type="button" data-home="file">Wybierz plik</button>
+              <button class="s-btn s-btn--secondary pt-drop__btn" type="button" data-home="folder">Otwórz folder</button>
+            </div>
+            <p class="pt-drop__or">albo upuść tutaj plik lub folder</p>
+            <p class="pt-drop__error" role="status" hidden></p>
+            <noscript><p class="pt-drop__error">To narzędzie wymaga JavaScriptu, bo plik jest przetwarzany w Twojej przeglądarce.</p></noscript>
+          </div>
+          <div class="s-routes">
+            <a href="/pl/metadane-pliku/"><svg class="s-routes__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><circle cx="11" cy="14" r="2.6"/><path d="M13 16l2.4 2.4"/></svg><span><strong>Plik otwiera się w Inspektorze plików</strong><small>Prawdziwy typ, metadane, tekst, sumy kontrolne i ukryte dane. Skrzynki pocztowe otwierają się w przeglądarce MBOX.</small></span></a>
+            <a href="/pl/menedzer-plikow/"><svg class="s-routes__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h6l2 2.5h10V20H3z"/><path d="M3 12h18"/></svg><span><strong>Folder otwiera się w Menedżerze plików</strong><small>Przeglądaj, podglądaj, pakuj, zmieniaj nazwy i szukaj duplikatów.</small></span></a>
+            <a href="/pl/narzedzia-pdf/"><svg class="s-routes__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><path d="M9 18l.6-2.6 5-5 2 2-5 5z"/></svg><span><strong>Pracujesz nad plikiem PDF?</strong><small>Przejdź prosto do jednego z 30 narzędzi PDF.</small></span></a>
+          </div>
+          <ul class="s-trust"><li>Bez przesyłania</li><li>Za darmo</li><li>Bez konta</li><li>Po załadowaniu działa offline</li></ul>
+          <p class="s-home__install"><button class="s-btn s-btn--link" type="button" data-home="install" hidden>Zainstaluj jako aplikację</button></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="s-section s-section--tint">
+      <div class="s-wrap">
+        <h2>Dla każdego pliku i folderu</h2>
+        <p class="s-section__lede">Zajrzyj do pojedynczego pliku, uporządkuj cały folder, czytaj notatki Markdown albo lata zarchiwizowanej poczty, zawsze tak samo prywatnie.</p>
+        <div class="s-cards"><a class="s-card" data-cat="files" href="/pl/metadane-pliku/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><circle cx="11" cy="14" r="2.6"/><path d="M13 16l2.4 2.4"/></svg>
+          <span class="s-card__title">Inspektor plików</span>
+          <span class="s-card__desc">Zobacz wszystko, co kryje plik: tekst, metadane, sumy kontrolne i osadzone pliki.</span>
+        </a><a class="s-card" data-cat="files" href="/pl/menedzer-plikow/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h6l2 2.5h10V20H3z"/><path d="M3 12h18"/></svg>
+          <span class="s-card__title">Menedżer plików</span>
+          <span class="s-card__desc">Przeglądaj, podglądaj, pakuj, rozpakowuj i zmieniaj nazwy całych folderów.</span>
+        </a><a class="s-card" data-cat="files" href="/pl/otworz-plik-md/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 5.5h19v13h-19z"/><path d="M6 15V9l2.5 3L11 9v6M15.5 9v6m0 0L13.5 13m2 2l2-2"/></svg>
+          <span class="s-card__title">Przeglądarka MD</span>
+          <span class="s-card__desc">Otwieraj, edytuj i konwertuj pliki Markdown z podglądem na żywo.</span>
+        </a><a class="s-card" data-cat="files" href="/pl/otworz-plik-mbox/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18v14H3z"/><path d="M3.5 6l8.5 7 8.5-7"/></svg>
+          <span class="s-card__title">Przeglądarka MBOX</span>
+          <span class="s-card__desc">Czytaj i przeszukuj archiwa poczty z Gmaila, Thunderbirda i Apple Mail.</span>
+        </a><a class="s-card" data-cat="files" href="/pl/znajdz-duplikaty-plikow/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h8v11H3z M13 10h8v11h-8z"/><path d="M6 17.5v3h4M18 6.5v-3h-4"/></svg>
+          <span class="s-card__title">Szukanie duplikatów</span>
+          <span class="s-card__desc">Znajdź identyczne pliki po zawartości i zobacz, ile miejsca zajmują niepotrzebne kopie.</span>
+        </a><a class="s-card" data-cat="files" href="/pl/masowa-zmiana-nazw-plikow/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><path d="M9 18l.6-2.6 5-5 2 2-5 5z"/></svg>
+          <span class="s-card__title">Zmiana nazw hurtowo</span>
+          <span class="s-card__desc">Zmień nazwy wielu plików naraz regułami i zobacz każdą nową nazwę, zanim cokolwiek zastosujesz.</span>
+        </a><a class="s-card" data-cat="files" href="/pl/zip-z-haslem/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 11h12v10H6z"/><path d="M8.5 11V7a3.5 3.5 0 0 1 7 0v4"/><path d="M12 15v2.5"/></svg>
+          <span class="s-card__title">ZIP z hasłem</span>
+          <span class="s-card__desc">Spakuj pliki i foldery do ZIP i zaszyfruj je hasłem AES-256 w przeglądarce.</span>
+        </a><a class="s-card" data-cat="files" href="/pl/rozpakuj-rar-zip-7z-online/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><path d="M10 11h4v5h-4z"/><path d="M12 19v2"/></svg>
+          <span class="s-card__title">Rozpakuj archiwa</span>
+          <span class="s-card__desc">Rozpakuj ZIP, RAR, 7Z, TAR i inne archiwa w przeglądarce, także ZIP chroniony hasłem.</span>
+        </a><a class="s-card" data-cat="files" href="/pl/usun-exif-ze-zdjec/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h8.5L20 11.5 12 20l-8-8z"/><circle cx="8.5" cy="8.5" r="1.3"/></svg>
+          <span class="s-card__title">Usuwanie metadanych</span>
+          <span class="s-card__desc">Usuń z JPG, PNG, WebP i PDF dane EXIF, lokalizację GPS i właściwości dokumentu bez utraty jakości.</span>
+        </a><a class="s-card" data-cat="files" href="/pl/sortuj-zdjecia-wedlug-daty/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><circle cx="10" cy="11.5" r="1.3"/><path d="M6 18l3.5-3 2.5 2 2.5-3 3.5 4"/></svg>
+          <span class="s-card__title">Sortowanie zdjęć po dacie</span>
+          <span class="s-card__desc">Posortuj zdjęcia do folderów według daty wykonania odczytanej z EXIF i w razie potrzeby zmień ich nazwy.</span>
+        </a><a class="s-card" data-cat="files" href="/pl/porownaj-foldery/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h7v16H3z M14 4h7v16h-7z"/><path d="M5.5 9h2M5.5 12.5h2M16.5 9h2M16.5 12.5h2" /><path d="M12 2v20" stroke-dasharray="2 2"/></svg>
+          <span class="s-card__title">Porównanie folderów</span>
+          <span class="s-card__desc">Porównaj dwa foldery i zobacz, które pliki są tylko w jednym, różnią się albo są identyczne.</span>
+        </a><a class="s-card" data-cat="files" href="/pl/szukaj-tekstu-w-plikach/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><circle cx="11" cy="14" r="2.6"/><path d="M13 16l2.4 2.4"/></svg>
+          <span class="s-card__title">Szukanie tekstu w plikach</span>
+          <span class="s-card__desc">Przeszukaj zawartość wielu plików naraz: PDF, Word, Excel, PowerPoint, tekst, kod i e-maile.</span>
+        </a><a class="s-card" data-cat="files" href="/pl/co-zajmuje-miejsce-na-dysku/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h7v8H3z M14 3h7v8h-7z M3 15h7v6H3z M14 15h7v6h-7z"/></svg>
+          <span class="s-card__title">Mapa zajętości folderu</span>
+          <span class="s-card__desc">Zobacz na mapie, które foldery i pliki zajmują najwięcej miejsca, i znajdź największe pliki.</span>
+        </a><a class="s-card" data-cat="files" href="/pl/suma-kontrolna-pliku/">
+          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><path d="M10.5 14l1.5-1v5.5M10.5 18.5h3"/></svg>
+          <span class="s-card__title">Sumy kontrolne</span>
+          <span class="s-card__desc">Policz SHA-256, SHA-1, SHA-512 i MD5 plików i sprawdź, czy pobrany plik zgadza się z oczekiwaną sumą.</span>
+        </a></div>
       </div>
     </section>
 
@@ -101,6 +197,9 @@
           <h2>Wszystkie narzędzia PDF</h2>
           <a href="/pl/narzedzia-pdf/">Wszystkie narzędzia PDF (30) →</a>
         </div>
+        <nav class="s-chips s-chips--left" aria-label="Najczęściej używane narzędzia PDF">
+          <a class="s-chip" href="/pl/polacz-pdf/">Połącz PDF</a><a class="s-chip" href="/pl/podziel-pdf/">Podziel PDF</a><a class="s-chip" href="/pl/kompresuj-pdf/">Kompresuj PDF</a><a class="s-chip" href="/pl/ocr-pdf/">OCR PDF</a><a class="s-chip" href="/pl/pdf-na-word/">PDF na Word</a><a class="s-chip" href="/pl/pdf-na-jpg/">PDF na JPG</a><a class="s-chip" href="/pl/jpg-na-pdf/">JPG na PDF</a><a class="s-chip" href="/pl/edytuj-pdf/">Edytuj PDF</a><a class="s-chip" href="/pl/podpisz-pdf/">Podpisz PDF</a><a class="s-chip" href="/pl/porownaj-pdf/">Porównaj PDF</a><a class="s-chip" href="/pl/zabezpiecz-pdf/">Zabezpiecz PDF</a>
+        </nav>
         <div class="s-cat">
         <div class="s-cat__head"><h3>Porządkowanie stron</h3></div>
         <div class="s-cards"><a class="s-card" data-cat="organize" href="/pl/polacz-pdf/">
@@ -240,30 +339,6 @@
       </div>
     </section>
 
-    <section class="s-section s-section--tint">
-      <div class="s-wrap">
-        <h2>Nie tylko PDF</h2>
-        <p class="s-section__lede">Całe foldery, notatki Markdown i lata zarchiwizowanej poczty, tak samo prywatnie.</p>
-        <div class="s-cards"><a class="s-card" data-cat="files" href="/pl/metadane-pliku/">
-          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4"/><circle cx="11" cy="14" r="2.6"/><path d="M13 16l2.4 2.4"/></svg>
-          <span class="s-card__title">Inspektor plików</span>
-          <span class="s-card__desc">Zobacz wszystko, co kryje plik: tekst, metadane, sumy kontrolne i osadzone pliki.</span>
-        </a><a class="s-card" data-cat="files" href="/pl/menedzer-plikow/">
-          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h6l2 2.5h10V20H3z"/><path d="M3 12h18"/></svg>
-          <span class="s-card__title">Menedżer plików</span>
-          <span class="s-card__desc">Przeglądaj, podglądaj, pakuj, rozpakowuj i zmieniaj nazwy całych folderów.</span>
-        </a><a class="s-card" data-cat="files" href="/pl/otworz-plik-md/">
-          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 5.5h19v13h-19z"/><path d="M6 15V9l2.5 3L11 9v6M15.5 9v6m0 0L13.5 13m2 2l2-2"/></svg>
-          <span class="s-card__title">Przeglądarka MD</span>
-          <span class="s-card__desc">Otwieraj, edytuj i konwertuj pliki Markdown z podglądem na żywo.</span>
-        </a><a class="s-card" data-cat="files" href="/pl/otworz-plik-mbox/">
-          <svg class="s-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18v14H3z"/><path d="M3.5 6l8.5 7 8.5-7"/></svg>
-          <span class="s-card__title">Przeglądarka MBOX</span>
-          <span class="s-card__desc">Czytaj i przeszukuj archiwa poczty z Gmaila, Thunderbirda i Apple Mail.</span>
-        </a></div>
-      </div>
-    </section>
-
     <section class="s-section">
       <div class="s-wrap">
         <h2>Prywatne dzięki samej konstrukcji</h2>
@@ -296,5 +371,6 @@
     </div>
   </footer>
   <script src="/assets/js/site.js?v=21b41bad" defer></script>
+  <script type="module" src="/assets/js/home.js?v=35410f5c"></script>
 </body>
 </html>

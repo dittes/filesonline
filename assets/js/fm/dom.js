@@ -134,7 +134,8 @@ export function dialog({ title, body, footer, size = 'm', className = '' }) {
   const close = value => { result = value; node.close(); };
   node.append(
     el('header.fm-dialog__head', el('h2', title), iconBtn('x', t('Close'), () => close())),
-    bodyEl, footEl);
+    bodyEl);
+  if (footEl) node.append(footEl);
   node.addEventListener('close', () => { node.remove(); resolve(result); });
   node.addEventListener('mousedown', e => { if (e.target === node) close(); });
   document.body.append(node);
@@ -143,14 +144,14 @@ export function dialog({ title, body, footer, size = 'm', className = '' }) {
 }
 
 /** Ask for one line of text. Resolves with the string, or null when cancelled. */
-export function prompt({ title, label, value = '', action = t('Save'), selectStem = false }) {
-  const input = el('input.fm-input', { type: 'text', value, autocomplete: 'off', spellcheck: false });
+export function prompt({ title, label, value = '', action = t('Save'), selectStem = false, type = 'text' }) {
+  const input = el('input.fm-input', { type, value, autocomplete: 'off', spellcheck: false });
   const d = dialog({
     title, size: 's',
     body: el('label.fm-field', el('span.fm-field__label', label), input),
     footer: [btn(t('Cancel'), () => d.close(null)), btn(action, () => submit(), { variant: 'primary' })],
   });
-  const submit = () => { const v = input.value.trim(); if (v) d.close(v); };
+  const submit = () => { const v = type === 'password' ? input.value : input.value.trim(); if (v) d.close(v); };
   input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
   input.focus();
   const dot = value.lastIndexOf('.');
